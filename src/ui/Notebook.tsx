@@ -1,5 +1,6 @@
 import { FAMILY_NAMES, PATTERNS, type Level, type PatternId, type SocketOption } from '../engine'
 import { parseNoteKey } from '../game/progress/progress'
+import { SeenIn } from './SeenIn'
 import { useDialog } from './useDialog'
 
 type Entry = { level: Level; option: SocketOption }
@@ -56,6 +57,7 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
               {PATTERNS[pattern].name} <small>{FAMILY_NAMES[PATTERNS[pattern].family]}</small>
             </h3>
             <p className="gist">{PATTERNS[pattern].gist}</p>
+            <SeenIn info={PATTERNS[pattern].seenIn} />
             {list.map(({ level, option }) => (
               <article key={`${level.id}:${option.note.title}`} className={`note ${option.outcome}`}>
                 <span className="where">
