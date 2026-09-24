@@ -1,9 +1,8 @@
 name: CI
 
+# main se verifica en deploy.yml antes de publicar; aquí, cada pull request.
 on:
   pull_request:
-  push:
-    branches-ignore: [main] # main ya se verifica en deploy.yml
 
 permissions:
   contents: read
