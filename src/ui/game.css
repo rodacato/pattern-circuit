@@ -456,7 +456,7 @@
 .inventory {
   left: 20px;
   bottom: 96px;
-  padding: 12px 14px 14px;
+  padding: 10px 12px 12px;
   animation: rise 0.4s ease-out;
 }
 
@@ -478,7 +478,7 @@
 
 .cartridges {
   flex-wrap: wrap;
-  max-width: 560px;
+  max-width: 480px;
 }
 
 .cartridges {
@@ -490,10 +490,11 @@
   --fam: var(--violet);
   position: relative;
   display: grid;
-  gap: 2px;
-  min-width: 118px;
-  padding: 12px 12px 10px;
+  gap: 1px;
+  min-width: 104px;
+  padding: 9px 10px 7px;
   text-align: left;
+  font-size: 13px;
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -538,7 +539,7 @@
 
 .cartridge .family {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .cartridge:hover {

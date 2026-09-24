@@ -104,7 +104,7 @@ export class NeonStage {
     if (s.circuitVersion !== this.builtVersion) this.build()
     s.update(delta)
     const time = performance.now()
-    const t = worldTransform(this.app.screen, this.bounds, this.view)
+    const t = worldTransform(this.app.screen, this.bounds, this.view, this.inventoryInset())
     this.world.scale.set(t.scale)
     this.world.position.set(t.x, t.y)
     for (const e of s.playback.drainEvents()) this.onEvent(e)
@@ -234,7 +234,7 @@ export class NeonStage {
       e.preventDefault()
       const rect = canvas.getBoundingClientRect()
       const pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top }
-      this.view = zoomAt(this.app.screen, this.bounds, this.view, pointer, Math.exp(-e.deltaY * 0.0015))
+      this.view = zoomAt(this.app.screen, this.bounds, this.view, pointer, Math.exp(-e.deltaY * 0.0015), this.inventoryInset())
     }, { passive: false })
     canvas.addEventListener('dblclick', () => (this.view = { zoom: 1, x: 0, y: 0 }))
   }
@@ -254,6 +254,11 @@ export class NeonStage {
       this.fx.burst(drag.to, C.red, 16, 2.4)
       this.fx.float(at, 'ese cable no resuelve nada aquí', C.red)
     }
+  }
+
+  // Mientras el inventario está abierto, el circuito se encuadra por encima de él.
+  private inventoryInset() {
+    return this.session.inventoryOpen ? 150 : 0
   }
 
   private clientToWorld(clientX: number, clientY: number): Point {

@@ -38,8 +38,9 @@ export type View = { zoom: number; x: number; y: number }
 export const ZOOM_LIMITS = [0.5, 3] as const
 
 // Vista final = encuadre automático × zoom del jugador, desplazada por su paneo.
-export function worldTransform(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View) {
-  const insets = insetsFor(screen)
+export function worldTransform(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, extraBottom = 0) {
+  const base = insetsFor(screen)
+  const insets = { ...base, bottom: base.bottom + (screen.height > 560 ? extraBottom : 0) }
   const scale = fitWorld(screen, bounds, insets).zoom * view.zoom
   const free = screen.height - insets.top - insets.bottom
   return {
@@ -50,11 +51,11 @@ export function worldTransform(screen: { width: number; height: number }, bounds
 }
 
 // Zoom alrededor del puntero: el punto del mundo bajo el cursor no se mueve.
-export function zoomAt(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, pointer: Point, factor: number): View {
-  const before = worldTransform(screen, bounds, view)
+export function zoomAt(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, pointer: Point, factor: number, extraBottom = 0): View {
+  const before = worldTransform(screen, bounds, view, extraBottom)
   const world = { x: (pointer.x - before.x) / before.scale, y: (pointer.y - before.y) / before.scale }
   const zoom = Math.min(ZOOM_LIMITS[1], Math.max(ZOOM_LIMITS[0], view.zoom * factor))
-  const centered = worldTransform(screen, bounds, { zoom, x: 0, y: 0 })
+  const centered = worldTransform(screen, bounds, { zoom, x: 0, y: 0 }, extraBottom)
   return { zoom, x: pointer.x - world.x * centered.scale - centered.x, y: pointer.y - world.y * centered.scale - centered.y }
 }
 
