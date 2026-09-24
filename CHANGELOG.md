@@ -9,6 +9,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ### Added
 
 - **Predecir antes de ver**: al enchufar un patrón el juego pregunta qué hará (resuelve, a medias, no encaja), y antes de un ticket, cuántas piezas habrá que modificar. Después de correr, muestra si acertaste; el Cuaderno lleva la cuenta de predicciones acertadas.
+- **Cambios en el código**: en la comparación, la pestaña "Cambios" del panel muestra qué líneas de Ruby se agregaron o quitaron (con ticket: lo que el ticket obligó a tocar, sin y con patrón).
+
+### Fixed
+
+- En escritorios angostos (1024 px), la tarjeta del nivel ya no tapa la tarjeta de etapa.
 
 ## [1.0.0] - 2026-09-24
 

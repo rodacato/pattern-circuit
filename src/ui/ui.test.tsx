@@ -6,12 +6,14 @@ import { GameSession } from '../game/session/GameSession'
 import { LEVELS } from '../levels'
 import { BriefCard } from './BriefCard'
 import { StageCard } from './cards/StageCard'
+import { CodePanel } from './CodePanel'
 import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
 import { isShortcut } from './shortcuts'
 import { Transport } from './Transport'
 
 afterEach(cleanup)
+Element.prototype.scrollIntoView = () => {} // jsdom no implementa scroll
 
 const session = (id: string, store = new MemoryProgressStore()) => new GameSession(LEVELS.find((l) => l.id === id)!, store)
 const runOut = (s: GameSession) =>
@@ -108,6 +110,24 @@ describe('predicciones', () => {
     fireEvent.click(screen.getByRole('button', { name: 'No encaja aquí' }))
     runOut(s)
     expect(screen.getByRole('status').textContent).toContain('Acertaste')
+  })
+})
+
+describe('CodePanel', () => {
+  it('en la comparación ofrece ver los cambios del código', () => {
+    const s = session('L01-strategy')
+    render(<CodePanel session={s} />)
+    expect(screen.queryByRole('tab', { name: 'Cambios' })).toBeNull()
+    runOut(s)
+    act(() => void s.plug('strategy'))
+    runOut(s)
+    act(() => s.continue())
+    act(() => s.skipPrediction())
+    runOut(s)
+    act(() => s.continue())
+    fireEvent.click(screen.getByRole('tab', { name: 'Cambios' }))
+    expect(screen.getByText(/Lo que cambió con el ticket, con Strategy/)).toBeTruthy()
+    expect(document.querySelectorAll('.line.add').length).toBeGreaterThan(0)
   })
 })
 
