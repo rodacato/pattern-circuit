@@ -126,6 +126,13 @@ Cosas que se dejan así a sabiendas, con su razón:
 - **Patrón nuevo**: añadirlo a `PATTERN_IDS` en `schema.ts` y a `PATTERNS` en `patterns.ts` (con su fuente en `docs/DESIGN.md`), su skin en `render/skins/`, y enseñarlo en algún nivel (los tests lo exigen).
 - **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`. Primitivas actuales: `source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`, `breaker`.
 
+## Temas nuevos
+
+Un **tema** (`levels/tracks.ts`) es un recorrido propio: nombre, capítulos en orden y niveles numerados desde 0. Hoy hay uno, "Patrones de diseño". Los tests ya verifican el orden por tema, y "siguiente nivel" no salta de un tema a otro.
+
+- **Lo que encaja sin tocar el motor**: todo lo que se pueda contar como pulsos que recorren componentes. Por ejemplo, sistemas completos con CQRS, eventos, sagas o microservicios. Un tema así es solo contenido: sus capítulos en `tracks.ts` y sus niveles en `levels/`, con ids únicos. Si hace falta un comportamiento nuevo (por ejemplo, latencia de red entre servicios), se agrega como primitiva, con su test.
+- **Lo que no encaja**: algoritmos (ordenamientos, grafos, estructuras de datos). Necesitan otra visualización (arreglos, árboles, pasos) y otro motor, no pulsos en un circuito. Sería una capa nueva al lado de `engine/`, con su propio render; no está preparada a propósito, para no sumar complejidad que nada usa todavía.
+
 ## Deploy
 
 `vite.config.ts` usa `base: './'`, así que el build es estático y funciona bajo cualquier subruta (`https://<usuario>.github.io/<repo>/`). El workflow [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) corre `npm run check` y publica `dist/` en GitHub Pages en cada push a `main`. El progreso del jugador vive en `localStorage` del navegador.

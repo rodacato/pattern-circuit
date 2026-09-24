@@ -1,20 +1,30 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate, PATTERN_IDS, reachableVariants } from '../engine'
-import { CHAPTERS, LEVELS } from '.'
+import { CHAPTERS, LEVELS, nextLevel, TRACKS, trackOf } from '.'
 import type { Level } from '../engine'
 
 const solution = (l: Level) => l.sockets.map((s) => ({ id: s.id, pattern: s.inventory.find((p) => s.options[p]?.outcome === 'solves')! }))
 
 describe('registro de niveles', () => {
-  it('los niveles van en orden consecutivo desde 0', () => {
-    expect(LEVELS.map((l) => l.order)).toEqual(LEVELS.map((_, i) => i))
+  it.each(TRACKS.map((t) => [t.name, t] as const))('%s: niveles consecutivos desde 0 y capítulos en orden', (_name, track) => {
+    const levels = LEVELS.filter((l) => trackOf(l.chapter) === track)
+    expect(levels.map((l) => l.order)).toEqual(levels.map((_, i) => i))
+    expect([...new Set(levels.map((l) => l.chapter))]).toEqual(Object.keys(track.chapters))
   })
 
-  it('cada nivel pertenece a un capítulo con nombre, y los capítulos avanzan en orden', () => {
+  it('los ids de nivel son únicos (el progreso guardado los usa como clave)', () => {
+    expect(new Set(LEVELS.map((l) => l.id)).size).toBe(LEVELS.length)
+  })
+
+  it('cada capítulo pertenece a un solo tema y cada nivel a un capítulo con nombre', () => {
+    const ids = TRACKS.flatMap((t) => Object.keys(t.chapters))
+    expect(new Set(ids).size).toBe(ids.length)
     for (const l of LEVELS) expect(CHAPTERS[l.chapter], l.id).toBeDefined()
-    const order = Object.keys(CHAPTERS)
-    const seen = [...new Set(LEVELS.map((l) => l.chapter))]
-    expect(seen).toEqual(order)
+  })
+
+  it('el siguiente nivel es el próximo del mismo tema; el último no tiene siguiente', () => {
+    expect(nextLevel(LEVELS[0])).toBe(LEVELS[1])
+    expect(nextLevel(LEVELS.at(-1)!)).toBeUndefined()
   })
 
   it('cada patrón del catálogo se enseña en algún nivel y se puede probar en algún socket', () => {

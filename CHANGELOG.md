@@ -17,6 +17,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Changed
 
+- Los capítulos pertenecen a un **tema** (`levels/tracks.ts`): preparación para sumar recorridos nuevos (por ejemplo, sistemas completos con CQRS, eventos o microservicios) sin tocar el motor.
+
 - La cafetería completa pasa a ser el nivel 26. El progreso guardado con el id anterior se traduce solo.
 
 ### Fixed
