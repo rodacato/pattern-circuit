@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { LEVELS } from '../levels'
-import { GameSession } from './session'
+import { LEVELS } from '../../levels'
+import { GameSession } from './GameSession'
 
 const tutorial = () => new GameSession(LEVELS.find((l) => l.id === 'L00-tutorial')!)
 const runOut = (s: GameSession) => {

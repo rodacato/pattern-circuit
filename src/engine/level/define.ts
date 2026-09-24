@@ -1,7 +1,7 @@
-import { parseCode, resolveRegion, type CodeFile } from './code'
-import { compile } from './compile'
-import { buildCircuit, codeKey, scenarioFor, type Variant } from './level'
-import { LevelDef, type LevelInput } from './schema'
+import { parseCode, resolveRegion, type CodeFile } from '../code/regions'
+import { compile } from '../circuit/compile'
+import { buildCircuit, codeKey, scenarioFor, type Variant } from './variants'
+import { LevelDef, type LevelInput } from '../schema'
 
 export type Level = LevelDef & { codeFiles: Record<string, CodeFile> }
 

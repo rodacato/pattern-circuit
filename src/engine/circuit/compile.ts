@@ -1,6 +1,6 @@
 import { pathLength, wirePath, type Point } from './geometry'
 import { circuitErrors, wireId } from './patch'
-import type { Circuit, NodeDef, WireDef } from './schema'
+import type { Circuit, NodeDef, WireDef } from '../schema'
 
 export type CompiledWire = WireDef & { id: string; path: Point[]; length: number }
 

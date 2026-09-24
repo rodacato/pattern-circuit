@@ -1,4 +1,4 @@
-import type { Predicate } from './schema'
+import type { Predicate } from '../schema'
 import type { Pulse } from './types'
 
 export function matches(p: Predicate, pulse: Pulse): boolean {

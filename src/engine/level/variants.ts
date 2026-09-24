@@ -1,6 +1,6 @@
-import { applyPatch, nodesTouched } from './patch'
-import type { Assertion, Circuit, LevelDef, MetricName, PatternId, Scenario, SocketOption } from './schema'
-import { createSim, runToEnd, type SimConfig } from './sim'
+import { applyPatch, nodesTouched } from '../circuit/patch'
+import type { Assertion, Circuit, LevelDef, MetricName, PatternId, Scenario, SocketOption } from '../schema'
+import { createSim, runToEnd, type SimConfig } from '../sim/sim'
 
 // Una variante es una combinación de decisiones del jugador sobre el circuito base.
 export type Variant = {

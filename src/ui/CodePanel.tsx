@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { resolveRegion } from '../../engine'
-import { highlightRuby, plainTokens, type Token } from '../code/highlight'
-import type { GameSession } from '../session'
+import { resolveRegion } from '../engine'
+import { highlightRuby, plainTokens, type Token } from './code/highlight'
+import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 export function CodePanel({ session }: { session: GameSession }) {
@@ -10,15 +10,15 @@ export function CodePanel({ session }: { session: GameSession }) {
   const activeRef = useSession(session, (s) => s.activeRef)
   const followed = useSession(session, (s) => s.followed)
   const inspected = useSession(session, (s) => (s.inspected ? s.circuit.nodes.get(s.inspected)?.label : undefined))
-  const [tokens, setTokens] = useState<Token[][]>(() => plainTokens(file.text))
+  const [highlighted, setHighlighted] = useState<{ text: string; tokens: Token[][] }>()
+  const tokens = highlighted?.text === file.text ? highlighted.tokens : plainTokens(file.text)
   const body = useRef<HTMLDivElement>(null)
   const region = resolveRegion(file, activeRef)
 
   useEffect(() => {
     let alive = true
-    setTokens(plainTokens(file.text))
     highlightRuby(file.text)
-      .then((t) => alive && setTokens(t))
+      .then((t) => alive && setHighlighted({ text: file.text, tokens: t }))
       .catch(() => {}) // sin resaltado, el código plano sigue siendo legible
     return () => {
       alive = false

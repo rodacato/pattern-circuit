@@ -1,5 +1,5 @@
 // Estado de simulación: JSON plano, clonable, sin referencias al circuito.
-import type { MetricName, PulseShape } from './schema'
+import type { MetricName, PulseShape } from '../schema'
 
 export type PulseLoc =
   | { kind: 'wire'; wireId: string; progress: number } // 0..1 a lo largo del cable

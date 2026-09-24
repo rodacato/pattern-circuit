@@ -1,4 +1,4 @@
-import { SPEEDS, type GameSession } from '../session'
+import { SPEEDS, type GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 export function Transport({ session }: { session: GameSession }) {

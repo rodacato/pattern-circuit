@@ -13,7 +13,7 @@ import {
   type SimEvent,
   type SimState,
   type Variant,
-} from '../engine'
+} from '../../engine'
 
 export type SessionStatus = 'ready' | 'running' | 'done'
 export type ConnectResult = 'repaired' | 'wrong' | 'none'

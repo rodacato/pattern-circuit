@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import type { MetricName } from '../../engine'
-import type { GameSession } from '../session'
+import { useState } from 'react'
+import type { Evaluation, MetricName } from '../engine'
+import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 const METRIC_TEXT: Record<MetricName, string> = {
@@ -18,9 +18,8 @@ const OP_TEXT = { '==': 'debía ser', '<=': 'máximo', '>=': 'mínimo' } as cons
 export function ResultCard({ session, onNext }: { session: GameSession; onNext?: () => void }) {
   const result = useSession(session, (s) => s.result)
   const hint = useSession(session, (s) => s.pendingRepairs[0]?.prompt)
-  const [hidden, setHidden] = useState(false)
-  useEffect(() => setHidden(false), [result])
-  if (!result || hidden) return null
+  const [dismissed, setDismissed] = useState<Evaluation>()
+  if (!result || dismissed === result) return null
 
   if (result.won) {
     return (
@@ -49,7 +48,7 @@ export function ResultCard({ session, onNext }: { session: GameSession; onNext?:
 
   return (
     <div className="result card failed">
-      <button className="close" onClick={() => setHidden(true)} aria-label="Cerrar">
+      <button className="close" onClick={() => setDismissed(result)} aria-label="Cerrar">
         ×
       </button>
       <span className="eyebrow">Algo salió mal</span>

@@ -1,11 +1,9 @@
 import { Application, BlurFilter, Container, FederatedPointerEvent, Graphics, Rectangle, Text } from 'pixi.js'
-import { pointAt, wirePath, type NodeDef, type Point, type Pulse, type SimEvent } from '../../engine'
-import type { GameSession } from '../session'
+import { pointAt, wirePath, type NodeDef, type Point, type SimEvent } from '../engine'
+import type { GameSession } from '../game/session/GameSession'
+import { CELL as CELL_PX, circuitBounds, fitWorld, nearestPulse, NODE_H, NODE_W, nodeAt, nodeCenter, outPort, pulsePosition, toPx } from './layout'
 import { DROP_TEXT, FONT_MONO, FONT_UI, NEON as C, pulseColor } from './theme'
 
-const CELL = 62
-const NODE_W = 112
-const NODE_H = 50
 const PORT_R = 6
 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: number; size: number }
@@ -81,14 +79,11 @@ export class NeonStage {
     this.builtVersion = s.circuitVersion
     this.trails.clear()
     const nodes = [...s.circuit.nodes.values()]
-    this.bounds = {
-      w: Math.max(...nodes.map((n) => n.at[0])) * CELL,
-      h: Math.max(...nodes.map((n) => n.at[1])) * CELL,
-    }
+    this.bounds = circuitBounds(nodes)
 
     const g = this.base.clear()
-    for (let x = -4; x <= this.bounds.w / CELL + 4; x++) {
-      for (let y = -4; y <= this.bounds.h / CELL + 4; y++) g.circle(x * CELL, y * CELL, 1.3).fill({ color: C.grid })
+    for (let x = -4; x <= this.bounds.w / CELL_PX + 4; x++) {
+      for (let y = -4; y <= this.bounds.h / CELL_PX + 4; y++) g.circle(x * CELL_PX, y * CELL_PX, 1.3).fill({ color: C.grid })
     }
     for (const w of s.circuit.wires.values()) {
       const pts = w.path.map(toPx)
@@ -109,7 +104,7 @@ export class NeonStage {
 
   private nodeView(n: NodeDef): Container {
     const box = new Container()
-    const p = toPx({ x: n.at[0], y: n.at[1] })
+    const p = nodeCenter(n)
     box.position.set(p.x, p.y)
     box.eventMode = 'static'
     box.cursor = 'pointer'
@@ -150,13 +145,8 @@ export class NeonStage {
     stage.on('pointerup', () => this.endDrag())
     stage.on('pointerupoutside', () => this.endDrag())
     stage.on('pointerdown', (e: FederatedPointerEvent) => {
-      const at = this.world.toLocal(e.global)
-      let best: { id: number; d: number } | undefined
-      for (const [id, p] of this.positions) {
-        const d = Math.hypot(p.x - at.x, p.y - at.y)
-        if (d < 18 && (!best || d < best.d)) best = { id, d }
-      }
-      if (best) this.session.follow(best.id)
+      const id = nearestPulse(this.positions, this.world.toLocal(e.global))
+      if (id !== undefined) this.session.follow(id)
     })
   }
 
@@ -164,13 +154,10 @@ export class NeonStage {
     const drag = this.drag
     if (!drag) return
     this.drag = undefined
-    const target = [...this.session.circuit.nodes.values()].find((n) => {
-      const p = toPx({ x: n.at[0], y: n.at[1] })
-      return Math.abs(drag.to.x - p.x) <= NODE_W / 2 && Math.abs(drag.to.y - p.y) <= NODE_H / 2
-    })
+    const target = nodeAt(this.session.circuit.nodes.values(), drag.to)
     if (!target) return
     const result = this.session.connect(drag.from, target.id)
-    const at = toPx({ x: target.at[0], y: target.at[1] })
+    const at = nodeCenter(target)
     if (result === 'repaired') {
       this.burst(at, C.green, 30, 3)
       this.float(at, '¡conectado!', C.green)
@@ -181,17 +168,16 @@ export class NeonStage {
   }
 
   private fit() {
-    const { width, height } = this.app.screen
-    const zoom = Math.min(width / (this.bounds.w + CELL * 3.6), height / (this.bounds.h + CELL * 3.4), 1.7)
-    this.world.scale.set(zoom)
-    this.world.position.set(Math.round((width - this.bounds.w * zoom) / 2), Math.round((height - this.bounds.h * zoom) / 2))
+    const fit = fitWorld(this.app.screen, this.bounds)
+    this.world.scale.set(fit.zoom)
+    this.world.position.set(fit.x, fit.y)
   }
 
   private onEvent(e: SimEvent) {
     const s = this.session
     const node = 'nodeId' in e ? s.circuit.nodes.get(e.nodeId) : undefined
     if (!node) return
-    const at = toPx({ x: node.at[0], y: node.at[1] })
+    const at = nodeCenter(node)
     const pulse = 'pulseId' in e ? s.timeline.current.state.pulses.find((p) => p.id === e.pulseId) : undefined
     const color = pulse ? pulseColor(pulse.tags) : C.cyan
     switch (e.type) {
@@ -257,7 +243,7 @@ export class NeonStage {
     const state = s.timeline.current.state
     const connecting = s.pendingRepairs.length > 0
     for (const n of s.circuit.nodes.values()) {
-      const base = toPx({ x: n.at[0], y: n.at[1] })
+      const base = nodeCenter(n)
       const sh = this.shake.get(n.id) ?? 0
       const p = { x: base.x + Math.sin(time / 18) * sh * 5, y: base.y }
       this.views.get(n.id)!.x = p.x
@@ -295,8 +281,7 @@ export class NeonStage {
   }
 
   private overNode(n: NodeDef) {
-    const p = toPx({ x: n.at[0], y: n.at[1] })
-    return !!this.drag && Math.abs(this.drag.to.x - p.x) <= NODE_W / 2 && Math.abs(this.drag.to.y - p.y) <= NODE_H / 2
+    return !!this.drag && nodeAt([n], this.drag.to) !== undefined
   }
 
   // El árbol de if/elsif: una rama por caso más el `else` que pierde pedidos.
@@ -317,9 +302,7 @@ export class NeonStage {
 
   private drawDrag(d: Graphics, gl: Graphics) {
     if (!this.drag) return
-    const n = this.session.circuit.nodes.get(this.drag.from)!
-    const from = toPx({ x: n.at[0], y: n.at[1] })
-    from.x += NODE_W / 2
+    const from = outPort(this.session.circuit.nodes.get(this.drag.from)!)
     d.moveTo(from.x, from.y).lineTo(this.drag.to.x, this.drag.to.y).stroke({ width: 3, color: C.green, cap: 'round' })
     gl.moveTo(from.x, from.y).lineTo(this.drag.to.x, this.drag.to.y).stroke({ width: 8, color: C.green, alpha: 0.6 })
     d.circle(this.drag.to.x, this.drag.to.y, 5).fill({ color: C.green })
@@ -333,7 +316,9 @@ export class NeonStage {
     this.followLabel.visible = false
     for (const p of s.timeline.current.state.pulses) {
       if (p.status !== 'alive') continue
-      const pos = this.pulsePosition(p, prev.get(p.id), perNode)
+      const slot = p.loc.kind === 'wire' ? 0 : (perNode.get(p.loc.nodeId) ?? 0)
+      if (p.loc.kind !== 'wire') perNode.set(p.loc.nodeId, slot + 1)
+      const pos = pulsePosition(s.circuit, p, prev.get(p.id), s.alpha, slot)
       this.positions.set(p.id, pos)
       const color = pulseColor(p.tags)
       const trail = this.trails.get(p.id) ?? []
@@ -356,20 +341,6 @@ export class NeonStage {
         gl.circle(pos.x, pos.y, 14).stroke({ width: 3, color: C.white, alpha: 0.5 })
       }
     }
-  }
-
-  private pulsePosition(p: Pulse, before: Pulse | undefined, perNode: Map<string, number>): Point {
-    const s = this.session
-    if (p.loc.kind === 'wire') {
-      const wire = s.circuit.wires.get(p.loc.wireId)!
-      const from = before?.loc.kind === 'wire' && before.loc.wireId === p.loc.wireId ? before.loc.progress : p.loc.progress
-      return toPx(pointAt(wire.path, from + (p.loc.progress - from) * s.alpha))
-    }
-    const n = s.circuit.nodes.get(p.loc.nodeId)!
-    const k = perNode.get(n.id) ?? 0
-    perNode.set(n.id, k + 1)
-    const c = toPx({ x: n.at[0], y: n.at[1] })
-    return { x: c.x - NODE_W / 2 + 16 + k * 16, y: c.y - NODE_H / 2 }
   }
 
   private drawParticles(d: Graphics, gl: Graphics) {
@@ -411,8 +382,6 @@ export class NeonStage {
     })
   }
 }
-
-const toPx = (p: Point): Point => ({ x: p.x * CELL, y: p.y * CELL })
 
 function dashed(g: Graphics, a: Point, b: Point, dash: number, gap: number, color: number, alpha: number) {
   const len = Math.hypot(b.x - a.x, b.y - a.y)

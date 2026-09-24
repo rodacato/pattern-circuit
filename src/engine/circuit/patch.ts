@@ -1,4 +1,4 @@
-import type { Circuit, GraphPatch, NodeDef, WireDef } from './schema'
+import type { Circuit, GraphPatch, NodeDef, WireDef } from '../schema'
 
 export function wireId(w: WireDef): string {
   if (w.id) return w.id

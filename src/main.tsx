@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import DebugApp from './debug/DebugApp.tsx'
-import GameApp from './game/ui/GameApp.tsx'
+import GameApp from './ui/GameApp.tsx'
 
 const debug = new URLSearchParams(location.search).has('debug')
 

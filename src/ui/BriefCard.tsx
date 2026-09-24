@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { GameSession } from '../session'
+import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 export function BriefCard({ session }: { session: GameSession }) {

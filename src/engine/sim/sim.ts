@@ -1,6 +1,6 @@
-import { compile, type CompiledCircuit, type CompiledWire } from './compile'
+import { compile, type CompiledCircuit, type CompiledWire } from '../circuit/compile'
 import { matches } from './predicate'
-import type { Circuit, NodeDef, Scenario, ScenarioPulse } from './schema'
+import type { Circuit, NodeDef, Scenario, ScenarioPulse } from '../schema'
 import type { DropReason, Pulse, SimEvent, SimState } from './types'
 
 export type SimConfig = {
