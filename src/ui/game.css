@@ -1146,3 +1146,21 @@
   margin-top: 14px;
 }
 
+.seen-in {
+  margin: 6px 0 10px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.seen-in .label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.seen-in a {
+  color: var(--cyan);
+}
+

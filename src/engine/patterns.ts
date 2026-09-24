@@ -1,13 +1,17 @@
 import type { PatternId } from './schema'
+import { SEEN_IN } from './seenIn'
 
 export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture' | 'resilience' | 'principle'
 
-export type PatternInfo = { name: string; family: PatternFamily; gist: string }
+// Dónde aparece en el ecosistema Ruby: un ejemplo real, con la fuente que lo muestra.
+export type SeenIn = { example: string; text: string; url: string }
+
+export type PatternInfo = { name: string; family: PatternFamily; gist: string; seenIn?: SeenIn }
 
 // Catálogo de patrones: nombre visible, familia y la idea en una frase.
 // Familias GoF según Gamma et al. (1994); Null Object es "object structural" según Woolf (1997).
 // Las fuentes de cada patrón están en docs/DESIGN.md.
-export const PATTERNS: Record<PatternId, PatternInfo> = {
+const CATALOG: Record<PatternId, Omit<PatternInfo, 'seenIn'>> = {
   'factory-method': { name: 'Factory Method', family: 'creational', gist: 'Una subclase decide qué objeto crear.' },
   builder: { name: 'Builder', family: 'creational', gist: 'Arma un objeto complejo paso a paso y lo entrega al final con build(), que puede validarlo.' },
   singleton: { name: 'Singleton', family: 'creational', gist: 'Una sola instancia de la clase, con un punto de acceso global.' },
@@ -30,6 +34,10 @@ export const PATTERNS: Record<PatternId, PatternInfo> = {
   'keep-simple': { name: 'Mantenerlo simple', family: 'principle', gist: 'Sin variación real a la vista, la solución directa: el patrón se agrega cuando un cambio lo pida (YAGNI).' },
   saga: { name: 'Saga', family: 'architecture', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
 }
+
+export const PATTERNS = Object.fromEntries(
+  Object.entries(CATALOG).map(([id, info]) => [id, { ...info, seenIn: SEEN_IN[id as PatternId] }]),
+) as Record<PatternId, PatternInfo>
 
 export const FAMILY_NAMES: Record<PatternFamily, string> = {
   creational: 'creacional',

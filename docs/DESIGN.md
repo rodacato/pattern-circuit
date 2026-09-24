@@ -120,6 +120,10 @@ Las familias de los 14 patrones GoF son las del libro (creacional, estructural, 
 
 Dos variantes conviene nombrar: el Builder del nivel 3 es el de Bloch (*Effective Java*, ítem 2: muchos parámetros y `build()` que valida), no el Director de GoF; el Proxy del nivel 9 es un *cache proxy* (POSA 1).
 
+## Dónde lo has visto
+
+Cada patrón muestra un ejemplo real del ecosistema Ruby (stdlib, Rails o una gema conocida) en el Cuaderno y al superar el nivel, con enlace a la documentación o al código que lo muestra. Los ejemplos están en [`src/engine/seenIn.ts`](../src/engine/seenIn.ts) y se verificaron contra esos enlaces; cuando el ejemplo es una variante o un pariente del patrón (STI como fábrica parametrizada, AASM como máquina de estados declarativa, el *process manager* de Rails Event Store como saga), el texto lo dice.
+
 ## Fuentes
 
 El contenido de cada nivel se verificó contra estas fuentes y contra las guías del autor. El juego simplifica, pero no debería contradecir ninguna.

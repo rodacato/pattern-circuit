@@ -146,6 +146,7 @@ describe('Notebook', () => {
     render(<Notebook levels={LEVELS} notes={['L01-strategy:observer', 'L10-observer:observer']} onClose={() => {}} onReset={onReset} />)
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('2 notas de campo')
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1)
+    expect(screen.getByRole('link', { name: /Ver fuente/ }).getAttribute('href')).toContain('Observable')
     vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
     fireEvent.click(screen.getByRole('button', { name: 'Borrar progreso' }))
     expect(onReset).not.toHaveBeenCalled()

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PATTERNS, type Evaluation, type MetricName } from '../../engine'
 import { choiceLabel, isRight, type Prediction } from '../../game/learning/prediction'
 import type { GameSession } from '../../game/session/GameSession'
+import { SeenIn } from '../SeenIn'
 import { useSession } from '../useSession'
 
 const METRIC_TEXT: Record<MetricName, string> = {
@@ -267,9 +268,10 @@ function WinCard({ session, onNext }: { session: GameSession; onNext?: () => voi
       <h2>{!onNext ? '¡Terminaste Pattern Circuit!' : patterns.length ? `Aprendiste ${patterns.map((p) => PATTERNS[p].name).join(' + ')}` : '¡La cafetería funciona!'}</h2>
       {!onNext && <p className="muted">La cafetería entera corre sobre los patrones que fuiste enchufando. Tu cuaderno guarda lo que aprendiste de cada uno, también de los que no encajaban.</p>}
       {patterns.map((p) => (
-        <p key={p} className="muted">
-          {PATTERNS[p].gist}
-        </p>
+        <div key={p}>
+          <p className="muted">{PATTERNS[p].gist}</p>
+          <SeenIn info={PATTERNS[p].seenIn} />
+        </div>
       ))}
       <div className="actions">
         <button onClick={() => session.play()}>Ver de nuevo</button>
