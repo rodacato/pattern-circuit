@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { evaluate, reachableVariants } from '../engine'
+import { evaluate, PATTERN_IDS, reachableVariants } from '../engine'
 import { CHAPTERS, LEVELS } from '.'
 import type { Level } from '../engine'
 
@@ -10,8 +10,16 @@ describe('registro de niveles', () => {
     expect(LEVELS.map((l) => l.order)).toEqual(LEVELS.map((_, i) => i))
   })
 
-  it('cada nivel pertenece a un capítulo con nombre', () => {
+  it('cada nivel pertenece a un capítulo con nombre, y los capítulos avanzan en orden', () => {
     for (const l of LEVELS) expect(CHAPTERS[l.chapter], l.id).toBeDefined()
+    const order = Object.keys(CHAPTERS)
+    const seen = [...new Set(LEVELS.map((l) => l.chapter))]
+    expect(seen).toEqual(order)
+  })
+
+  it('cada patrón del catálogo se enseña en algún nivel y se puede probar en algún socket', () => {
+    const taught = new Set(LEVELS.flatMap((l) => l.sockets.flatMap((s) => s.inventory.filter((p) => s.options[p]?.outcome === 'solves'))))
+    expect(PATTERN_IDS.filter((p) => !taught.has(p))).toEqual([])
   })
 
   it('cada nivel con socket tiene exactamente una opción que resuelve', () => {

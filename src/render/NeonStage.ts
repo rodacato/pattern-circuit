@@ -27,7 +27,7 @@ export class NeonStage {
   private readonly reduced = prefersReducedMotion()
   private readonly fx = new Effects(this.fxLayer, this.reduced)
   private readonly motion = new NodeAnimations(this.reduced)
-  private readonly skins: Partial<Record<PatternId, Skin>> = createSkins()
+  private readonly skins: Record<PatternId, Skin> = createSkins()
   private readonly pulses = new PulseLayer(this.skins)
   private readonly session: GameSession
   private readonly sockets: SocketLayer

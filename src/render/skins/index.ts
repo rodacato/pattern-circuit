@@ -10,7 +10,8 @@ export type { DrawContext, Skin } from './types'
 export { stateColor } from './behavioral'
 
 // Cada stage crea sus skins: el estado de animación (qué cartucho brilla, qué prensa baja) no se comparte.
-export function createSkins(): Partial<Record<PatternId, Skin>> {
+// Record completo: un patrón nuevo sin skin no compila.
+export function createSkins(): Record<PatternId, Skin> {
   return {
     'factory-method': factoryMethod(),
     builder: builder(),
