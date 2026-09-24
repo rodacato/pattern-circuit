@@ -93,6 +93,7 @@ render/
 | Motor | `engine/**/*.test.ts` | unitarios sobre circuitos mínimos (`engine/testing.ts`) |
 | Niveles | `levels/*/level.test.ts` + `levels/levels.test.ts` | comportamiento por patrón + invariantes comunes a todos los niveles |
 | Aplicación | `game/**/*.test.ts` | sesión, flujo y progreso con adaptador en memoria |
+| Código Ruby | `levels/ruby.test.ts` | `ruby -wc` sobre cada archivo que ve el jugador (se omite sin ruby) |
 | Render | `render/layout.test.ts` | geometría pura |
 | Arquitectura | `architecture.test.ts` | reglas de dependencia entre capas |
 
