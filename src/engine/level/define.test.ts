@@ -38,7 +38,7 @@ const input = (overrides: Partial<LevelInput> = {}): LevelInput => ({
 
 describe('defineLevel', () => {
   it('acepta un nivel completo y precompila su código', () => {
-    expect(defineLevel(input()).codeFiles.base.text).toBe('# base')
+    expect(defineLevel(input()).codeFiles.rb.base.text).toBe('# base')
   })
 
   it('las reparaciones parciales también son alcanzables', () => {

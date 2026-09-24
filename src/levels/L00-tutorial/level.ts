@@ -1,6 +1,8 @@
 import { defineLevel } from '../../engine'
 import base from './base.rb?raw'
 import repaired from './repaired.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsRepaired from './ts/repaired.ts?raw'
 
 export default defineLevel({
   id: 'L00-tutorial',
@@ -53,5 +55,5 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 3 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base, repaired } },
+  code: { rb: { base, repaired }, ts: { base: tsBase, repaired: tsRepaired } },
 })

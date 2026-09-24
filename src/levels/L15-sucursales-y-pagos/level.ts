@@ -10,6 +10,15 @@ import crearBuilder from '../L02-factory-method/builder.rb?raw'
 import common from '../L02-factory-method/common.rb?raw'
 import crearFactory from '../L02-factory-method/factory.rb?raw'
 import crearSingleton from '../L02-factory-method/singleton.rb?raw'
+import tsCobrarBase from '../L01-strategy/ts/base.ts?raw'
+import tsCobrarDecorator from '../L01-strategy/ts/decorator.ts?raw'
+import tsCobrarObserver from '../L01-strategy/ts/observer.ts?raw'
+import tsCobrarStrategy from '../L01-strategy/ts/strategy.ts?raw'
+import tsCrearBase from '../L02-factory-method/ts/base.ts?raw'
+import tsCrearBuilder from '../L02-factory-method/ts/builder.ts?raw'
+import tsCommon from '../L02-factory-method/ts/common.ts?raw'
+import tsCrearFactory from '../L02-factory-method/ts/factory.ts?raw'
+import tsCrearSingleton from '../L02-factory-method/ts/singleton.ts?raw'
 
 const MENU: Record<string, string> = { centro: 'latte', playa: 'frappe', montana: 'chocolate' }
 const rightDrink: Predicate = { any: Object.entries(MENU).map(([branch, drink]) => ({ all: [{ hasTag: branch }, { hasTag: `made:${drink}` }] })) }
@@ -182,6 +191,17 @@ export default defineLevel({
       cobrar_strategy: cobrarStrategy,
       cobrar_observer: cobrarObserver,
       cobrar_decorator: cobrarDecorator,
+    },
+    ts: {
+      base: tsCommon,
+      crear_base: tsCrearBase,
+      crear_factory: tsCrearFactory,
+      crear_singleton: tsCrearSingleton,
+      crear_builder: tsCrearBuilder,
+      cobrar_base: tsCobrarBase,
+      cobrar_strategy: tsCobrarStrategy,
+      cobrar_observer: tsCobrarObserver,
+      cobrar_decorator: tsCobrarDecorator,
     },
   },
 })

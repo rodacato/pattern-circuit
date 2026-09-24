@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { CodeLang } from '../engine'
 import { dueItems, reviewItems } from '../game/learning/review'
 import { firstUnfinished, KeyValueProgressStore, MemoryProgressStore, type ProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
@@ -28,11 +29,33 @@ function browserProgressStore(): ProgressStore {
 
 const progressStore = browserProgressStore()
 
+// El lenguaje del código es una preferencia de este navegador, como el idioma.
+const CODE_LANG_KEY = 'pattern-circuit:code'
+const storedCodeLang = (): CodeLang => {
+  try {
+    return window.localStorage.getItem(CODE_LANG_KEY) === 'ts' ? 'ts' : 'rb'
+  } catch {
+    return 'rb'
+  }
+}
+
 export default function GameApp() {
   const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, progressStore.load()).id)
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = nextLevel(LEVELS[index])
-  const session = useMemo(() => new GameSession(LEVELS[index], progressStore), [index])
+  const session = useMemo(() => {
+    const s = new GameSession(LEVELS[index], progressStore)
+    s.codeLang = storedCodeLang()
+    return s
+  }, [index])
+  const codeLang = useSession(session, (s) => s.codeLang)
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CODE_LANG_KEY, codeLang)
+    } catch {
+      // sin almacenamiento, la preferencia dura esta sesión
+    }
+  }, [codeLang])
   const { t, locale, setLocale } = useLocale()
   const host = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<NeonStage>()

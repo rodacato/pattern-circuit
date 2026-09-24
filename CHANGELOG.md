@@ -16,6 +16,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - **Pistas escalonadas**: en vez de la respuesta, primero una pregunta guía según el síntoma, luego la familia del patrón (con las definiciones de GoF), después un descarte y, al final, el patrón.
 - **Táctil y tablet**: pellizcar para zoom, doble toque para encuadrar, blancos más grandes con el dedo y layout vertical (circuito arriba, código abajo) hasta 1000 px. En teléfonos (menos de 600 px) sigue el aviso.
 - **Versión en inglés**: botón ES/EN en la barra superior; toda la interfaz, los 27 niveles, las pistas, las notas y los ejemplos traducidos. El idioma se recuerda en el navegador. Los comentarios del código Ruby siguen en español.
+- **Código en TypeScript**: el panel de código cambia entre Ruby y TypeScript; los 27 niveles cuentan la misma historia en los dos lenguajes. La elección se recuerda en el navegador.
 
 ### Changed
 

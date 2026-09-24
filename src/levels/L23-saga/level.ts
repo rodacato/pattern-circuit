@@ -5,8 +5,14 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import saga from './saga.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommand from './ts/command.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
+import tsSaga from './ts/saga.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const avisar = node('avisar', 'Avisar al cliente', 'Counter', [0, 5], { type: 'sink', expects: { hasTag: 'reembolsado' }, message: '💸 reembolsado y avisado' }, { codeRef: 'Counter#notify' })
 
 export default defineLevel({
@@ -86,5 +92,5 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0, label: 'clientes que pagaron y se quedaron sin nada' },
     { metric: 'invalidAtSink', op: '==', value: 0, label: 'avisos sin reembolso' },
   ],
-  code: { rb: { base: code(base), saga: code(saga), command: code(base + command), observer: code(base + observer) } },
+  code: { rb: { base: code(base), saga: code(saga), command: code(base + command), observer: code(base + observer) }, ts: { base: codeTs(tsBase), saga: codeTs(tsSaga), command: codeTs(tsBase + tsCommand), observer: codeTs(tsBase + tsObserver) } },
 })

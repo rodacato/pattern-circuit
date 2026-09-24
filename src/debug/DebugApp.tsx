@@ -35,7 +35,7 @@ export default function DebugApp() {
   const compiled = useMemo(() => compile(circuit), [circuit])
   const timeline = useMemo(() => new Timeline(createSim(circuit, scenarioFor(level, variant))), [circuit, level, variant])
   const evaluation = useMemo(() => evaluate(level, variant), [level, variant])
-  const code = level.codeFiles[codeKey(level, variant)]
+  const code = level.codeFiles.rb[codeKey(level, variant)]
   const region = resolveRegion(code, activeRef)
 
   const rerender = () => setFrame((f) => f + 1)

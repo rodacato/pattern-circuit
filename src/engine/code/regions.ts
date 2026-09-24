@@ -1,9 +1,10 @@
 // Fragmentos de código con marcadores `# region: Clase#metodo` / `# endregion` (anidables).
+// El marcador es un comentario del lenguaje: `#` en Ruby, `//` en TypeScript.
 export type CodeRegion = { start: number; end: number } // líneas 1-based, inclusivas
 export type CodeFile = { text: string; regions: Record<string, CodeRegion> }
 
-const OPEN = /^\s*#\s*region:\s*(\S+)\s*$/
-const CLOSE = /^\s*#\s*endregion\s*$/
+const OPEN = /^\s*(?:#|\/\/)\s*region:\s*(\S+)\s*$/
+const CLOSE = /^\s*(?:#|\/\/)\s*endregion\s*$/
 
 export function parseCode(source: string): CodeFile {
   const lines: string[] = []

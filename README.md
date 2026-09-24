@@ -1,6 +1,6 @@
 # Pattern Circuit
 
-Juego educativo para entender **patrones de diseño viéndolos, no leyéndolos**. Una cafetería es un circuito de nodos; cada pedido es un pulso de luz que lo recorre. Cuando algo falla (pedidos perdidos, cobros dobles, código que hay que abrir para cada cambio), enchufas un patrón en el socket y ves cómo cambia el recorrido, junto al código Ruby que lo implementa.
+Juego educativo para entender **patrones de diseño viéndolos, no leyéndolos**. Una cafetería es un circuito de nodos; cada pedido es un pulso de luz que lo recorre. Cuando algo falla (pedidos perdidos, cobros dobles, código que hay que abrir para cada cambio), enchufas un patrón en el socket y ves cómo cambia el recorrido, junto al código que lo implementa, en **Ruby o TypeScript**.
 
 - **27 niveles** en 9 capítulos, del tutorial a "la cafetería completa".
 - **20 patrones**: 14 del catálogo GoF, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker y Saga. Y un capítulo para lo contrario: cuándo **no** aplicar uno.
@@ -37,7 +37,7 @@ Está en **español e inglés** (botón ES/EN arriba). El progreso se guarda en 
 
 ## Desarrollo
 
-Requiere Node 22 o superior. Ruby es opcional: si está instalado, los tests verifican la sintaxis de todo el código que ve el jugador.
+Requiere Node 22 o superior. Ruby es opcional: si está instalado, los tests verifican la sintaxis de todo el código Ruby que ve el jugador (la del TypeScript se verifica siempre).
 
 ```bash
 npm install

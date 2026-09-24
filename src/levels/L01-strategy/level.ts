@@ -6,9 +6,17 @@ import decoratorCashier from './decorator.rb?raw'
 import observerCashier from './observer.rb?raw'
 import strategyCashier from './strategy.rb?raw'
 import strategyAppCashier from './strategy_app.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBaseApp from './ts/base_app.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsDecorator from './ts/decorator.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
+import tsStrategyApp from './ts/strategy_app.ts?raw'
 import { withCommon as withCommonCode } from '../kit'
 
 const withCommon = withCommonCode(common)
+const withCommonTs = withCommonCode(tsCommon)
 
 const PAYMENTS = [
   { key: 'cash', id: 'pagoEfectivo', label: 'Efectivo', className: 'CashPayment', row: 0 },
@@ -181,6 +189,14 @@ export default defineLevel({
       strategy_app: withCommon(strategyAppCashier),
       observer: withCommon(observerCashier),
       decorator: withCommon(decoratorCashier),
+    },
+    ts: {
+      base: withCommonTs(tsBase),
+      base_app: withCommonTs(tsBaseApp),
+      strategy: withCommonTs(tsStrategy),
+      strategy_app: withCommonTs(tsStrategyApp),
+      observer: withCommonTs(tsObserver),
+      decorator: withCommonTs(tsDecorator),
     },
   },
 })

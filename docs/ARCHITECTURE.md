@@ -49,6 +49,7 @@ engine/
 
 - Un nivel puede tener **varios sockets**: las variantes alcanzables son el producto cartesiano de lo que se puede enchufar en cada uno, y el código Ruby se compone con `base` + un fragmento por socket. Los niveles de combinación reutilizan los `.rb` de los niveles donde se aprendió cada patrón.
 - `defineLevel` valida el esquema y **todas las variantes alcanzables** (cualquier subconjunto de reparaciones × patrones × tickets): si una no compila, no tiene escenario o apunta a una región de Ruby inexistente, el nivel no carga y el test falla.
+- **Código en varios lenguajes**: `code.rb` (referencia) y `code.ts`, con las mismas claves. Los fragmentos TypeScript viven en `levels/<id>/ts/` (fuera de `tsc` y del lint del proyecto: son ejemplos para mostrar) y usan `// region:` en vez de `# region:`. `defineLevel` valida que cada `codeRef` exista en cada lenguaje, y `typescript.test.ts` comprueba la sintaxis con `ts.transpileModule`, igual que `ruby.test.ts` con `ruby -wc`.
 - Un nivel tiene **como máximo un ticket de cambio**: el flujo tiene una sola etapa "cambio" y el esquema lo impone.
 - El registro (`levels/index.ts`) descubre carpetas con `import.meta.glob`: añadir un nivel no toca ningún otro archivo.
 - `levels/kit.ts` trae ayudantes (`node`, `wire`, `abstract`, `chain`, `pulse`…) para escribir niveles con poco ruido.
@@ -105,6 +106,8 @@ render/
 | Niveles | `levels/*/level.test.ts` + `levels/levels.test.ts` | comportamiento por patrón + invariantes comunes a todos los niveles |
 | Aplicación | `game/**/*.test.ts` | sesión, flujo y progreso con adaptador en memoria |
 | Código Ruby | `levels/ruby.test.ts` | `ruby -wc` sobre cada archivo que ve el jugador (se omite sin ruby) |
+| Código TypeScript | `levels/typescript.test.ts` | sintaxis de cada fragmento TS y que ningún nivel falte |
+| Traducciones | `i18n/coverage.test.ts` | cada texto visible tiene inglés y conserva sus huecos |
 | Render | `render/layout.test.ts`, `render/motion.test.ts` | geometría y animaciones puras |
 | UI | `ui/ui.test.tsx` | componentes con Testing Library (jsdom) sobre una sesión real |
 | Arquitectura | `architecture.test.ts` | reglas de dependencia entre capas |

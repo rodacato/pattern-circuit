@@ -7,8 +7,16 @@ import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import facadePrecalentar from './facade_precalentar.rb?raw'
 import proxy from './proxy.rb?raw'
+import tsAdapter from './ts/adapter.ts?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBasePrecalentar from './ts/base_precalentar.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFacade from './ts/facade.ts?raw'
+import tsFacadePrecalentar from './ts/facade_precalentar.ts?raw'
+import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const step = (id: string, label: string, className: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
   node(id, label, className, at, { type: 'transform', addTags: [tag] }, { codeRef })
 const preheat = (id: string, at: [number, number]) => step(id, 'Precalentar', 'EspressoMachine', 'EspressoMachine#preheat', at, 'precalentado')
@@ -131,6 +139,14 @@ export default defineLevel({
       facade_precalentar: code(facadePrecalentar),
       adapter: code(base + adapter),
       proxy: code(base + proxy),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      base_precalentar: codeTs(tsBasePrecalentar),
+      facade: codeTs(tsFacade),
+      facade_precalentar: codeTs(tsFacadePrecalentar),
+      adapter: codeTs(tsBase + tsAdapter),
+      proxy: codeTs(tsBase + tsProxy),
     },
   },
 })

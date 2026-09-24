@@ -5,8 +5,14 @@ import breaker from './breaker.rb?raw'
 import chainCode from './chain.rb?raw'
 import common from './common.rb?raw'
 import proxy from './proxy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBreaker from './ts/breaker.ts?raw'
+import tsChain from './ts/chain.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const orders = Array.from({ length: 8 }, (_, i) => pulse(i * 90, `Pedido ${i + 1}`))
 const offline = node('offline', 'Pago offline', 'OfflinePayments', [8, 4.5], { type: 'pass' }, { cost: 6, codeRef: 'OfflinePayments#charge' })
 const timeoutMark = (id: string, codeRef: string) =>
@@ -99,5 +105,5 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0 },
     { metric: 'invalidAtSink', op: '<=', value: 3, label: 'clientes que esperaron el timeout' },
   ],
-  code: { rb: { base: code(base), breaker: code(breaker), chain: code(chainCode), proxy: code(base + proxy) } },
+  code: { rb: { base: code(base), breaker: code(breaker), chain: code(chainCode), proxy: code(base + proxy) }, ts: { base: codeTs(tsBase), breaker: codeTs(tsBreaker), chain: codeTs(tsChain), proxy: codeTs(tsBase + tsProxy) } },
 })

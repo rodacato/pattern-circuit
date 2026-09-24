@@ -7,8 +7,16 @@ import busAnalytics from './bus_analytics.rb?raw'
 import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import observer from './observer.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBaseAnalytics from './ts/base_analytics.ts?raw'
+import tsBus from './ts/bus.ts?raw'
+import tsBusAnalytics from './ts/bus_analytics.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFacade from './ts/facade.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const consumer = (id: string, label: string, className: string, y: number) =>
   node(id, label, className, [9, y], { type: 'sink', message: `📨 ${label}` }, { codeRef: `${className}#on_event` })
 
@@ -116,5 +124,5 @@ export default defineLevel({
     { metric: 'delivered', op: '>=', value: 9 },
     { metric: 'nodesTouched', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), base_analytics: code(baseAnalytics), bus: code(bus), bus_analytics: code(busAnalytics), observer: code(observer), facade: code(facade) } },
+  code: { rb: { base: code(base), base_analytics: code(baseAnalytics), bus: code(bus), bus_analytics: code(busAnalytics), observer: code(observer), facade: code(facade) }, ts: { base: codeTs(tsBase), base_analytics: codeTs(tsBaseAnalytics), bus: codeTs(tsBus), bus_analytics: codeTs(tsBusAnalytics), observer: codeTs(tsObserver), facade: codeTs(tsFacade) } },
 })

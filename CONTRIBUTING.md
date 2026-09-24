@@ -40,6 +40,7 @@ npm run coverage # cobertura con umbrales
 1. Crea `src/levels/LNN-nombre/` con:
    - `level.ts`: los datos, con `defineLevel` y los ayudantes de `levels/kit.ts`;
    - los fragmentos `.rb`, con regiones `# region: Clase#metodo` / `# endregion` para cada `codeRef`;
+   - sus equivalentes TypeScript en `ts/`, con las mismas claves, la misma historia línea a línea y regiones `// region:` con los mismos nombres;
    - `level.test.ts`: el comportamiento pedagógico de cada opción ("Observer cobra tres veces", "Strategy + ticket toca 0 nodos");
    - `en.ts`: la traducción al inglés de cada texto del nivel (el test de cobertura de `i18n` dice cuáles faltan).
 2. El registro lo descubre solo. `defineLevel` valida todas las variantes alcanzables y `levels.test.ts` comprueba las invariantes comunes (sin patrón se falla, con el correcto se gana, ningún incorrecto gana…).

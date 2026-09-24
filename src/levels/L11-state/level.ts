@@ -5,8 +5,14 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import state from './state.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommand from './ts/command.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsState from './ts/state.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 
 const STATES = ['pendiente', 'pagado', 'preparando', 'entregado', 'cancelado']
 const TARGET: Record<string, string> = { pagar: 'pagado', preparar: 'preparando', entregar: 'entregado', cancelar: 'cancelado' }
@@ -97,5 +103,8 @@ export default defineLevel({
     { metric: 'invalidAtSink', op: '==', value: 0, label: 'eventos fuera de orden registrados' },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), state: code(state), strategy: code(strategy), command: code(base + command) } },
+  code: {
+    rb: { base: code(base), state: code(state), strategy: code(strategy), command: code(base + command) },
+    ts: { base: codeTs(tsBase), state: codeTs(tsState), strategy: codeTs(tsStrategy), command: codeTs(tsBase + tsCommand) },
+  },
 })

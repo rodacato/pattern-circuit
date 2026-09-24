@@ -5,8 +5,14 @@ import common from './common.rb?raw'
 import { withCommon } from '../kit'
 import decorator from './decorator.rb?raw'
 import factory from './factory.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBuilder from './ts/builder.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsDecorator from './ts/decorator.ts?raw'
+import tsFactory from './ts/factory.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 
 const impossible: Predicate = { all: [{ hasTag: 'caliente' }, { hasTag: 'hielo' }] }
 
@@ -178,6 +184,12 @@ export default defineLevel({
       builder: code(builder),
       factory: code(factory),
       decorator: code(decorator),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      builder: codeTs(tsBuilder),
+      factory: codeTs(tsFactory),
+      decorator: codeTs(tsDecorator),
     },
   },
 })

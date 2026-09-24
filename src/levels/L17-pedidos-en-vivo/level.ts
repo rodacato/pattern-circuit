@@ -9,6 +9,14 @@ import { permissive, strict } from '../L11-state/level'
 import eventosCommand from './events_command.rb?raw'
 import estadosState from '../L11-state/state.rb?raw'
 import eventosBase from '../L13-command/base.rb?raw'
+import tsAvisosBase from '../L10-observer/ts/base.ts?raw'
+import tsAvisosCommon from '../L10-observer/ts/common.ts?raw'
+import tsAvisosObserver from '../L10-observer/ts/observer.ts?raw'
+import tsEstadosBase from '../L11-state/ts/base.ts?raw'
+import tsEstadosCommon from '../L11-state/ts/common.ts?raw'
+import tsEstadosState from '../L11-state/ts/state.ts?raw'
+import tsEventosBase from '../L13-command/ts/base.ts?raw'
+import tsEventosCommand from './ts/events_command.ts?raw'
 
 const notFuera = { not: { hasTag: 'fuera-de-orden' } }
 const event = (at: number, name: string, cmd: number, label = name) => pulse(at, label, ['cmd:evento', name], { cmd }, 'eventos')
@@ -149,6 +157,15 @@ export default defineLevel({
       estados_state: estadosState,
       avisos_base: avisosBase,
       avisos_observer: avisosObserver,
+    },
+    ts: {
+      base: `${tsEstadosCommon}\n${tsAvisosCommon}`,
+      eventos_base: tsEventosBase,
+      eventos_command: tsEventosCommand,
+      estados_base: tsEstadosBase,
+      estados_state: tsEstadosState,
+      avisos_base: tsAvisosBase,
+      avisos_observer: tsAvisosObserver,
     },
   },
 })

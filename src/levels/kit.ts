@@ -35,6 +35,6 @@ export const pulse = (at: number, label: string, tags: string[] = [], data: Reco
 
 // El código común va antes del bloque de wiring, para que las clases existan cuando se instancian.
 export const withCommon = (common: string) => (code: string) => {
-  const wiring = code.indexOf('# region: wiring')
+  const wiring = code.search(/^(?:#|\/\/) region: wiring/m)
   return wiring < 0 ? `${code}\n${common}` : `${code.slice(0, wiring)}${common}\n${code.slice(wiring)}`
 }

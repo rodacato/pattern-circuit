@@ -1,5 +1,6 @@
 import {
   buildCircuit,
+  CODE_LANGS,
   codeKey,
   diffLines,
   diffStats,
@@ -8,6 +9,7 @@ import {
   scenarioFor,
   score,
   type ChangeTicket,
+  type CodeLang,
   type DiffLine,
   type Evaluation,
   type Level,
@@ -74,8 +76,29 @@ export class GameSession {
     return variantFor(this.level, this.flow, this.repairs)
   }
 
+  // Lenguaje del panel de código; si el nivel no lo trae, se muestra Ruby.
+  codeLang: CodeLang = 'rb'
+
+  setCodeLang(lang: CodeLang) {
+    this.codeLang = lang
+    this.emitter.emit()
+  }
+
+  get availableCodeLangs(): CodeLang[] {
+    return CODE_LANGS.filter((lang) => Object.keys(this.level.codeFiles[lang]).length > 0)
+  }
+
+  // El lenguaje que de verdad se muestra (Ruby si el nivel no trae el elegido).
+  get shownCodeLang(): CodeLang {
+    return this.availableCodeLangs.includes(this.codeLang) ? this.codeLang : 'rb'
+  }
+
+  private get files() {
+    return this.level.codeFiles[this.shownCodeLang]
+  }
+
   get codeFile() {
-    return this.level.codeFiles[codeKey(this.level, this.variant)]
+    return this.files[codeKey(this.level, this.variant)]
   }
 
   get sockets(): SocketDef[] {
@@ -119,7 +142,7 @@ export class GameSession {
   // que se está mirando (sin o con patrón); sin ticket, del código sin patrón al código con patrón.
   get codeChange(): CodeChange | undefined {
     if (this.flow.stage !== 'compare' && this.flow.stage !== 'complete') return undefined
-    const code = (stage: FlowState['stage'], side: Side) => this.level.codeFiles[codeKey(this.level, variantFor(this.level, { ...this.flow, stage, side }, this.repairs))]
+    const code = (stage: FlowState['stage'], side: Side) => this.files[codeKey(this.level, variantFor(this.level, { ...this.flow, stage, side }, this.repairs))]
     const side = this.flow.side
     const names = this.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
     // 'observe' = circuito base y 'choose' = con patrón, ambos sin ticket; 'compare' = el lado elegido, con ticket.

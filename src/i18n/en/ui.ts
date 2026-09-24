@@ -18,6 +18,8 @@ export const UI: Catalog = {
   'pulso #{id}': 'pulse #{id}',
   'nodo · {label}': 'node · {label}',
   'Código Ruby del circuito': 'Ruby code for the circuit',
+  'Código TypeScript del circuito': 'TypeScript code for the circuit',
+  'Lenguaje del código': 'Code language',
   'Haz clic en un nodo o en un pulso para seguir su código.': 'Click a node or a pulse to follow its code.',
   'Cambiar idioma': 'Cambiar idioma (switch to Spanish)',
   'Repasa problemas de niveles ya completados': 'Review problems from levels you already completed',

@@ -5,8 +5,14 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommand from './ts/command.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 
 export default defineLevel({
   id: 'L13-command',
@@ -97,5 +103,8 @@ export default defineLevel({
     { metric: 'cancelled', op: '==', value: 1 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), command: code(command), strategy: code(base + strategy), observer: code(base + observer) } },
+  code: {
+    rb: { base: code(base), command: code(command), strategy: code(base + strategy), observer: code(base + observer) },
+    ts: { base: codeTs(tsBase), command: codeTs(tsCommand), strategy: codeTs(tsBase + tsStrategy), observer: codeTs(tsBase + tsObserver) },
+  },
 })

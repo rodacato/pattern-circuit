@@ -7,8 +7,16 @@ import common from './common.rb?raw'
 import strategy from './strategy.rb?raw'
 import template from './template.rb?raw'
 import templateManga from './template_manga.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBaseManga from './ts/base_manga.ts?raw'
+import tsBuilder from './ts/builder.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
+import tsTemplate from './ts/template.ts?raw'
+import tsTemplateManga from './ts/template_manga.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const step = (id: string, label: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
   node(id, label, codeRef.split('#')[0], at, { type: 'transform', addTags: [tag] }, { codeRef })
 const skeleton = (id: string, label: string, codeRef: string, x: number, tag: string) => skinned('template-method', step(id, label, codeRef, [x, 2], tag))
@@ -150,6 +158,14 @@ export default defineLevel({
       template_manga: code(templateManga),
       strategy: code(strategy),
       builder: code(builder),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      base_manga: codeTs(tsBaseManga),
+      template: codeTs(tsTemplate),
+      template_manga: codeTs(tsTemplateManga),
+      strategy: codeTs(tsStrategy),
+      builder: codeTs(tsBuilder),
     },
   },
 })

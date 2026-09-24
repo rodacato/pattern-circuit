@@ -1,9 +1,10 @@
 import { parseCode, resolveRegion, type CodeFile } from '../code/regions'
 import { compile } from '../circuit/compile'
 import { buildCircuit, codeKey, scenarioFor, solvesAll, type Plug, type Variant } from './variants'
-import { LevelDef, type LevelInput } from '../schema'
+import { CODE_LANGS, LevelDef, type CodeLang, type LevelInput } from '../schema'
 
-export type Level = LevelDef & { codeFiles: Record<string, CodeFile> }
+// codeFiles[lenguaje][clave]: los lenguajes que el nivel no trae quedan vacíos.
+export type Level = LevelDef & { codeFiles: Record<CodeLang, Record<string, CodeFile>> }
 
 // Las reparaciones se hacen de a una, en cualquier orden: cualquier subconjunto es alcanzable.
 const subsets = <T>(items: T[]): T[][] => items.reduce<T[][]>((acc, x) => acc.flatMap((s) => [s, [...s, x]]), [[]])
@@ -30,14 +31,20 @@ export function reachableVariants(level: LevelDef): Variant[] {
 export function defineLevel(input: LevelInput): Level {
   const level = LevelDef.parse(input)
   const errors: string[] = []
-  const codeFiles: Record<string, CodeFile> = {}
+  const codeFiles = Object.fromEntries(CODE_LANGS.map((lang) => [lang, {}])) as Level['codeFiles']
+  const langs = CODE_LANGS.filter((lang) => level.code[lang])
 
-  for (const [key, source] of Object.entries(level.code.rb)) {
-    try {
-      codeFiles[key] = parseCode(source)
-    } catch (e) {
-      errors.push(`código ${key}: ${(e as Error).message}`)
+  for (const lang of langs) {
+    const sources = level.code[lang]!
+    for (const [key, source] of Object.entries(sources)) {
+      try {
+        codeFiles[lang][key] = parseCode(source)
+      } catch (e) {
+        errors.push(`código ${lang}/${key}: ${(e as Error).message}`)
+      }
     }
+    // Otro lenguaje cuenta la misma historia: los mismos fragmentos que en Ruby.
+    for (const key of Object.keys(level.code.rb)) if (!(key in sources)) errors.push(`código ${lang}: falta ${key}`)
   }
   for (const socket of level.sockets) {
     for (const pattern of socket.inventory) {
@@ -56,15 +63,17 @@ export function defineLevel(input: LevelInput): Level {
       compile(circuit)
       scenarioFor(level, v)
       const key = codeKey(level, v)
-      if (!codeFiles[key] && key.includes('+')) codeFiles[key] = parseCode(key.split('+').map((k) => level.code.rb[k] ?? '').join('\n'))
-      const file = codeFiles[key]
-      if (!file) {
-        errors.push(`${label}: falta el código ${codeKey(level, v)}`)
-        continue
-      }
-      for (const n of circuit.nodes) {
-        if (n.codeRef && !resolveRegion(file, n.codeRef)) {
-          errors.push(`${label}: ${n.id} apunta a ${n.codeRef}, que no está en ${codeKey(level, v)}`)
+      for (const lang of langs) {
+        const files = codeFiles[lang]
+        if (!files[key] && key.includes('+')) files[key] = parseCode(key.split('+').map((k) => level.code[lang]![k] ?? '').join('\n'))
+        const file = files[key]
+        const where = lang === 'rb' ? key : `${lang}/${key}`
+        if (!file) {
+          errors.push(`${label}: falta el código ${where}`)
+          continue
+        }
+        for (const n of circuit.nodes) {
+          if (n.codeRef && !resolveRegion(file, n.codeRef)) errors.push(`${label}: ${n.id} apunta a ${n.codeRef}, que no está en ${where}`)
         }
       }
     } catch (e) {
