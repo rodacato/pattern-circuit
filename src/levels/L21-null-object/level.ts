@@ -6,8 +6,15 @@ import common from './common.rb?raw'
 import decorator from './decorator.rb?raw'
 import nullObject from './null_object.rb?raw'
 import proxy from './proxy.rb?raw'
+import tsAdapter from './ts/adapter.ts?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsDecorator from './ts/decorator.ts?raw'
+import tsNullObject from './ts/null_object.ts?raw'
+import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const usesCard = (id: string, label: string, className: string, codeRef: string, x: number): NodeInput =>
   node(id, label, className, [x, 2], { type: 'guard', require: { not: { hasTag: 'tarjeta:nil' } }, onFail: 'drop' }, { codeRef })
 
@@ -83,5 +90,5 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 4 },
     { metric: 'dropped', op: '==', value: 0, label: 'pedidos que explotaron con NoMethodError' },
   ],
-  code: { rb: { base: code(base), null_object: code(nullObject), decorator: code(base + decorator), proxy: code(base + proxy), adapter: code(base + adapter) } },
+  code: { rb: { base: code(base), null_object: code(nullObject), decorator: code(base + decorator), proxy: code(base + proxy), adapter: code(base + adapter) }, ts: { base: codeTs(tsBase), null_object: codeTs(tsNullObject), decorator: codeTs(tsBase + tsDecorator), proxy: codeTs(tsBase + tsProxy), adapter: codeTs(tsBase + tsAdapter) } },
 })

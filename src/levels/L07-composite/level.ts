@@ -5,8 +5,14 @@ import common from './common.rb?raw'
 import composite from './composite.rb?raw'
 import decorator from './decorator.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsComposite from './ts/composite.ts?raw'
+import tsDecorator from './ts/decorator.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const leaf = (id: string, label: string, at: [number, number]) => skinned('composite', node(id, label, 'Product', at, { type: 'pass' }, { codeRef: 'Product#make' }))
 
 export default defineLevel({
@@ -116,6 +122,12 @@ export default defineLevel({
       composite: code(composite),
       decorator: code(base + decorator),
       strategy: code(base + strategy),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      composite: codeTs(tsComposite),
+      decorator: codeTs(tsBase + tsDecorator),
+      strategy: codeTs(tsBase + tsStrategy),
     },
   },
 })

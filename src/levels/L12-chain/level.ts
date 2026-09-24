@@ -7,8 +7,16 @@ import chainSupervisor from './chain_supervisor.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBaseSupervisor from './ts/base_supervisor.ts?raw'
+import tsChain from './ts/chain.ts?raw'
+import tsChainSupervisor from './ts/chain_supervisor.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const handler = (id: string, label: string, className: string, at: [number, number], amount: string): NodeInput =>
   skinned('chain-of-responsibility', node(id, label, className, at, { type: 'guard', require: { hasTag: `monto:${amount}` }, onFail: 'next' }, { codeRef: `${className}#handle` }))
 const next = (from: string, to: string) => ({ ...abstract(from, to), port: 'next' })
@@ -151,6 +159,14 @@ export default defineLevel({
       chain_supervisor: code(chainSupervisor),
       strategy: code(strategy),
       observer: code(observer),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      base_supervisor: codeTs(tsBaseSupervisor),
+      chain: codeTs(tsChain),
+      chain_supervisor: codeTs(tsChainSupervisor),
+      strategy: codeTs(tsStrategy),
+      observer: codeTs(tsObserver),
     },
   },
 })

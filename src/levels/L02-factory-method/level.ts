@@ -7,8 +7,16 @@ import { withCommon } from '../kit'
 import factory from './factory.rb?raw'
 import factoryPuerto from './factory_puerto.rb?raw'
 import singleton from './singleton.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBasePuerto from './ts/base_puerto.ts?raw'
+import tsBuilder from './ts/builder.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFactory from './ts/factory.ts?raw'
+import tsFactoryPuerto from './ts/factory_puerto.ts?raw'
+import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 
 // Cada sucursal tiene su bebida; entregar otra es un pedido equivocado.
 const MENU: Record<string, string> = { centro: 'latte', playa: 'frappe', montana: 'chocolate', puerto: 'te' }
@@ -196,6 +204,14 @@ export default defineLevel({
       factory_puerto: code(factoryPuerto),
       singleton: code(singleton),
       builder: code(builder),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      base_puerto: codeTs(tsBasePuerto),
+      factory: codeTs(tsFactory),
+      factory_puerto: codeTs(tsFactoryPuerto),
+      singleton: codeTs(tsSingleton),
+      builder: codeTs(tsBuilder),
     },
   },
 })

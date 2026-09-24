@@ -9,6 +9,15 @@ import extrasAdapter from './extras_adapter.rb?raw'
 import extrasBase from './extras_base.rb?raw'
 import extrasDecorator from './extras_decorator.rb?raw'
 import extrasSingleton from './extras_singleton.rb?raw'
+import tsComboBase from '../L07-composite/ts/base.ts?raw'
+import tsCommon from '../L07-composite/ts/common.ts?raw'
+import tsComboComposite from '../L07-composite/ts/composite.ts?raw'
+import tsComboStrategy from '../L07-composite/ts/strategy.ts?raw'
+import tsComboFacade from './ts/combo_facade.ts?raw'
+import tsExtrasAdapter from './ts/extras_adapter.ts?raw'
+import tsExtrasBase from './ts/extras_base.ts?raw'
+import tsExtrasDecorator from './ts/extras_decorator.ts?raw'
+import tsExtrasSingleton from './ts/extras_singleton.ts?raw'
 
 const EXTRAS = ['avena', 'shot']
 const extrasApplied: Predicate = { all: EXTRAS.map((e) => ({ any: [{ not: { hasTag: e } }, { hasTag: `+${e}` }] })) }
@@ -165,6 +174,17 @@ export default defineLevel({
       extras_decorator: extrasDecorator,
       extras_adapter: extrasBase + extrasAdapter,
       extras_singleton: extrasBase + extrasSingleton,
+    },
+    ts: {
+      base: tsCommon,
+      combo_base: tsComboBase,
+      combo_composite: tsComboComposite,
+      combo_strategy: tsComboBase + tsComboStrategy,
+      combo_facade: tsComboBase + tsComboFacade,
+      extras_base: tsExtrasBase,
+      extras_decorator: tsExtrasDecorator,
+      extras_adapter: tsExtrasBase + tsExtrasAdapter,
+      extras_singleton: tsExtrasBase + tsExtrasSingleton,
     },
   },
 })

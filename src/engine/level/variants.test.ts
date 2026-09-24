@@ -56,7 +56,7 @@ describe('niveles con varios sockets', () => {
   it('compone el código con la base y un fragmento por socket', () => {
     expect(codeKey(level, {})).toBe('base+a_vacio+b_vacio')
     expect(codeKey(level, both)).toBe('base+a_ok+b_ok')
-    expect(level.codeFiles['base+a_mal+b_vacio'].text).toBe('# base\n# a×\n# b?')
+    expect(level.codeFiles.rb['base+a_mal+b_vacio'].text).toBe('# base\n# a×\n# b?')
   })
 
   it('las variantes cubren todas las combinaciones y el ticket solo sobre base o solución completa', () => {

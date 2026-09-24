@@ -5,8 +5,14 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import eventBus from './event_bus.rb?raw'
 import simple from './simple.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommand from './ts/command.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsEventBus from './ts/event_bus.ts?raw'
+import tsSimple from './ts/simple.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const PIECES = 5 // avisar a la cocina no necesita piezas nuevas: basta un cable
 
 export default defineLevel({
@@ -82,5 +88,8 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0 },
     { metric: 'nodes', op: '<=', value: PIECES },
   ],
-  code: { rb: { base: code(base), simple: code(simple), event_bus: code(eventBus), command: code(command) } },
+  code: {
+    rb: { base: code(base), simple: code(simple), event_bus: code(eventBus), command: code(command) },
+    ts: { base: codeTs(tsBase), simple: codeTs(tsSimple), event_bus: codeTs(tsEventBus), command: codeTs(tsCommand) },
+  },
 })

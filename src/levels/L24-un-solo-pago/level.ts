@@ -5,8 +5,14 @@ import common from './common.rb?raw'
 import factory from './factory.rb?raw'
 import simple from './simple.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFactory from './ts/factory.ts?raw'
+import tsSimple from './ts/simple.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const PIECES = 5 // las piezas que ya tiene el circuito: arreglar el cobro no necesita más
 
 export default defineLevel({
@@ -86,5 +92,8 @@ export default defineLevel({
     { metric: 'invalidAtSink', op: '==', value: 0, label: 'cobros con el IVA doble' },
     { metric: 'nodes', op: '<=', value: PIECES },
   ],
-  code: { rb: { base: code(base), simple: code(simple), strategy: code(strategy), factory: code(factory) } },
+  code: {
+    rb: { base: code(base), simple: code(simple), strategy: code(strategy), factory: code(factory) },
+    ts: { base: codeTs(tsBase), simple: codeTs(tsSimple), strategy: codeTs(tsStrategy), factory: codeTs(tsFactory) },
+  },
 })

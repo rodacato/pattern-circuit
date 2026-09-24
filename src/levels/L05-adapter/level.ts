@@ -5,8 +5,14 @@ import base from './base.rb?raw'
 import common from './common.rb?raw'
 import decorator from './decorator.rb?raw'
 import facade from './facade.rb?raw'
+import tsAdapter from './ts/adapter.ts?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsDecorator from './ts/decorator.ts?raw'
+import tsFacade from './ts/facade.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 
 export default defineLevel({
   id: 'L05-adapter',
@@ -92,5 +98,8 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 3 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), adapter: code(adapter), decorator: code(decorator), facade: code(facade) } },
+  code: {
+    rb: { base: code(base), adapter: code(adapter), decorator: code(decorator), facade: code(facade) },
+    ts: { base: codeTs(tsBase), adapter: codeTs(tsAdapter), decorator: codeTs(tsDecorator), facade: codeTs(tsFacade) },
+  },
 })

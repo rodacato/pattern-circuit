@@ -5,8 +5,14 @@ import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import proxy from './proxy.rb?raw'
 import singleton from './singleton.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFacade from './ts/facade.ts?raw'
+import tsProxy from './ts/proxy.ts?raw'
+import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const items = ['café', 'leche', 'café', 'café', 'leche', 'café']
 
 export default defineLevel({
@@ -85,5 +91,6 @@ export default defineLevel({
   ],
   code: {
     rb: { base: code(base), proxy: code(proxy), singleton: code(singleton), facade: code(facade) },
+    ts: { base: codeTs(tsBase), proxy: codeTs(tsProxy), singleton: codeTs(tsSingleton), facade: codeTs(tsFacade) },
   },
 })

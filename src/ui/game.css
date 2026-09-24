@@ -1231,3 +1231,26 @@
   }
 }
 
+.lang-switch {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 8px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.lang-switch button {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.lang-switch button.on {
+  background: var(--panel-2);
+  color: var(--text);
+}
+

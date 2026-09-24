@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { collapse, resolveRegion } from '../engine'
-import { highlightRuby, plainTokens, type Token } from './code/highlight'
+import { collapse, resolveRegion, type CodeLang } from '../engine'
+import { highlight, plainTokens, type Token } from './code/highlight'
 import type { GameSession } from '../game/session/GameSession'
 import { prefersReducedMotion } from '../render/motion'
 import { msg } from '../i18n'
@@ -65,7 +65,8 @@ function CodeDiff({ session }: { session: GameSession }) {
 
 function CodeView({ session }: { session: GameSession }) {
   const t = useT()
-  const fileName = 'cafeteria.rb'
+  const lang = useSession(session, (s) => s.shownCodeLang)
+  const fileName = `cafeteria.${lang}`
   const file = useSession(session, (s) => s.codeFile)
   const activeRef = useSession(session, (s) => s.playback.activeRef)
   const followed = useSession(session, (s) => s.playback.followed)
@@ -77,13 +78,13 @@ function CodeView({ session }: { session: GameSession }) {
 
   useEffect(() => {
     let alive = true
-    highlightRuby(file.text)
+    highlight(file.text, lang)
       .then((t) => alive && setHighlighted({ text: file.text, tokens: t }))
       .catch(() => {}) // sin resaltado, el código plano sigue siendo legible
     return () => {
       alive = false
     }
-  }, [file.text])
+  }, [file.text, lang])
 
   useEffect(() => {
     body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
@@ -95,6 +96,7 @@ function CodeView({ session }: { session: GameSession }) {
     <>
       <div className="code-head">
         <span className="file">{fileName}</span>
+        <LangSwitch session={session} />
         {activeRef && (
           <span className="ref">
             {source && <em>{source}</em>}
@@ -102,7 +104,7 @@ function CodeView({ session }: { session: GameSession }) {
           </span>
         )}
       </div>
-      <div className="code-body" ref={body} tabIndex={0} aria-label={t('Código Ruby del circuito')}>
+      <div className="code-body" ref={body} tabIndex={0} aria-label={t(lang === 'rb' ? 'Código Ruby del circuito' : 'Código TypeScript del circuito')}>
         {tokens.map((line, i) => {
           const on = !!region && i + 1 >= region.start && i + 1 <= region.end
           return (
@@ -125,3 +127,23 @@ function CodeView({ session }: { session: GameSession }) {
     </>
   )
 }
+
+const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript' }
+
+// El mismo circuito contado en otro lenguaje: la preferencia la guarda GameApp para los niveles siguientes.
+function LangSwitch({ session }: { session: GameSession }) {
+  const t = useT()
+  const shown = useSession(session, (s) => s.shownCodeLang)
+  const langs = session.availableCodeLangs
+  if (langs.length < 2) return null
+  return (
+    <span className="lang-switch" role="group" aria-label={t('Lenguaje del código')}>
+      {langs.map((lang) => (
+        <button key={lang} className={lang === shown ? 'on' : ''} aria-pressed={lang === shown} onClick={() => session.setCodeLang(lang)}>
+          {LANG_NAME[lang]}
+        </button>
+      ))}
+    </span>
+  )
+}
+

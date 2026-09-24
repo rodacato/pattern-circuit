@@ -8,7 +8,7 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   optimizeDeps: {
-    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/themes/tokyo-night.mjs'],
+    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs'],
   },
   build: {
     // La gramática de Ruby de Shiki (~1.9 MB, se carga bajo demanda) supera el aviso por defecto.

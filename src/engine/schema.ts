@@ -2,6 +2,9 @@
 // motor se infieren de aquí y el loader valida cada nivel contra este esquema.
 import { z } from 'zod'
 
+export const CODE_LANGS = ['rb', 'ts'] as const
+export type CodeLang = (typeof CODE_LANGS)[number]
+
 export const PULSE_SHAPES = ['circle', 'square', 'triangle', 'diamond'] as const
 export const PATTERN_IDS = [
   'factory-method', 'builder', 'singleton',
@@ -215,7 +218,8 @@ export const LevelDef = z.object({
   changeTickets: z.array(ChangeTicket).max(1).default([]), // el flujo del nivel tiene una sola etapa de cambio
   winWhen: z.array(Assertion).default([]),
   checklist: z.array(ChecklistItem).default([]),
-  code: z.object({ rb: z.record(z.string(), z.string()) }), // { base, strategy, ... }
+  // Un fragmento por clave ({ base, strategy, … }) en cada lenguaje; Ruby es el de referencia.
+  code: z.object({ rb: z.record(z.string(), z.string()), ts: z.record(z.string(), z.string()).optional() }),
 })
 
 export type PulseShape = z.infer<typeof PulseShape>

@@ -5,8 +5,14 @@ import common from './common.rb?raw'
 import factory from './factory.rb?raw'
 import singleton from './singleton.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsFactory from './ts/factory.ts?raw'
+import tsSingleton from './ts/singleton.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const counter = (id: string, at: [number, number], key: string, fresh = false, codeRef = 'TicketCounter#next') =>
   node(id, 'Contador', 'TicketCounter', at, { type: 'counter', key, field: 'ticket', fresh }, { codeRef })
 
@@ -102,5 +108,8 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 6 },
     { metric: 'invalidAtSink', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), singleton: code(singleton), factory: code(factory), strategy: code(strategy) } },
+  code: {
+    rb: { base: code(base), singleton: code(singleton), factory: code(factory), strategy: code(strategy) },
+    ts: { base: codeTs(tsBase), singleton: codeTs(tsSingleton), factory: codeTs(tsFactory), strategy: codeTs(tsStrategy) },
+  },
 })

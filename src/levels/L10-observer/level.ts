@@ -7,8 +7,16 @@ import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import observerCocina from './observer_cocina.rb?raw'
 import strategy from './strategy.rb?raw'
+import tsBase from './ts/base.ts?raw'
+import tsBaseCocina from './ts/base_cocina.ts?raw'
+import tsChain from './ts/chain.ts?raw'
+import tsCommon from './ts/common.ts?raw'
+import tsObserver from './ts/observer.ts?raw'
+import tsObserverCocina from './ts/observer_cocina.ts?raw'
+import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
+const codeTs = withCommon(tsCommon)
 const subscriber = (id: string, label: string, className: string, y: number) =>
   node(id, label, className, [10, y], { type: 'sink', message: `🔔 ${label} avisada` }, { codeRef: `${className}#update` })
 
@@ -104,6 +112,14 @@ export default defineLevel({
       observer_cocina: code(observerCocina),
       strategy: code(strategy),
       chain: code(chainCode),
+    },
+    ts: {
+      base: codeTs(tsBase),
+      base_cocina: codeTs(tsBaseCocina),
+      observer: codeTs(tsObserver),
+      observer_cocina: codeTs(tsObserverCocina),
+      strategy: codeTs(tsStrategy),
+      chain: codeTs(tsChain),
     },
   },
 })
