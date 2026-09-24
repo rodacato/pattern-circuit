@@ -186,7 +186,7 @@ export class NeonStage {
     sub.anchor.set(0.5, 0)
     sub.y = 6
     box.addChild(title, sub)
-    if (n.behavior.type === 'machine') {
+    if (n.behavior.type === 'machine' || n.behavior.type === 'breaker') {
       const current = label('', 11, C.bg, FONT_UI, '700')
       current.anchor.set(0.5)
       current.y = NODE_H / 2 + 13
@@ -399,11 +399,12 @@ export class NeonStage {
     }
   }
 
-  // Toda máquina muestra su estado actual en una etiqueta del color de ese estado.
+  // Máquinas e interruptores muestran su estado actual en una etiqueta del color de ese estado.
   private drawMachineState(d: Graphics, gl: Graphics, n: NodeDef, p: Point, h: number) {
     const text = this.stateLabels.get(n.id)
-    if (!text || n.behavior.type !== 'machine') return
-    const current = this.session.playback.timeline.current.state.nodeState[n.id] ?? n.behavior.initial
+    if (!text || (n.behavior.type !== 'machine' && n.behavior.type !== 'breaker')) return
+    const initial = n.behavior.type === 'machine' ? n.behavior.initial : 'cerrado'
+    const current = this.session.playback.timeline.current.state.nodeState[n.id] ?? initial
     const color = stateColor(current)
     text.text = current
     const w = text.width + 16

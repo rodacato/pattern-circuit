@@ -2,6 +2,7 @@ import type { PatternId } from '../../engine'
 import { chainOfResponsibility, command, observer, state, strategy, templateMethod } from './behavioral'
 import { builder, factoryMethod, singleton } from './creational'
 import { cqrs, eventBus, portsAndAdapters } from './architecture'
+import { circuitBreaker, nullObject, saga } from './resilience'
 import { adapter, composite, decorator, facade, proxy } from './structural'
 import type { Skin } from './types'
 
@@ -28,5 +29,8 @@ export function createSkins(): Partial<Record<PatternId, Skin>> {
     'ports-and-adapters': portsAndAdapters(),
     'event-bus': eventBus(),
     cqrs: cqrs(),
+    'null-object': nullObject(),
+    'circuit-breaker': circuitBreaker(),
+    saga: saga(),
   }
 }
