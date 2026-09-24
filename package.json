@@ -1,8 +1,14 @@
 {
-  "name": "design-patterns",
+  "name": "pattern-circuit",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Juego educativo para entender patrones de diseño viendo cómo un pulso recorre el circuito de una cafetería.",
+  "license": "MIT",
+  "author": "Adrian Castillo",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
