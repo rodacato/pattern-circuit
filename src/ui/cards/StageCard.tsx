@@ -39,7 +39,7 @@ export function StageCard({ session, onNext }: { session: GameSession; onNext?: 
   if (!result || dismissed === result) return null
   const close = () => setDismissed(result)
   if (stage === 'choose' && plugged) return <NoteCard session={session} onClose={close} />
-  if (stage === 'choose') return <ProblemCard result={result} onClose={close} />
+  if (stage === 'choose') return <ProblemCard session={session} result={result} onClose={close} />
   return <FailCard session={session} result={result} onClose={close} />
 }
 
@@ -91,13 +91,37 @@ function FailCard({ session, result, onClose }: { session: GameSession; result: 
   )
 }
 
-function ProblemCard({ result, onClose }: { result: Evaluation; onClose?: () => void }) {
+// Pistas de menos a más; la última dice qué patrón probar.
+function Hints({ session }: { session: GameSession }) {
+  const shown = useSession(session, (s) => s.hintsShown)
+  const ladder = session.hintLadder
+  const hints = ladder.slice(0, shown)
+  return (
+    <>
+      {hints.length > 0 && (
+        <ol className="hints">
+          {hints.map((h) => (
+            <li key={h}>{h}</li>
+          ))}
+        </ol>
+      )}
+      {shown < ladder.length && (
+        <button className="link hint-button" onClick={() => session.nextHint()}>
+          💡 {shown === 0 ? 'Quiero una pista' : 'Otra pista'} ({shown + 1}/{ladder.length})
+        </button>
+      )}
+    </>
+  )
+}
+
+function ProblemCard({ session, result, onClose }: { session: GameSession; result: Evaluation; onClose?: () => void }) {
   return (
     <div className="stage-card card bad" role="status">
       <Close onClose={onClose} />
       <span className="eyebrow">Problema detectado</span>
       <Failures result={result} />
       <p className="hint">Arrastra un patrón del inventario al socket ⬡ que late sobre el circuito (o elígelo con clic o teclado). Probar uno equivocado también enseña.</p>
+      <Hints session={session} />
     </div>
   )
 }
@@ -166,6 +190,7 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
           <span className="muted">Prueba otro patrón del inventario.</span>
         )}
       </div>
+      {!solved && <Hints session={session} />}
     </div>
   )
 }

@@ -101,6 +101,17 @@ describe('StageCard', () => {
   })
 })
 
+describe('pistas', () => {
+  it('se revelan de a una hasta nombrar el patrón', () => {
+    const s = session('L01-strategy')
+    render(<StageCard session={s} onNext={() => {}} />)
+    runOut(s)
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: /pista/ }))
+    expect(screen.getAllByRole('listitem').at(-1)?.textContent).toBe('Prueba con Strategy.')
+    expect(screen.queryByRole('button', { name: /pista/ })).toBeNull()
+  })
+})
+
 describe('predicciones', () => {
   it('al enchufar pregunta primero y, tras la corrida, dice si acertó', () => {
     const s = session('L01-strategy')

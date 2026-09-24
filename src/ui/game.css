@@ -1164,3 +1164,27 @@
   color: var(--cyan);
 }
 
+.hints {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--amber);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.hints li + li {
+  margin-top: 4px;
+}
+
+.hint-button {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  color: var(--amber);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
