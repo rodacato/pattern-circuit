@@ -62,7 +62,7 @@ session ─► render PixiJS neón + skins · panel de código · HUD · progres
 
 - `step(sim) → { sim, events }` es puro y determinista (tick fijo). Velocidad = ticks por frame.
 - `Timeline` guarda referencias a snapshots cada N ticks; retroceder = restaurar + re-simular.
-- **Primitivas cerradas** (`source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`). Un patrón es un `GraphPatch` de primitivas + un skin. Nivel nuevo = solo datos.
+- **Primitivas cerradas** (`source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`, `breaker`). Un patrón es un `GraphPatch` de primitivas + un skin. Nivel nuevo = solo datos.
 - `nodesTouched`: un nodo existente cuenta si cambia su definición, desaparece o gana/pierde una dependencia **concreta** de salida. Registrar un cable abstracto en un `slot` no cuenta.
 - Código Ruby con marcadores `# region: Clase#metodo` anidables; `Clase#metodo:rama` cae a la región padre.
 - `defineLevel` recorre todas las variantes alcanzables (reparaciones × sockets × tickets) y falla si alguna no compila, no tiene escenario o apunta a una región de código inexistente.
@@ -71,28 +71,35 @@ El esquema completo está en [`src/engine/schema.ts`](../src/engine/schema.ts).
 
 ## Progresión
 
-| # | Capítulo | Patrón | Contexto |
+| # | Capítulo | Patrón | Contexto en la cafetería |
 |---|---|---|---|
-| 0 | Apertura | — | Circuito lineal (tutorial) |
+| 0 | Apertura | — | El circuito lineal (tutorial) |
 | 1 | El mostrador | Strategy | Métodos de pago |
 | 2 | | Factory Method | Sucursales con menús distintos |
 | 3 | | Builder | Pedido a la medida |
-| 4 | | Singleton | Contador de tickets (y su coste oculto) |
+| 4 | | Singleton | Turnos repetidos entre cajas (su coste vuelve en el 18) |
 | 5 | La barra crece | Adapter | Terminal de pago de otro proveedor |
-| 6 | | Decorator | Extras que suman precio |
-| 7 | | Composite | Combos que contienen productos y combos |
-| 8 | | Facade | La cocina |
-| 9 | | Proxy | Inventario remoto y lento |
-| 10 | Hora pico | Observer | "Pedido listo" → cliente, pantalla, lealtad |
-| 11 | | State | Ciclo de vida del pedido |
-| 12 | | Chain of Resp. | Descuentos y validaciones |
-| 13 | | Command + undo | Cola del barista, cancelar/modificar |
-| 14 | | Template Method | Recetas de preparación |
-| 15–17 | Todo junto | Factory+Strategy · Composite+Decorator · State+Observer+Command | |
-| 18 | Arquitectura | Ports & Adapters | Núcleo sin BD/Stripe/UI (paga el Singleton del 4) |
-| 19 | | Event bus | Sucursales desacopladas |
-| 20 | | CQRS | Pantalla de pedidos vs toma de pedidos |
-| 21 | Final | — | Recorrido por la cafetería completa |
+| 6 | | Decorator | Extras que se apilan (+ ticket: caramelo) |
+| 7 | | Composite | Combos dentro de combos |
+| 8 | | Facade | La cocina por dentro (+ ticket: precalentar) |
+| 9 | | Proxy | Almacén remoto y lento |
+| 10 | Hora pico | Observer | ¡Pedido listo! (+ ticket: la cocina) |
+| 11 | | State | La vida de un pedido |
+| 12 | | Chain of Responsibility | Reembolsos (+ ticket: supervisor) |
+| 13 | | Command + undo | Me equivoqué de pedido |
+| 14 | | Template Method | Recetas copiadas (+ ticket: manga térmica) |
+| 15 | Todo junto | Factory Method + Strategy | Sucursales y pagos (2 sockets) |
+| 16 | | Composite + Decorator | Combos con extras (2 sockets) |
+| 17 | | Command + State + Observer | Pedidos en vivo (3 sockets) |
+| 18 | Arquitectura | Ports & Adapters | El mismo núcleo en pruebas y en producción |
+| 19 | | Event Bus | Servicios que se enteran (+ ticket: Analytics) |
+| 20 | | CQRS | Mil pantallas, un mostrador |
+| 21 | Resiliencia | Null Object | El cliente sin tarjeta |
+| 22 | | Circuit Breaker | El proveedor se cayó |
+| 23 | | Saga | Cobrado y sin avena |
+| 24 | La cafetería completa | — | Recorrido final con todo funcionando junto |
+
+Patrones evaluados y descartados: Mediator (se solapa con Event Bus), Memento (Command ya cubre deshacer), Visitor e Iterator (poco visibles en un circuito), DI y Repository (quedan dentro de Ports & Adapters).
 
 ### Niveles 0–3 (resumen)
 
@@ -107,5 +114,5 @@ El esquema completo está en [`src/engine/schema.ts`](../src/engine/schema.ts).
 2. **Lenguaje visual** ✅: render PixiJS neón (brillo, estelas, partículas, cables animados), controles con teclado, panel de código Ruby con Shiki que sigue al pulso o al nodo, cable arrastrable para reparar, lista de pasos por nivel, tarjetas de resultado. Nivel 0 jugable de punta a punta.
 3. **Sockets y patrones** ✅: inventario arrastrable, socket que late, skins por patrón, notas de campo y cuaderno, ticket de cambio, comparación sin/con, flujo del nivel como máquina de estados, progreso en localStorage. Niveles 1–3 jugables.
 4. **Capítulos 1–3** ✅: niveles 4–14 con sus skins. El motor sumó cinco primitivas genéricas (`counter`, `join`, `cache`, `machine`, `buffer`); ningún nivel necesitó lógica propia en el motor.
-5. **Combinaciones y arquitectura**: niveles 15–21, cámara para circuitos grandes.
+5. **Combinaciones, arquitectura y resiliencia** ✅: niveles 15–24, varios sockets por circuito, código Ruby compuesto por fragmentos, primitiva `breaker`, cámara con zoom y paneo, deploy a GitHub Pages.
 6. **Sandbox y pulido**: plantillas genéricas por patrón, transiciones, reduced-motion, teclado.

@@ -1,6 +1,6 @@
 # Pattern Circuit
 
-Juego educativo para entender patrones de diseño viendo cómo un pulso recorre el circuito de una cafetería. Diseño completo en [docs/DESIGN.md](docs/DESIGN.md).
+Juego educativo para entender patrones de diseño viendo cómo un pulso recorre el circuito de una cafetería: 24 niveles, de Strategy a Saga, con el código en Ruby. Diseño completo en [docs/DESIGN.md](docs/DESIGN.md).
 
 ```bash
 npm install
@@ -17,3 +17,9 @@ Arquitectura por capas en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - `src/render/`: render PixiJS neón y skins por patrón.
 - `src/ui/`: interfaz React.
 - `src/debug/`: vista de depuración del motor (`?debug`).
+
+## Publicar en GitHub Pages
+
+1. Sube el repo a GitHub (rama `main`).
+2. En **Settings → Pages**, elige **Source: GitHub Actions**.
+3. Cada push a `main` corre las verificaciones y publica el juego (workflow en `.github/workflows/deploy.yml`).

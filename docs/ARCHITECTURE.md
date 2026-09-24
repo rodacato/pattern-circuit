@@ -44,6 +44,7 @@ engine/
 
 ## levels: contenido
 
+- Un nivel puede tener **varios sockets**: las variantes alcanzables son el producto cartesiano de lo que se puede enchufar en cada uno, y el código Ruby se compone con `base` + un fragmento por socket. Los niveles de combinación reutilizan los `.rb` de los niveles donde se aprendió cada patrón.
 - `defineLevel` valida el esquema y **todas las variantes alcanzables** (reparaciones × patrones × tickets): si una no compila, no tiene escenario o apunta a una región de Ruby inexistente, el nivel no carga y el test falla.
 - El registro (`levels/index.ts`) descubre carpetas con `import.meta.glob`: añadir un nivel no toca ningún otro archivo.
 - `levels/kit.ts` trae ayudantes (`node`, `wire`, `abstract`, `chain`, `pulse`…) para escribir niveles con poco ruido.
@@ -72,12 +73,12 @@ game/
 render/
   NeonStage.ts    capas Pixi, bucle por frame, gestos → comandos de la sesión
   layout.ts       geometría de pantalla pura (fit, hit test, interpolación) — con tests
-  skins/          firma visual por patrón: creational · structural · behavioral + registro PatternId → Skin
+  skins/          firma visual por patrón: creational · structural · behavioral · architecture · resilience
   fx.ts           partículas y textos flotantes
   theme.ts        paleta y tipografías
 ```
 
-- Lo que se puede calcular sin Pixi vive en funciones puras con test (`layout.ts`). `NeonStage` queda como pegamento delgado.
+- Lo que se puede calcular sin Pixi vive en funciones puras con test (`layout.ts`: encuadre, zoom alrededor del puntero, hit tests, interpolación). `NeonStage` queda como pegamento delgado.
 - **Skins**: cada patrón aporta su firma (cartuchos, ondas, anillos, moldes…) implementando la interfaz `Skin`. Un patrón nuevo = un archivo en `skins/` + registrarlo.
 
 ## ui: composición
@@ -101,4 +102,8 @@ render/
 
 - **Nivel nuevo**: carpeta `src/levels/LNN-nombre/` con `level.ts`, sus `.rb` y un `level.test.ts`. Las invariantes comunes se comprueban solas.
 - **Patrón nuevo**: añadirlo a `PATTERN_IDS` en `schema.ts` (si no existe), su skin en `render/skins/`, y usarlo en un socket de un nivel.
-- **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`. Primitivas actuales: `source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`.
+- **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`. Primitivas actuales: `source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`, `breaker`.
+
+## Deploy
+
+`vite.config.ts` usa `base: './'`, así que el build es estático y funciona bajo cualquier subruta (`https://<usuario>.github.io/<repo>/`). El workflow [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) corre `npm run check` y publica `dist/` en GitHub Pages en cada push a `main`. El progreso del jugador vive en `localStorage` del navegador.
