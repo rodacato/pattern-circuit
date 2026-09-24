@@ -8,6 +8,7 @@ export const PATTERN_IDS = [
   'adapter', 'decorator', 'proxy', 'composite', 'facade',
   'strategy', 'observer', 'state', 'command', 'chain-of-responsibility', 'template-method',
   'ports-and-adapters', 'event-bus', 'cqrs',
+  'null-object', 'circuit-breaker', 'saga',
 ] as const
 
 export const PulseShape = z.enum(PULSE_SHAPES)
@@ -90,6 +91,8 @@ export const Behavior = z.discriminatedUnion('type', [
     states: z.record(z.string(), z.record(z.string(), Transition)),
     else: z.union([z.literal('drop'), z.string()]).default('drop'),
   }),
+  // Interruptor: deja pasar por `call` hasta ver `threshold` pulsos con `failTag`; entonces se abre y todo va por `fallback`.
+  z.object({ type: z.literal('breaker'), threshold: z.number().int().positive(), failTag: z.string() }),
   // Retiene cada pulso `cost` ticks; un pulso con `cancelTag` anula al retenido con el mismo `data[match]`.
   z.object({ type: z.literal('buffer'), cancelTag: z.string(), match: z.string() }),
 ])
@@ -194,6 +197,7 @@ export const Assertion = z.object({
   metric: z.enum(METRICS),
   op: z.enum(['==', '<=', '>=']),
   value: z.number(),
+  label: z.string().optional(), // cómo se lee la métrica en este nivel ("eventos fuera de orden")
 })
 
 export const LevelDef = z.object({

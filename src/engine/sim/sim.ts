@@ -219,6 +219,19 @@ class Tick {
         }
         return this.exitVia(pulse, node, t.port)
       }
+      case 'breaker': {
+        const key = `breaker:${node.id}`
+        if (pulse.tags.includes(b.failTag)) {
+          const failures = (this.s.counters[key] ?? 0) + 1
+          this.s.counters[key] = failures
+          if (failures >= b.threshold && this.s.nodeState[node.id] !== 'abierto') {
+            this.s.nodeState[node.id] = 'abierto'
+            this.emit({ type: 'node.state', nodeId: node.id, state: 'abierto' })
+          }
+          return this.exitVia(pulse, node, 'fallback')
+        }
+        return this.exitVia(pulse, node, this.s.nodeState[node.id] === 'abierto' ? 'fallback' : 'call')
+      }
       case 'buffer':
         return this.exitVia(pulse, node, pulse.tags.includes(b.cancelTag) ? 'orphan' : 'out')
     }

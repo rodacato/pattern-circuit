@@ -1,6 +1,6 @@
 import type { PatternId } from './schema'
 
-export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture'
+export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture' | 'resilience'
 
 export type PatternInfo = { name: string; family: PatternFamily; gist: string }
 
@@ -23,6 +23,9 @@ export const PATTERNS: Record<PatternId, PatternInfo> = {
   'ports-and-adapters': { name: 'Ports & Adapters', family: 'architecture', gist: 'El núcleo no conoce el mundo exterior, solo sus puertos.' },
   'event-bus': { name: 'Event Bus', family: 'architecture', gist: 'Los componentes se hablan por eventos, sin conocerse.' },
   cqrs: { name: 'CQRS', family: 'architecture', gist: 'Escribir y leer por caminos separados.' },
+  'null-object': { name: 'Null Object', family: 'behavioral', gist: 'Un objeto que no hace nada en lugar de nil: sin ifs de "¿existe?".' },
+  'circuit-breaker': { name: 'Circuit Breaker', family: 'resilience', gist: 'Tras varios fallos deja de llamar al servicio caído y responde por otro camino.' },
+  saga: { name: 'Saga', family: 'resilience', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
 }
 
 export const FAMILY_NAMES: Record<PatternFamily, string> = {
@@ -30,4 +33,5 @@ export const FAMILY_NAMES: Record<PatternFamily, string> = {
   structural: 'estructural',
   behavioral: 'comportamiento',
   architecture: 'arquitectura',
+  resilience: 'resiliencia',
 }

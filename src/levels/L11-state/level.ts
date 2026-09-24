@@ -94,7 +94,7 @@ export default defineLevel({
   ],
   scenarios: [{ id: 'main', pulses: events }],
   winWhen: [
-    { metric: 'invalidAtSink', op: '==', value: 0 },
+    { metric: 'invalidAtSink', op: '==', value: 0, label: 'eventos fuera de orden registrados' },
     { metric: 'dropped', op: '==', value: 0 },
   ],
   code: { rb: { base: code(base), state: code(state), strategy: code(strategy), command: code(base + command) } },

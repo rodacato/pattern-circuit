@@ -511,8 +511,14 @@
   --fam: var(--cyan);
 }
 
-.cartridge.architecture {
+.cartridge.architecture,
+.note-group.architecture {
   --fam: var(--green);
+}
+
+.cartridge.resilience,
+.note-group.resilience {
+  --fam: #ff5fd2;
 }
 
 .cartridge .stripe {

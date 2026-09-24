@@ -149,4 +149,28 @@ describe('primitivas con memoria', () => {
     expect(sim.state.metrics).toMatchObject({ delivered: 1, cancelled: 1, dropped: 0 })
     expect(sim.state.pulses.map((p) => p.status)).toEqual(['cancelled', 'delivered', 'cancelled'])
   })
+
+  it('breaker: tras el umbral de fallos se abre y desvía todo al respaldo', () => {
+    const c = Circuit.parse({
+      nodes: [
+        node('src', 0, { type: 'source' }),
+        node('b', 2, { type: 'breaker', threshold: 2, failTag: 'fallo' }),
+        node('svc', 4, { type: 'guard', require: { hasTag: 'nunca' }, onFail: 'fallo' }),
+        node('mark', 3, { type: 'transform', addTags: ['fallo'] }, 2),
+        node('backup', 6, { type: 'sink' }, 2),
+      ],
+      wires: [
+        { from: 'src', to: 'b' },
+        { from: 'b', port: 'call', to: 'svc' },
+        { from: 'svc', port: 'fallo', to: 'mark' },
+        { from: 'mark', to: 'b' },
+        { from: 'b', port: 'fallback', to: 'backup' },
+      ],
+    })
+    const s = Scenario.parse({ id: 's', pulses: [0, 150, 300, 450].map((at) => ({ at, from: 'src' })) })
+    const { sim } = runToEnd(createSim(c, s))
+    expect(sim.state.metrics).toMatchObject({ delivered: 4, dropped: 0 })
+    expect(sim.state.nodeState.b).toBe('abierto')
+    expect(sim.state.pulses.map((p) => p.trail.includes('svc'))).toEqual([true, true, false, false])
+  })
 })

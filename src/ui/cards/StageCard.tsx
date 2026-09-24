@@ -45,7 +45,7 @@ function Failures({ result }: { result: Evaluation }) {
         .filter((r) => !r.pass)
         .map((r) => (
           <li key={r.assertion.metric}>
-            <b>{r.actual}</b> {METRIC_TEXT[r.assertion.metric]}{' '}
+            <b>{r.actual}</b> {r.assertion.label ?? METRIC_TEXT[r.assertion.metric]}{' '}
             <span className="expected">
               ({OP_TEXT[r.assertion.op]} {r.assertion.value})
             </span>
@@ -181,7 +181,7 @@ function CompareCard({ session }: { session: GameSession }) {
         <tbody>
           {rows.map((m) => (
             <tr key={m}>
-              <td>{METRIC_TEXT[m]}</td>
+              <td>{session.level.winWhen.find((a) => a.metric === m)?.label ?? METRIC_TEXT[m]}</td>
               <td className="bad">{cmp.without.metrics[m]}</td>
               <td className="good">{cmp.with.metrics[m]}</td>
             </tr>
