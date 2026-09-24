@@ -837,8 +837,8 @@
 
 /* panel de código */
 .code-panel {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   border-left: 1px solid var(--line);
   background: var(--panel);
@@ -884,6 +884,8 @@
 }
 
 .code-body {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   padding: 12px 0 40px;
   font: 12.5px/1.65 'JetBrains Mono', ui-monospace, Menlo, monospace;
@@ -998,7 +1000,7 @@
   display: none;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 600px) {
   .desktop-only {
     position: fixed;
     inset: 0;
@@ -1186,5 +1188,46 @@
   font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Táctil: el canvas maneja sus gestos (el navegador no debe hacer scroll ni zoom encima), y los
+   blancos para tocar crecen. La leyenda muestra los gestos que corresponden a cada puntero. */
+.stage canvas,
+.cartridge {
+  touch-action: none;
+}
+
+.legend .camera.touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .legend .camera.touch {
+    display: inline;
+  }
+
+  .legend .camera.mouse {
+    display: none;
+  }
+
+  .transport button,
+  .cartridge,
+  .choices button,
+  .actions button {
+    min-height: 44px;
+  }
+}
+
+/* Tablet vertical: el circuito arriba y el código abajo. */
+@media (max-width: 1000px) {
+  .game main {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 62fr) minmax(0, 38fr);
+  }
+
+  .code-panel {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
 }
 

@@ -115,7 +115,7 @@ export default function GameApp() {
 
       {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
       {reviewOpen && <Review session={session} levels={LEVELS} onClose={closeReview} />}
-      <p className="desktop-only">Pattern Circuit está pensado para pantallas de escritorio. Ábrelo en una ventana más ancha para jugar.</p>
+      <p className="desktop-only">Pattern Circuit necesita una pantalla más ancha: ábrelo en una tablet, una computadora o gira el teléfono.</p>
     </div>
   )
 }
@@ -132,7 +132,8 @@ function Legend() {
       <span>
         <i className="dashed" /> depende de una interfaz
       </span>
-      <span className="camera">rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar · espacio, ←, →, R: reproducción</span>
+      <span className="camera mouse">rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar · espacio, ←, →, R: reproducción</span>
+      <span className="camera touch">pellizca: zoom · arrastra el fondo: mover · doble toque: encuadrar</span>
     </div>
   )
 }

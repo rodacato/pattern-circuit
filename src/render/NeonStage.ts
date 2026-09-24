@@ -3,6 +3,7 @@ import { initialNodeState, pointAt, timesDelivered, wirePath, type NodeDef, type
 import type { GameSession } from '../game/session/GameSession'
 import { dashed, drawBranchGlyph, label } from './draw'
 import { Effects } from './fx'
+import { coarsePointer, DoubleTap, Pinch } from './gestures'
 import { CELL, circuitBounds, nearestPulse, NODE_H, NODE_W, nodeAt, nodeCenter, outPort, toPx, worldTransform, zoomAt, type View } from './layout'
 import { NodeAnimations, prefersReducedMotion } from './motion'
 import { PulseLayer } from './PulseLayer'
@@ -11,6 +12,9 @@ import { SocketLayer } from './SocketLayer'
 import { DROP_TEXT, FONT_MONO, FONT_UI, INVALID_TEXT, NEON as C, pulseColor } from './theme'
 
 const PORT_R = 6
+const TOUCH = coarsePointer() // con el dedo, los blancos para tocar son más grandes
+const PORT_HIT = PORT_R + (TOUCH ? 16 : 6)
+const PULSE_HIT = TOUCH ? 30 : 18
 const INVENTORY_INSET = 150 // mientras el inventario está abierto, el circuito se encuadra por encima de él
 
 type Drag = { from: string; to: Point }
@@ -172,7 +176,7 @@ export class NeonStage {
       this.stateLabels.set(n.id, current)
     }
 
-    const port = new Graphics().circle(0, 0, PORT_R + 6).fill({ color: 0xffffff, alpha: 0.001 })
+    const port = new Graphics().circle(0, 0, PORT_HIT).fill({ color: 0xffffff, alpha: 0.001 })
     port.position.set(NODE_W / 2, 0)
     port.eventMode = 'static'
     port.cursor = 'crosshair'
@@ -185,7 +189,7 @@ export class NeonStage {
     return box
   }
 
-  // Cámara: rueda = zoom hacia el puntero, arrastrar el fondo = mover, doble clic = encuadrar.
+  // Cámara: rueda o pellizco = zoom hacia el puntero, arrastrar el fondo = mover, doble clic o doble toque = encuadrar.
   private bindPointer() {
     const stage = this.app.stage
     stage.eventMode = 'static'
@@ -204,7 +208,7 @@ export class NeonStage {
     stage.on('pointerup', end)
     stage.on('pointerupoutside', end)
     stage.on('pointerdown', (e: FederatedPointerEvent) => {
-      const id = nearestPulse(this.pulses.positions, this.world.toLocal(e.global))
+      const id = nearestPulse(this.pulses.positions, this.world.toLocal(e.global), PULSE_HIT)
       if (id !== undefined) this.session.follow(id)
       else if (e.target === stage) this.panning = { x: e.global.x, y: e.global.y }
     })
@@ -219,7 +223,39 @@ export class NeonStage {
       },
       { passive: false },
     )
-    canvas.addEventListener('dblclick', () => (this.view = { zoom: 1, x: 0, y: 0 }))
+    canvas.addEventListener('dblclick', () => this.reframe())
+    this.bindTouch(canvas)
+  }
+
+  // Dos dedos: zoom alrededor del punto medio (y cancela el paneo de un dedo). Doble toque: encuadrar.
+  private bindTouch(canvas: HTMLCanvasElement) {
+    const pinch = new Pinch()
+    const doubleTap = new DoubleTap()
+    const local = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top }
+    }
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return
+      pinch.down(e.pointerId, local(e))
+      if (pinch.active) this.panning = undefined
+    })
+    canvas.addEventListener('pointermove', (e) => {
+      const zoom = e.pointerType === 'touch' ? pinch.move(e.pointerId, local(e)) : undefined
+      if (zoom) this.view = zoomAt(this.app.screen, this.bounds, this.view, zoom.center, zoom.factor, this.inset())
+    })
+    const lift = (e: PointerEvent) => {
+      if (e.pointerType !== 'touch') return
+      const wasPinch = pinch.active
+      pinch.up(e.pointerId)
+      if (!wasPinch && e.type === 'pointerup' && doubleTap.tap(e.timeStamp, local(e))) this.reframe()
+    }
+    canvas.addEventListener('pointerup', lift)
+    canvas.addEventListener('pointercancel', lift)
+  }
+
+  private reframe() {
+    this.view = { zoom: 1, x: 0, y: 0 }
   }
 
   private endDrag() {
