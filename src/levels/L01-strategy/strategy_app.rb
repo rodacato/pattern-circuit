@@ -1,0 +1,45 @@
+class Cashier
+  def initialize(payment_methods, barista)
+    @payment_methods = payment_methods
+    @barista = barista
+  end
+
+  # Intacto: el pago con app no tocó esta clase.
+  # region: Cashier#charge
+  def charge(order)
+    @payment_methods.fetch(order.payment).charge(order)
+    @barista.prepare(order)
+  end
+  # endregion
+end
+
+class CashPayment
+  # region: CashPayment#charge
+  def charge(order) = CashDrawer.collect(order.total)
+  # endregion
+end
+
+class CardPayment
+  # region: CardPayment#charge
+  def charge(order) = CardTerminal.charge(order.total)
+  # endregion
+end
+
+class VoucherPayment
+  # region: VoucherPayment#charge
+  def charge(order) = VoucherBook.redeem(order.total)
+  # endregion
+end
+
+# region: AppPayment#charge
+class AppPayment # ← nuevo cartucho, nada más
+  def charge(order) = AppWallet.charge(order.total)
+end
+# endregion
+
+# region: wiring
+cashier = Cashier.new(
+  { cash: CashPayment.new, card: CardPayment.new, voucher: VoucherPayment.new, app: AppPayment.new },
+  barista
+)
+# endregion
