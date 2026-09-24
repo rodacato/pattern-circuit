@@ -24,6 +24,12 @@ const TAG_COLORS: Record<string, number> = {
   card: 0x4cc9ff,
   voucher: 0xffc15e,
   app: 0xff5fd2,
+  centro: 0x4cc9ff,
+  playa: 0xffc15e,
+  montana: 0xb57cff,
+  puerto: 0x7cff9b,
+  'args-cruzados': 0xffb86b,
+  hielo: 0x9fe7ff,
 }
 
 export const pulseColor = (tags: string[]) => TAG_COLORS[tags.find((t) => t in TAG_COLORS) ?? ''] ?? NEON.white

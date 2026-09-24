@@ -258,7 +258,8 @@ export class NeonStage {
       case 'pulse.deliver': {
         const dup = (s.playback.timeline.current.state.deliveredOrigins[pulse!.originId] ?? 0) > 1
         const tone = !e.valid ? C.red : dup ? C.amber : C.green
-        const text = !e.valid ? INVALID_TEXT : dup ? '¡cobrado otra vez!' : `☕ ${pulse?.label ?? 'pedido'} entregado`
+        const message = node.behavior.type === 'sink' ? node.behavior.message : undefined
+        const text = !e.valid ? INVALID_TEXT : dup ? '¡cobrado otra vez!' : (message ?? `☕ ${pulse?.label ?? 'pedido'} entregado`)
         this.fx.burst(at, tone, 20, 2.4)
         this.fx.float(at, text, tone)
         if (!e.valid) this.shake.set(e.nodeId, 0.7)

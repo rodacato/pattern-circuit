@@ -41,7 +41,7 @@ export const Predicate: z.ZodType<Predicate> = z.lazy(() =>
 // es una composición de estas primitivas más un skin visual.
 export const Behavior = z.discriminatedUnion('type', [
   z.object({ type: z.literal('source') }),
-  z.object({ type: z.literal('sink'), expects: Predicate.optional() }),
+  z.object({ type: z.literal('sink'), expects: Predicate.optional(), message: z.string().optional() }),
   z.object({ type: z.literal('pass') }),
   z.object({
     type: z.literal('transform'),
