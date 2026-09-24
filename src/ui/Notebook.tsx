@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
 import { FAMILY_NAMES, PATTERNS, type Level, type PatternId, type SocketOption } from '../engine'
 import { parseNoteKey } from '../game/progress/progress'
+import { useDialog } from './useDialog'
 
 type Entry = { level: Level; option: SocketOption }
 
@@ -25,18 +25,7 @@ type Props = { levels: Level[]; notes: string[]; predictions?: { right: number; 
 export function Notebook({ levels, notes, predictions, onClose, onReset }: Props) {
   const byPattern = entriesFor(levels, notes)
   const total = [...byPattern.values()].reduce((n, list) => n + list.length, 0)
-  const closeButton = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    closeButton.current?.focus()
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      opener?.focus()
-    }
-  }, [onClose])
+  const closeButton = useDialog<HTMLButtonElement>(onClose)
 
   const reset = () => {
     if (window.confirm('¿Borrar todo el progreso? Se pierden los niveles completados y las notas del cuaderno.')) onReset()

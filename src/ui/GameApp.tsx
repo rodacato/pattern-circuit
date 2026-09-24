@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { dueItems, reviewItems } from '../game/learning/review'
 import { firstUnfinished, KeyValueProgressStore, MemoryProgressStore, type ProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { chapterName, LEVELS } from '../levels'
@@ -8,6 +9,7 @@ import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
 import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
+import { Review } from './Review'
 import { isShortcut, SHORTCUTS } from './shortcuts'
 import { Transport } from './Transport'
 import { useSession } from './useSession'
@@ -32,8 +34,13 @@ export default function GameApp() {
   const host = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<NeonStage>()
   const [notebookOpen, setNotebookOpen] = useState(false)
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const dialogOpen = notebookOpen || reviewOpen
   const progress = useSession(session, (s) => s.progress)
   const closeNotebook = useCallback(() => setNotebookOpen(false), [])
+  const closeReview = useCallback(() => setReviewOpen(false), [])
+  const reviewable = useSession(session, (s) => reviewItems(LEVELS, s.progress.completed).length)
+  const due = useSession(session, (s) => dueItems(reviewItems(LEVELS, s.progress.completed), s.progress.review, Date.now()).length)
 
   useEffect(() => {
     let created: NeonStage | undefined
@@ -51,7 +58,7 @@ export default function GameApp() {
   }, [session])
 
   useEffect(() => {
-    if (notebookOpen) return
+    if (dialogOpen) return
     const onKey = (e: KeyboardEvent) => {
       const action = SHORTCUTS[e.key]
       if (!action || !isShortcut(e)) return
@@ -60,7 +67,7 @@ export default function GameApp() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [session, notebookOpen])
+  }, [session, dialogOpen])
 
   return (
     <div className="game">
@@ -70,6 +77,11 @@ export default function GameApp() {
           Pattern Circuit
         </div>
         <div className="topbar-actions">
+          {reviewable > 0 && (
+            <button className="notebook-button" onClick={() => setReviewOpen(true)} aria-haspopup="dialog" title="Repasa problemas de niveles ya completados">
+              🧠 Repasar <span aria-label={`${due} pendientes`}>{due}</span>
+            </button>
+          )}
           <button className="notebook-button" onClick={() => setNotebookOpen(true)} aria-haspopup="dialog">
             📓 Cuaderno <span aria-label={`${progress.notes.length} notas`}>{progress.notes.length}</span>
           </button>
@@ -101,6 +113,7 @@ export default function GameApp() {
       </main>
 
       {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
+      {reviewOpen && <Review session={session} levels={LEVELS} onClose={closeReview} />}
       <p className="desktop-only">Pattern Circuit está pensado para pantallas de escritorio. Ábrelo en una ventana más ancha para jugar.</p>
     </div>
   )

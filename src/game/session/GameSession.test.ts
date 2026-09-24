@@ -142,7 +142,7 @@ describe('GameSession · detalles', () => {
   })
 
   it('borrar el progreso lo vacía en el almacén', () => {
-    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'], predictions: { right: 1, total: 2 } })
+    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'], predictions: { right: 1, total: 2 }, review: {} })
     const s = session('L01-strategy', store)
     s.resetProgress()
     expect(store.load()).toEqual(emptyProgress())
@@ -225,5 +225,14 @@ describe('GameSession · cambios en el código', () => {
 
   it('antes de comparar no hay cambios que mostrar', () => {
     expect(session('L01-strategy').codeChange).toBeUndefined()
+  })
+})
+
+describe('GameSession · repaso', () => {
+  it('anota la respuesta en el progreso guardado', () => {
+    const store = new MemoryProgressStore()
+    const s = session('L00-tutorial', store)
+    s.recordReview('L01-strategy/metodo-de-pago', true, 1000)
+    expect(store.load().review['L01-strategy/metodo-de-pago']).toMatchObject({ box: 1 })
   })
 })
