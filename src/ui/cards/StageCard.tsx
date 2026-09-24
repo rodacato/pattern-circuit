@@ -201,8 +201,9 @@ function WinCard({ session, onNext }: { session: GameSession; onNext?: () => voi
   const patterns = session.pluggedPatterns
   return (
     <div className="stage-card card won">
-      <span className="eyebrow">Nivel superado</span>
-      <h2>{patterns.length ? `Aprendiste ${patterns.map((p) => PATTERNS[p].name).join(' + ')}` : '¡La cafetería funciona!'}</h2>
+      <span className="eyebrow">{onNext ? 'Nivel superado' : 'Fin del recorrido'}</span>
+      <h2>{!onNext ? '¡Terminaste Pattern Circuit!' : patterns.length ? `Aprendiste ${patterns.map((p) => PATTERNS[p].name).join(' + ')}` : '¡La cafetería funciona!'}</h2>
+      {!onNext && <p className="muted">La cafetería entera corre sobre los patrones que fuiste enchufando. Tu cuaderno guarda lo que aprendiste de cada uno, también de los que no encajaban.</p>}
       {patterns.map((p) => (
         <p key={p} className="muted">
           {PATTERNS[p].gist}
