@@ -59,6 +59,9 @@ export function initialNodeState(behavior: Behavior): string | undefined {
   return undefined
 }
 
+// Cuántas veces llegó a un sink el pedido original (más de una = cobro duplicado).
+export const timesDelivered = (state: SimState, sinkId: string, originId: number) => state.deliveredOrigins[`${sinkId}:${originId}`] ?? 0
+
 // Un pulso retenido en un join cuyos hermanos se perdieron ya no avanzará: no bloquea el final.
 export function isDone(sim: Sim): boolean {
   return sim.state.scenarioCursor >= sim.schedule.length && sim.state.pulses.every((p) => p.status !== 'alive' || p.loc.kind === 'held')

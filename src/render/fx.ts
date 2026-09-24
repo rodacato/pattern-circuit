@@ -7,17 +7,21 @@ type Ring = { x: number; y: number; r: number; max: number; life: number; color:
 type Floater = { text: Text; life: number }
 
 // Efectos efímeros: partículas, ondas y textos que suben. Viven en coordenadas del mundo.
+// Con movimiento reducido solo quedan los textos, quietos: la información se mantiene, el movimiento no.
 export class Effects {
   private particles: Particle[] = []
   private rings: Ring[] = []
   private floaters: Floater[] = []
   private readonly layer: Container
+  private readonly reduced: boolean
 
-  constructor(layer: Container) {
+  constructor(layer: Container, reduced = false) {
     this.layer = layer
+    this.reduced = reduced
   }
 
   burst(at: Point, color: number, count = 20, speed = 2.4) {
+    if (this.reduced) return
     for (let i = 0; i < count; i++) {
       const a = (Math.PI * 2 * i) / count + Math.random() * 0.3
       const v = speed * (0.5 + Math.random() * 0.8)
@@ -26,6 +30,7 @@ export class Effects {
   }
 
   ring(at: Point, color: number, max = 70) {
+    if (this.reduced) return
     this.rings.push({ x: at.x, y: at.y, r: 8, max, life: 1, color })
   }
 
@@ -57,7 +62,7 @@ export class Effects {
 
     this.floaters = this.floaters.filter((f) => {
       f.life -= 0.01
-      f.text.y -= 0.45
+      if (!this.reduced) f.text.y -= 0.45
       f.text.alpha = Math.min(1, f.life * 2)
       if (f.life > 0) return true
       f.text.destroy()

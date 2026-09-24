@@ -1,6 +1,6 @@
 import { NEON as C, pulseColor } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
-import { arc } from './draw'
+import { arc } from '../draw'
 import type { Skin } from './types'
 
 // Strategy: el nodo contexto tiene una ranura; cada estrategia concreta es un cartucho con franja violeta.

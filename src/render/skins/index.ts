@@ -6,7 +6,7 @@ import { circuitBreaker, nullObject, saga } from './resilience'
 import { adapter, composite, decorator, facade, proxy } from './structural'
 import type { Skin } from './types'
 
-export type { DrawContext, EventContext, Skin } from './types'
+export type { DrawContext, Skin } from './types'
 export { stateColor } from './behavioral'
 
 // Cada stage crea sus skins: el estado de animación (qué cartucho brilla, qué prensa baja) no se comparte.

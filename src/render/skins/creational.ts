@@ -1,6 +1,6 @@
 import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
-import { arc } from './draw'
+import { arc } from '../draw'
 import type { Skin } from './types'
 
 // Factory Method: cada creador es una prensa con molde que baja al estampar el producto.
