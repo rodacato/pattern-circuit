@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-24
+
+Mejoras de aprendizaje: predecir, ver el cambio en el código, repasar, saber cuándo no usar un patrón y reconocerlo en código real. Además, inglés, TypeScript y tablets.
+
 ### Added
 
 - **Predecir antes de ver**: al enchufar un patrón el juego pregunta qué hará (resuelve, a medias, no encaja), y antes de un ticket, cuántas piezas habrá que modificar. Después de correr, muestra si acertaste; el Cuaderno lleva la cuenta de predicciones acertadas.
@@ -15,13 +19,12 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - **Dónde lo has visto**: cada patrón muestra un ejemplo real en Ruby o Rails (Rack middleware, SimpleDelegator, `Post.none`, ActiveJob…) con enlace a su documentación, en el Cuaderno y al superar el nivel.
 - **Pistas escalonadas**: en vez de la respuesta, primero una pregunta guía según el síntoma, luego la familia del patrón (con las definiciones de GoF), después un descarte y, al final, el patrón.
 - **Táctil y tablet**: pellizcar para zoom, doble toque para encuadrar, blancos más grandes con el dedo y layout vertical (circuito arriba, código abajo) hasta 1000 px. En teléfonos (menos de 600 px) sigue el aviso.
-- **Versión en inglés**: botón ES/EN en la barra superior; toda la interfaz, los 27 niveles, las pistas, las notas y los ejemplos traducidos. El idioma se recuerda en el navegador. Los comentarios del código Ruby siguen en español.
+- **Versión en inglés**: botón ES/EN en la barra superior; toda la interfaz, los 27 niveles, las pistas, las notas y los ejemplos traducidos. El idioma se recuerda en el navegador. Los comentarios del código siguen en español.
 - **Código en TypeScript**: el panel de código cambia entre Ruby y TypeScript; los 27 niveles cuentan la misma historia en los dos lenguajes. La elección se recuerda en el navegador.
 
 ### Changed
 
 - Los capítulos pertenecen a un **tema** (`levels/tracks.ts`): preparación para sumar recorridos nuevos (por ejemplo, sistemas completos con CQRS, eventos o microservicios) sin tocar el motor.
-
 - La cafetería completa pasa a ser el nivel 26. El progreso guardado con el id anterior se traduce solo.
 
 ### Fixed
@@ -53,5 +56,6 @@ Primera versión pública.
 - Deploy estático a GitHub Pages y CI para pull requests con GitHub Actions.
 
 
-[Unreleased]: https://github.com/rodacato/pattern-circuit/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/rodacato/pattern-circuit/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/rodacato/pattern-circuit/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/rodacato/pattern-circuit/releases/tag/v1.0.0
