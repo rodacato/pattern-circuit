@@ -29,3 +29,6 @@ Primera versión pública.
 - Vista de depuración del motor (`?debug`).
 - Deploy estático a GitHub Pages y CI para pull requests con GitHub Actions.
 
+
+[Unreleased]: https://github.com/rodacato/pattern-circuit/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rodacato/pattern-circuit/releases/tag/v1.0.0
