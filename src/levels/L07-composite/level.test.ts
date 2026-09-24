@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'composite' | 'decorator' | 'strategy') => ({ socket: { id: 'combo', pattern } })
+const socket = (pattern: 'composite' | 'decorator' | 'strategy') => ({ sockets: [{ id: 'combo', pattern }] })
 
 describe('L07 · Composite', () => {
   it('sin patrón: el mini combo se pierde y la bandeja nunca se completa', () => {

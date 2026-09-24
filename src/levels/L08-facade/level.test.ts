@@ -14,7 +14,7 @@ describe('L08 · Facade', () => {
   })
 
   it('Facade: una sola orquestación, un solo lugar que cambiar', () => {
-    expect(evaluate(level, { socket }).metrics.invalidAtSink).toBe(0)
-    expect(evaluate(level, { socket, ticket: 'precalentar' }).touched).toEqual(['molino'])
+    expect(evaluate(level, { sockets: [socket] }).metrics.invalidAtSink).toBe(0)
+    expect(evaluate(level, { sockets: [socket], ticket: 'precalentar' }).touched).toEqual(['molino'])
   })
 })

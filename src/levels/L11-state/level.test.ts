@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createSim, evaluate, runToEnd, buildCircuit, scenarioFor } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'state' | 'strategy' | 'command') => ({ socket: { id: 'estados', pattern } })
+const socket = (pattern: 'state' | 'strategy' | 'command') => ({ sockets: [{ id: 'estados', pattern }] })
 
 describe('L11 · State', () => {
   it('sin patrón: tres eventos fuera de orden llegan al historial', () => {

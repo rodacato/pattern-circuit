@@ -1,14 +1,14 @@
 // Estado de simulación: JSON plano, clonable, sin referencias al circuito.
 import type { MetricName, PulseShape } from '../schema'
 
-export type PulseLoc =
+type PulseLoc =
   | { kind: 'wire'; wireId: string; progress: number } // 0..1 a lo largo del cable
   | { kind: 'node'; nodeId: string; remaining: number } // procesándose
   | { kind: 'queued'; nodeId: string } // esperando capacidad
   | { kind: 'held'; nodeId: string } // retenido en un join esperando a sus hermanos
   | { kind: 'gone'; nodeId: string } // entregado o perdido
 
-export type PulseStatus = 'alive' | 'delivered' | 'dropped' | 'merged' | 'cancelled'
+type PulseStatus = 'alive' | 'delivered' | 'dropped' | 'merged' | 'cancelled'
 
 export type Pulse = {
   id: number
@@ -52,7 +52,8 @@ export type SimState = {
   queues: Record<string, number[]> // ids en espera, FIFO
   deliveredOrigins: Record<string, number> // `${sink}:${origen}` -> entregas
   counters: Record<string, number>
-  nodeState: Record<string, string> // estado actual de cada máquina
+  nodeState: Record<string, string> // estado actual de cada máquina o interruptor
+  failures: Record<string, number> // fallos seguidos por interruptor
   cacheKeys: Record<string, string[]>
   joins: Record<string, Record<number, number[]>> // join -> origen -> pulsos retenidos
   sinkSeen: Record<string, string[]> // valores vistos por sinks con uniqueBy

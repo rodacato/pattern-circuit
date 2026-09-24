@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'circuit-breaker' | 'chain-of-responsibility') => ({ socket: { id: 'proveedor', pattern } })
+const socket = (pattern: 'circuit-breaker' | 'chain-of-responsibility') => ({ sockets: [{ id: 'proveedor', pattern }] })
 
 describe('L22 · Circuit Breaker', () => {
   it('sin patrón: todos los pedidos se pierden en el timeout', () => {

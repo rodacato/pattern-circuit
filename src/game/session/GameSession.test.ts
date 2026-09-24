@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { evaluate } from '../../engine'
 import { LEVELS } from '../../levels'
 import { MemoryProgressStore } from '../progress/progress'
 import { GameSession } from './GameSession'
@@ -69,5 +70,81 @@ describe('GameSession · nivel 1 (Strategy)', () => {
     s.finishLevel()
     expect(s.flow.stage).toBe('complete')
     expect(store.load()).toMatchObject({ completed: ['L01-strategy'], notes: ['L01-strategy:observer', 'L01-strategy:strategy'] })
+  })
+})
+
+describe('GameSession · detalles', () => {
+  const inChoose = (id: string) => {
+    const s = session(id)
+    runOut(s)
+    return s
+  }
+
+  it('con varios sockets, un patrón sin socket va al primero sin resolver que lo acepte', () => {
+    const s = inChoose('L15-sucursales-y-pagos')
+    const [first] = s.sockets
+    const pattern = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
+    s.plug(pattern)
+    expect(s.flow.plugs[first.id]?.pattern).toBe(pattern)
+    expect(s.pendingSockets.map((k) => k.id)).not.toContain(first.id)
+    expect(s.accepts(pattern, first.id)).toBe(true)
+  })
+
+  it('un patrón en un socket que no lo acepta no hace nada', () => {
+    const s = inChoose('L01-strategy')
+    expect(s.plug('strategy', 'no-existe')).toBeUndefined()
+    expect(s.flow.plugs).toEqual({})
+  })
+
+  it('desenchufar vuelve al circuito sin patrón y no lo corre solo', () => {
+    const s = inChoose('L01-strategy')
+    s.plug('strategy')
+    const [socket] = s.sockets
+    s.unplug(socket.id)
+    expect(s.pluggedAt(socket.id)).toBeUndefined()
+    expect(s.playback.playing).toBe(false)
+  })
+
+  it('conectar un nodo consigo mismo no cuenta como intento', () => {
+    expect(session('L00-tutorial').connect('cobrar', 'cobrar')).toBe('none')
+  })
+
+  it('reiniciar borra el resultado; reconstruir conserva velocidad y nodo inspeccionado', () => {
+    const s = inChoose('L01-strategy')
+    expect(s.result).toBeDefined()
+    s.setSpeed(2)
+    s.inspect('cobrar')
+    s.reset()
+    expect(s.result).toBeUndefined()
+    s.plug('strategy')
+    expect(s.playback.speed).toBe(2)
+    expect(s.playback.inspected).toBe('cobrar')
+  })
+
+  it('la calificación de la corrida coincide con evaluar la variante desde cero', () => {
+    const s = inChoose('L10-observer')
+    s.plug('observer')
+    runOut(s)
+    expect(s.result).toEqual(evaluate(s.level, s.variant))
+  })
+
+  it('la comparación lista solo las métricas objetivo que cambian', () => {
+    const s = session('L01-strategy')
+    runOut(s)
+    s.plug('strategy')
+    runOut(s)
+    s.continue()
+    s.applyTicket()
+    runOut(s)
+    s.continue()
+    expect(s.comparisonRows.length).toBeGreaterThan(0)
+    for (const m of s.comparisonRows) expect(s.comparison!.with.metrics[m]).not.toBe(s.comparison!.without.metrics[m])
+  })
+
+  it('borrar el progreso lo vacía en el almacén', () => {
+    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'] })
+    const s = session('L01-strategy', store)
+    s.resetProgress()
+    expect(store.load()).toEqual({ version: 1, completed: [], notes: [] })
   })
 })

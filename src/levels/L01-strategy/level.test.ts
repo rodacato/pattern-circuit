@@ -17,20 +17,20 @@ describe('L01 · Strategy', () => {
   })
 
   it('Strategy resuelve, y el pago con app no toca ningún nodo existente', () => {
-    expect(evaluate(l, { socket: socket('strategy') }).won).toBe(true)
-    const r = evaluate(l, { socket: socket('strategy'), ticket: 'pago-app' })
+    expect(evaluate(l, { sockets: [socket('strategy')] }).won).toBe(true)
+    const r = evaluate(l, { sockets: [socket('strategy')], ticket: 'pago-app' })
     expect(r.metrics).toMatchObject({ delivered: 4, dropped: 0, nodesTouched: 0 })
     expect(r.won).toBe(true)
   })
 
   it('Observer cobra el mismo pedido tres veces', () => {
-    const r = evaluate(l, { socket: socket('observer') })
+    const r = evaluate(l, { sockets: [socket('observer')] })
     expect(r.metrics).toMatchObject({ delivered: 9, duplicatesAtSink: 6 })
     expect(r.won).toBe(false)
   })
 
   it('Decorator envuelve el pedido pero el vale se pierde igual', () => {
-    const r = evaluate(l, { socket: socket('decorator') })
+    const r = evaluate(l, { sockets: [socket('decorator')] })
     expect(r.metrics).toMatchObject({ delivered: 2, dropped: 1 })
     expect(r.won).toBe(false)
   })

@@ -14,12 +14,12 @@ describe('L06 · Decorator', () => {
   })
 
   it('Decorator aplica cualquier combinación y el caramelo no toca nada existente', () => {
-    expect(evaluate(level, { socket: socket('decorator') }).metrics).toMatchObject({ delivered: 4, invalidAtSink: 0 })
-    const r = evaluate(level, { socket: socket('decorator'), ticket: 'caramelo' })
+    expect(evaluate(level, { sockets: [socket('decorator')] }).metrics).toMatchObject({ delivered: 4, invalidAtSink: 0 })
+    const r = evaluate(level, { sockets: [socket('decorator')], ticket: 'caramelo' })
     expect(r.metrics).toMatchObject({ delivered: 5, invalidAtSink: 0, nodesTouched: 0 })
   })
 
   it('Strategy aplica un solo extra por bebida', () => {
-    expect(evaluate(level, { socket: socket('strategy') }).metrics.invalidAtSink).toBe(2)
+    expect(evaluate(level, { sockets: [socket('strategy')] }).metrics.invalidAtSink).toBe(2)
   })
 })

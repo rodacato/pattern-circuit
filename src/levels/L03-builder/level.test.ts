@@ -11,17 +11,17 @@ describe('L03 · Builder', () => {
   })
 
   it('Builder corrige el orden y rechaza lo imposible antes de cobrar', () => {
-    const r = evaluate(l, { socket: socket('builder') })
+    const r = evaluate(l, { sockets: [socket('builder')] })
     expect(r.metrics).toMatchObject({ delivered: 3, invalidAtSink: 0, dropped: 0 })
     expect(r.won).toBe(true)
   })
 
   it('Factory Method pierde los pedidos que no tienen molde', () => {
-    expect(evaluate(l, { socket: socket('factory-method') }).metrics).toMatchObject({ delivered: 1, dropped: 2 })
+    expect(evaluate(l, { sockets: [socket('factory-method')] }).metrics).toMatchObject({ delivered: 1, dropped: 2 })
   })
 
   it('Decorator arregla los extras pero lo imposible sigue llegando a cocina', () => {
-    const r = evaluate(l, { socket: socket('decorator') })
+    const r = evaluate(l, { sockets: [socket('decorator')] })
     expect(r.metrics).toMatchObject({ invalidAtSink: 0, dropped: 1 })
     expect(r.won).toBe(false)
   })

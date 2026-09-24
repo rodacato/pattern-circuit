@@ -14,11 +14,11 @@ describe('L19 · Event Bus', () => {
   })
 
   it('Event Bus: todos se enteran y Analytics se suscribe sin tocar nada', () => {
-    expect(evaluate(level, { socket: socket('event-bus') }).metrics.delivered).toBe(9)
-    expect(evaluate(level, { socket: socket('event-bus'), ticket: 'analytics' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
+    expect(evaluate(level, { sockets: [socket('event-bus')] }).metrics.delivered).toBe(9)
+    expect(evaluate(level, { sockets: [socket('event-bus')], ticket: 'analytics' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
   })
 
   it('Observer por productor deja las listas desparejas', () => {
-    expect(evaluate(level, { socket: socket('observer') }).metrics.delivered).toBe(7)
+    expect(evaluate(level, { sockets: [socket('observer')] }).metrics.delivered).toBe(7)
   })
 })

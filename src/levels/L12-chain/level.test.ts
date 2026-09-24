@@ -14,12 +14,12 @@ describe('L12 · Chain of Responsibility', () => {
   })
 
   it('la cadena atiende o rechaza con aviso, y el supervisor se inserta sin tocar a nadie', () => {
-    expect(evaluate(level, { socket: socket('chain-of-responsibility') }).metrics).toMatchObject({ delivered: 4, dropped: 0 })
-    const r = evaluate(level, { socket: socket('chain-of-responsibility'), ticket: 'supervisor' })
+    expect(evaluate(level, { sockets: [socket('chain-of-responsibility')] }).metrics).toMatchObject({ delivered: 4, dropped: 0 })
+    const r = evaluate(level, { sockets: [socket('chain-of-responsibility')], ticket: 'supervisor' })
     expect(r.metrics).toMatchObject({ delivered: 5, dropped: 0, nodesTouched: 0 })
   })
 
   it('Observer paga el mismo reembolso varias veces', () => {
-    expect(evaluate(level, { socket: socket('observer') }).metrics.duplicatesAtSink).toBeGreaterThan(0)
+    expect(evaluate(level, { sockets: [socket('observer')] }).metrics.duplicatesAtSink).toBeGreaterThan(0)
   })
 })

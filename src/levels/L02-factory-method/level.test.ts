@@ -17,17 +17,17 @@ describe('L02 · Factory Method', () => {
   })
 
   it('Factory Method resuelve y Puerto no toca nodos existentes', () => {
-    expect(evaluate(l, { socket: socket('factory-method') }).won).toBe(true)
-    const r = evaluate(l, { socket: socket('factory-method'), ticket: 'sucursal-puerto' })
+    expect(evaluate(l, { sockets: [socket('factory-method')] }).won).toBe(true)
+    const r = evaluate(l, { sockets: [socket('factory-method')], ticket: 'sucursal-puerto' })
     expect(r.metrics).toMatchObject({ delivered: 4, invalidAtSink: 0, nodesTouched: 0 })
     expect(r.won).toBe(true)
   })
 
   it('Singleton le da lo mismo a todas las sucursales', () => {
-    expect(evaluate(l, { socket: socket('singleton') }).metrics.invalidAtSink).toBe(2)
+    expect(evaluate(l, { sockets: [socket('singleton')] }).metrics.invalidAtSink).toBe(2)
   })
 
   it('Builder arma pasos pero el if sigue eligiendo mal', () => {
-    expect(evaluate(l, { socket: socket('builder') }).metrics.invalidAtSink).toBe(1)
+    expect(evaluate(l, { sockets: [socket('builder')] }).metrics.invalidAtSink).toBe(1)
   })
 })

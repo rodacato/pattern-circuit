@@ -15,7 +15,7 @@ export class Playback {
 
   private carry = 0
   private pending: SimEvent[] = []
-  private pulseRefs = new Map<number, string>()
+  private pulseRefs = new Map<number, { tick: number; ref: string }[]>() // regiones que visitó cada pulso
 
   constructor(circuit: Circuit, scenario: Scenario, speed = 1) {
     this.circuit = compile(circuit)
@@ -28,13 +28,12 @@ export class Playback {
     return this.timeline.done
   }
 
-  get started() {
-    return this.timeline.tick > 0
-  }
-
   // Región activa: la del pulso seguido; si no hay, la del nodo inspeccionado.
   get activeRef(): string | undefined {
-    if (this.followed !== undefined && this.pulseRefs.has(this.followed)) return this.pulseRefs.get(this.followed)
+    const visited = this.followed !== undefined ? this.pulseRefs.get(this.followed) : undefined
+    // Tras retroceder, solo cuentan las regiones visitadas hasta el tick actual.
+    const ref = visited?.findLast((v) => v.tick < this.timeline.tick)?.ref
+    if (ref) return ref
     return this.inspected ? this.circuit.nodes.get(this.inspected)?.codeRef : undefined
   }
 
@@ -105,7 +104,11 @@ export class Playback {
     this.prevState = this.timeline.current.state
     const events = this.timeline.forward()
     for (const e of events) {
-      if ((e.type === 'pulse.enter' || e.type === 'pulse.branch') && e.codeRef) this.pulseRefs.set(e.pulseId, e.codeRef)
+      if ((e.type === 'pulse.enter' || e.type === 'pulse.branch') && e.codeRef) {
+        const visited = (this.pulseRefs.get(e.pulseId) ?? []).filter((v) => v.tick < e.tick) // al re-simular tras retroceder
+        visited.push({ tick: e.tick, ref: e.codeRef })
+        this.pulseRefs.set(e.pulseId, visited)
+      }
     }
     this.pending.push(...events)
     this.autoFollow()

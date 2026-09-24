@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'command' | 'strategy' | 'observer') => ({ socket: { id: 'pedidos', pattern } })
+const socket = (pattern: 'command' | 'strategy' | 'observer') => ({ sockets: [{ id: 'pedidos', pattern }] })
 
 describe('L13 · Command', () => {
   it('sin patrón: el latte se prepara igual y la cancelación se pierde', () => {

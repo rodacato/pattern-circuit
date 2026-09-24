@@ -3,9 +3,11 @@ import {
   codeKey,
   evaluate,
   scenarioFor,
+  score,
   type ChangeTicket,
   type Evaluation,
   type Level,
+  type MetricName,
   type PatternId,
   type PlayerAction,
   type SocketDef,
@@ -13,9 +15,20 @@ import {
   type Variant,
 } from '../../engine'
 import { Emitter } from '../events/Emitter'
-import { initialFlow, reduceFlow, variantFor, type FlowEvent, type FlowState, type Side } from '../flow/levelFlow'
+import {
+  initialFlow,
+  lastPluggedOption,
+  pendingSockets,
+  pluggedPatterns,
+  reduceFlow,
+  targetSocket,
+  variantFor,
+  type FlowEvent,
+  type FlowState,
+  type Side,
+} from '../flow/levelFlow'
 import { Playback } from '../playback/Playback'
-import { noteKey, withCompleted, withNote, type Progress, type ProgressStore } from '../progress/progress'
+import { emptyProgress, withCompleted, withNotes, type Progress, type ProgressStore } from '../progress/progress'
 
 export type ConnectResult = 'repaired' | 'wrong' | 'none'
 export type Comparison = Record<Side, Evaluation>
@@ -68,12 +81,38 @@ export class GameSession {
 
   // La opción enchufada más recientemente: la que comenta la nota de campo.
   get pluggedOption(): SocketOption | undefined {
-    const p = this.flow.last ? this.flow.plugs[this.flow.last] : undefined
-    return p ? this.level.sockets.find((s) => s.id === p.socketId)?.options[p.pattern] : undefined
+    return lastPluggedOption(this.level, this.flow)
   }
 
   get pluggedPatterns(): PatternId[] {
-    return this.level.sockets.flatMap((s) => (this.flow.plugs[s.id] ? [this.flow.plugs[s.id].pattern] : []))
+    return pluggedPatterns(this.level, this.flow)
+  }
+
+  get pendingSockets(): SocketDef[] {
+    return pendingSockets(this.level, this.flow)
+  }
+
+  // Patrón que corre ahora en cada socket (en la comparación "sin patrón", ninguno).
+  pluggedAt(socketId: string): PatternId | undefined {
+    return this.variant.sockets?.find((p) => p.id === socketId)?.pattern
+  }
+
+  // Métricas objetivo del nivel que cambian entre sin y con patrón: las filas de la comparación.
+  get comparisonRows(): MetricName[] {
+    const cmp = this.comparison
+    if (!cmp) return []
+    return [...new Set(this.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
+  }
+
+  // Resultado del patrón en un socket concreto, o en el primero que lo ofrece.
+  outcomeOf(pattern: PatternId): SocketOption['outcome'] | undefined {
+    const socketId = Object.values(this.flow.plugs).find((p) => p.pattern === pattern)?.socketId
+    const socket = this.level.sockets.find((s) => s.id === socketId) ?? this.level.sockets.find((s) => s.options[pattern])
+    return socket?.options[pattern]?.outcome
+  }
+
+  accepts(pattern: PatternId, socketId: string): boolean {
+    return !!this.level.sockets.find((s) => s.id === socketId)?.options[pattern]
   }
 
   get inventoryOpen() {
@@ -149,12 +188,8 @@ export class GameSession {
     return 'repaired'
   }
 
-  // Sin socket explícito, va al primero que acepte el patrón (prefiriendo uno aún sin resolver).
   plug(pattern: PatternId, socketId?: string): SocketOption | undefined {
-    const accepting = this.level.sockets.filter((s) => s.options[pattern])
-    const socket = socketId
-      ? accepting.find((s) => s.id === socketId)
-      : (accepting.find((s) => this.flow.plugs[s.id]?.outcome !== 'solves') ?? accepting[0])
+    const socket = targetSocket(this.level, this.flow, pattern, socketId)
     const option = socket?.options[pattern]
     if (!socket || !option || !this.inventoryOpen) return undefined
     this.dispatch({ type: 'plug', socketId: socket.id, pattern, outcome: option.outcome })
@@ -191,19 +226,21 @@ export class GameSession {
     this.emitter.emit()
   }
 
+  resetProgress() {
+    this.saveProgress(emptyProgress())
+    this.emitter.emit()
+  }
+
   private compare(): Comparison {
     const at = (side: Side) => evaluate(this.level, variantFor(this.level, { ...this.flow, stage: 'compare', side }, this.repairs))
     return { without: at('without'), with: at('with') }
   }
 
+  // La corrida ya terminó en la reproducción: basta con calificar su estado final.
   private runFinished() {
-    const variant = this.variant
-    this.result = evaluate(this.level, variant)
+    this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched)
     if (!this.result.won) this.failedRuns++
-    if (this.flow.stage === 'choose') {
-      const notes = Object.values(this.flow.plugs).reduce((p, plug) => withNote(p, noteKey(this.level.id, plug.pattern)), this.progress)
-      this.saveProgress(notes)
-    }
+    if (this.flow.stage === 'choose') this.saveProgress(withNotes(this.progress, this.level.id, this.pluggedPatterns))
     this.dispatch({ type: 'run-finished', won: this.result.won })
     this.completeIfDone()
     this.emitter.emit()

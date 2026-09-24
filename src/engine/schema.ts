@@ -211,7 +211,7 @@ export const LevelDef = z.object({
   sockets: z.array(SocketDef).default([]),
   repairs: z.array(Repair).default([]),
   scenarios: z.array(Scenario).min(1),
-  changeTickets: z.array(ChangeTicket).default([]),
+  changeTickets: z.array(ChangeTicket).max(1).default([]), // el flujo del nivel tiene una sola etapa de cambio
   winWhen: z.array(Assertion).default([]),
   checklist: z.array(ChecklistItem).default([]),
   code: z.object({ rb: z.record(z.string(), z.string()) }), // { base, strategy, ... }

@@ -1,6 +1,6 @@
 import { compile, type CompiledCircuit, type CompiledWire } from '../circuit/compile'
 import { matches } from './predicate'
-import type { Circuit, NodeDef, Scenario, ScenarioPulse } from '../schema'
+import type { Behavior, Circuit, NodeDef, Scenario, ScenarioPulse } from '../schema'
 import type { DropReason, Pulse, SimEvent, SimState } from './types'
 
 export type SimConfig = {
@@ -8,7 +8,7 @@ export type SimConfig = {
   defaultCost: number // ticks dentro de un nodo
 }
 
-export const DEFAULT_CONFIG: SimConfig = { speed: 0.1, defaultCost: 18 }
+const DEFAULT_CONFIG: SimConfig = { speed: 0.1, defaultCost: 18 }
 
 export type Sim = {
   circuit: CompiledCircuit
@@ -40,12 +40,23 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
       deliveredOrigins: {},
       counters: {},
       nodeState: {},
+      failures: {},
       cacheKeys: {},
       joins: {},
       sinkSeen: {},
       metrics: { spawned: 0, delivered: 0, dropped: 0, invalidAtSink: 0, duplicatesAtSink: 0, cancelled: 0, maxLoad: 0 },
     },
   }
+}
+
+export const BREAKER_OPEN = 'abierto'
+const BREAKER_CLOSED = 'cerrado'
+
+// Estado con el que arranca un nodo con estado (máquina o interruptor), antes de recibir pulsos.
+export function initialNodeState(behavior: Behavior): string | undefined {
+  if (behavior.type === 'machine') return behavior.initial
+  if (behavior.type === 'breaker') return BREAKER_CLOSED
+  return undefined
 }
 
 // Un pulso retenido en un join cuyos hermanos se perdieron ya no avanzará: no bloquea el final.
@@ -143,13 +154,13 @@ class Tick {
       return
     }
     this.startProcessing(pulse, node)
-    if (node.behavior.type === 'buffer') this.tryCancel(pulse, node, node.behavior)
   }
 
   private startProcessing(pulse: Pulse, node: NodeDef) {
     const cost = node.cost ?? (node.behavior.type === 'source' ? 0 : this.sim.config.defaultCost)
     pulse.loc = { kind: 'node', nodeId: node.id, remaining: cost }
     this.emit({ type: 'pulse.enter', pulseId: pulse.id, nodeId: node.id, codeRef: node.codeRef })
+    if (node.behavior.type === 'buffer') this.tryCancel(pulse, node, node.behavior)
   }
 
   private resolve(pulse: Pulse, node: NodeDef) {
@@ -161,18 +172,11 @@ class Tick {
       case 'sink':
         return this.deliver(pulse, node, (b.expects ? matches(b.expects, pulse) : true) && this.firstSeen(node, b.uniqueBy, pulse))
       case 'transform':
-        if (b.when && !matches(b.when, pulse)) return this.exitVia(pulse, node, 'out')
-        if (b.addTags) pulse.tags = [...new Set([...pulse.tags, ...b.addTags])]
-        if (b.removeTags) pulse.tags = pulse.tags.filter((t) => !b.removeTags!.includes(t))
-        if (b.setShape) pulse.shape = b.setShape
-        if (b.setData) pulse.data = { ...pulse.data, ...structuredClone(b.setData) }
-        this.emit({ type: 'pulse.transform', pulseId: pulse.id, nodeId: node.id })
-        return this.exitVia(pulse, node, 'out')
+        return this.transform(pulse, node, b)
       case 'branch': {
         const tag = Object.keys(b.cases).find((t) => pulse.tags.includes(t))
         this.emitBranch(pulse, node, tag ?? 'else')
-        if (tag) return this.exitVia(pulse, node, b.cases[tag])
-        return b.else === 'drop' ? this.drop(pulse, node, 'unhandled') : this.exitVia(pulse, node, b.else)
+        return this.exitOrDrop(pulse, node, tag ? b.cases[tag] : b.else, 'unhandled')
       }
       case 'slot': {
         const wire = this.c.outgoing.get(node.id)!.find((w) => w.key !== undefined && pulse.tags.includes(w.key))
@@ -186,59 +190,72 @@ class Tick {
         return this.leaveOn(pulse, node, first)
       }
       case 'guard':
-        if (matches(b.require, pulse)) return this.exitVia(pulse, node, 'out')
-        return b.onFail === 'drop' ? this.drop(pulse, node, 'guard') : this.exitVia(pulse, node, b.onFail)
-      case 'counter': {
-        const value = b.fresh ? 1 : (this.s.counters[b.key] ?? 0) + 1
-        if (!b.fresh) this.s.counters[b.key] = value
-        pulse.data = { ...pulse.data, [b.field]: value }
-        this.emit({ type: 'pulse.count', pulseId: pulse.id, nodeId: node.id, value })
-        return this.exitVia(pulse, node, 'out')
-      }
+        return this.exitOrDrop(pulse, node, matches(b.require, pulse) ? 'out' : b.onFail, 'guard')
+      case 'counter':
+        return this.count(pulse, node, b)
       case 'join':
         return this.join(pulse, node)
-      case 'cache': {
-        const key = String(pulse.data[b.key])
-        const seen = (this.s.cacheKeys[node.id] ??= [])
-        const hit = seen.includes(key)
-        if (!hit) seen.push(key)
-        this.emit({ type: 'pulse.cache', pulseId: pulse.id, nodeId: node.id, hit })
-        return this.exitVia(pulse, node, hit ? 'hit' : 'miss')
-      }
-      case 'machine': {
-        const current = this.s.nodeState[node.id] ?? b.initial
-        const transitions = b.states[current] ?? {}
-        const tag = Object.keys(transitions).find((t) => pulse.tags.includes(t))
-        this.emitBranch(pulse, node, current)
-        if (!tag) return b.else === 'drop' ? this.drop(pulse, node, 'unhandled') : this.exitVia(pulse, node, b.else)
-        const t = transitions[tag]
-        if (t.addTags) pulse.tags = [...new Set([...pulse.tags, ...t.addTags])]
-        if (t.to && t.to !== current) {
-          this.s.nodeState[node.id] = t.to
-          this.emit({ type: 'node.state', nodeId: node.id, state: t.to })
-        }
-        return this.exitVia(pulse, node, t.port)
-      }
-      case 'breaker': {
-        const key = `breaker:${node.id}`
-        if (pulse.tags.includes(b.failTag)) {
-          const failures = (this.s.counters[key] ?? 0) + 1
-          this.s.counters[key] = failures
-          if (failures >= b.threshold && this.s.nodeState[node.id] !== 'abierto') {
-            this.s.nodeState[node.id] = 'abierto'
-            this.emit({ type: 'node.state', nodeId: node.id, state: 'abierto' })
-          }
-          return this.exitVia(pulse, node, 'fallback')
-        }
-        return this.exitVia(pulse, node, this.s.nodeState[node.id] === 'abierto' ? 'fallback' : 'call')
-      }
+      case 'cache':
+        return this.cache(pulse, node, b)
+      case 'machine':
+        return this.machine(pulse, node, b)
+      case 'breaker':
+        return this.breaker(pulse, node, b)
       case 'buffer':
         return this.exitVia(pulse, node, pulse.tags.includes(b.cancelTag) ? 'orphan' : 'out')
     }
   }
 
+  private transform(pulse: Pulse, node: NodeDef, b: BehaviorOf<'transform'>) {
+    if (b.when && !matches(b.when, pulse)) return this.exitVia(pulse, node, 'out')
+    if (b.addTags) addTags(pulse, b.addTags)
+    if (b.removeTags) pulse.tags = pulse.tags.filter((t) => !b.removeTags!.includes(t))
+    if (b.setShape) pulse.shape = b.setShape
+    if (b.setData) pulse.data = { ...pulse.data, ...structuredClone(b.setData) }
+    this.emit({ type: 'pulse.transform', pulseId: pulse.id, nodeId: node.id })
+    return this.exitVia(pulse, node, 'out')
+  }
+
+  private count(pulse: Pulse, node: NodeDef, b: BehaviorOf<'counter'>) {
+    const value = b.fresh ? 1 : (this.s.counters[b.key] ?? 0) + 1
+    if (!b.fresh) this.s.counters[b.key] = value
+    pulse.data = { ...pulse.data, [b.field]: value }
+    this.emit({ type: 'pulse.count', pulseId: pulse.id, nodeId: node.id, value })
+    return this.exitVia(pulse, node, 'out')
+  }
+
+  private cache(pulse: Pulse, node: NodeDef, b: BehaviorOf<'cache'>) {
+    const key = String(pulse.data[b.key])
+    const seen = (this.s.cacheKeys[node.id] ??= [])
+    const hit = seen.includes(key)
+    if (!hit) seen.push(key)
+    this.emit({ type: 'pulse.cache', pulseId: pulse.id, nodeId: node.id, hit })
+    return this.exitVia(pulse, node, hit ? 'hit' : 'miss')
+  }
+
+  private machine(pulse: Pulse, node: NodeDef, b: BehaviorOf<'machine'>) {
+    const current = this.s.nodeState[node.id] ?? b.initial
+    const transitions = b.states[current] ?? {}
+    const tag = Object.keys(transitions).find((t) => pulse.tags.includes(t))
+    this.emitBranch(pulse, node, current)
+    if (!tag) return this.exitOrDrop(pulse, node, b.else, 'unhandled')
+    const t = transitions[tag]
+    if (t.addTags) addTags(pulse, t.addTags)
+    if (t.to) this.setState(node, t.to)
+    return this.exitVia(pulse, node, t.port)
+  }
+
+  // Los fallos vuelven al interruptor marcados con `failTag`; los éxitos no regresan, así que nunca reinician la cuenta.
+  private breaker(pulse: Pulse, node: NodeDef, b: BehaviorOf<'breaker'>) {
+    if (!pulse.tags.includes(b.failTag)) return this.exitVia(pulse, node, this.s.nodeState[node.id] === BREAKER_OPEN ? 'fallback' : 'call')
+    const failures = (this.s.failures[node.id] ?? 0) + 1
+    this.s.failures[node.id] = failures
+    if (failures >= b.threshold) this.setState(node, BREAKER_OPEN)
+    return this.exitVia(pulse, node, 'fallback')
+  }
+
   private join(pulse: Pulse, node: NodeDef) {
-    const expected = [...this.c.wires.values()].filter((w) => w.to === node.id).length
+    const expected = this.c.incoming.get(node.id) ?? 0
     const byOrigin = (this.s.joins[node.id] ??= {})
     const held = (byOrigin[pulse.originId] ??= [])
     if (held.length + 1 < expected) {
@@ -249,7 +266,7 @@ class Tick {
     }
     for (const id of held) {
       const sibling = this.s.pulses.find((p) => p.id === id)!
-      pulse.tags = [...new Set([...pulse.tags, ...sibling.tags])] // lo que cada parte aportó llega junto
+      addTags(pulse, sibling.tags) // lo que cada parte aportó llega junto
       sibling.status = 'merged'
       sibling.loc = { kind: 'gone', nodeId: node.id }
       this.emit({ type: 'pulse.merge', pulseId: id, nodeId: node.id, intoId: pulse.id })
@@ -290,6 +307,10 @@ class Tick {
     if (seen.includes(value)) return false
     seen.push(value)
     return true
+  }
+
+  private exitOrDrop(pulse: Pulse, node: NodeDef, port: string, reason: DropReason) {
+    return port === 'drop' ? this.drop(pulse, node, reason) : this.exitVia(pulse, node, port)
   }
 
   private exitVia(pulse: Pulse, node: NodeDef, port: string) {
@@ -345,6 +366,12 @@ class Tick {
     this.emit({ type: 'pulse.branch', pulseId: pulse.id, nodeId: node.id, branch, codeRef })
   }
 
+  private setState(node: NodeDef, state: string) {
+    if (this.s.nodeState[node.id] === state) return
+    this.s.nodeState[node.id] = state
+    this.emit({ type: 'node.state', nodeId: node.id, state })
+  }
+
   private setLoad(nodeId: string, load: number) {
     this.s.load[nodeId] = load
     this.s.metrics.maxLoad = Math.max(this.s.metrics.maxLoad, load)
@@ -356,4 +383,9 @@ class Tick {
   }
 }
 
+const addTags = (pulse: Pulse, tags: string[]) => {
+  pulse.tags = [...new Set([...pulse.tags, ...tags])]
+}
+
+type BehaviorOf<T extends Behavior['type']> = Extract<Behavior, { type: T }>
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never

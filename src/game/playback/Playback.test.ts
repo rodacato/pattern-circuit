@@ -46,4 +46,15 @@ describe('Playback', () => {
     expect(p.drainEvents()).toEqual([])
     expect(p.followed).toBeUndefined()
   })
+
+  it('al retroceder, el panel de código vuelve a la región donde estaba el pulso', () => {
+    const p = new Playback(circuit(), scenario({ at: 0 }))
+    while (p.activeRef !== 'A#run') p.step()
+    const reachedAt = p.timeline.tick
+    p.back()
+    expect(p.timeline.tick).toBe(reachedAt - 1)
+    expect(p.activeRef).toBeUndefined()
+    p.step()
+    expect(p.activeRef).toBe('A#run')
+  })
 })

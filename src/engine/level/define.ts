@@ -5,18 +5,22 @@ import { LevelDef, type LevelInput } from '../schema'
 
 export type Level = LevelDef & { codeFiles: Record<string, CodeFile> }
 
+// Las reparaciones se hacen de a una, en cualquier orden: cualquier subconjunto es alcanzable.
+const subsets = <T>(items: T[]): T[][] => items.reduce<T[][]>((acc, x) => acc.flatMap((s) => [s, [...s, x]]), [[]])
+
 // Los tickets de cambio solo se lanzan sobre el circuito base o con todos los sockets resueltos.
 export function reachableVariants(level: LevelDef): Variant[] {
-  const repairs = level.repairs.map((r) => r.id)
+  const all = level.repairs.map((r) => r.id)
+  const partial = subsets(all).filter((s) => s.length < all.length)
   const combos = level.sockets.reduce<Plug[][]>(
     (acc, socket) => acc.flatMap((plugs) => [plugs, ...socket.inventory.map((pattern) => [...plugs, { id: socket.id, pattern }])]),
     [[]],
   )
   const variants: Variant[] = []
   for (const sockets of combos) {
-    const v: Variant = sockets.length ? { repairs, sockets } : repairs.length ? { repairs } : {}
+    const v: Variant = sockets.length ? { repairs: all, sockets } : all.length ? { repairs: all } : {}
     variants.push(v)
-    if (sockets.length === 0 && repairs.length) variants.push({})
+    if (sockets.length === 0) variants.push(...partial.map((repairs) => (repairs.length ? { repairs } : {})))
     if (sockets.length === 0 || solvesAll(level, v)) for (const t of level.changeTickets) variants.push({ ...v, ticket: t.id })
   }
   return variants
@@ -40,6 +44,10 @@ export function defineLevel(input: LevelInput): Level {
       if (!socket.options[pattern]) errors.push(`socket ${socket.id}: ${pattern} en inventario sin opción`)
     }
   }
+  const fail = () => {
+    throw new Error(`Nivel ${level.id} inválido:\n- ${[...new Set(errors)].join('\n- ')}`)
+  }
+  if (errors.length) fail() // sin inventario coherente no se pueden recorrer las variantes
 
   for (const v of reachableVariants(level)) {
     const label = JSON.stringify(v)
@@ -64,6 +72,6 @@ export function defineLevel(input: LevelInput): Level {
     }
   }
 
-  if (errors.length) throw new Error(`Nivel ${level.id} inválido:\n- ${[...new Set(errors)].join('\n- ')}`)
+  if (errors.length) fail()
   return { ...level, codeFiles }
 }

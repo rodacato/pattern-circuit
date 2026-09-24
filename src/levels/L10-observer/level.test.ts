@@ -14,11 +14,11 @@ describe('L10 · Observer', () => {
   })
 
   it('Observer: todos se enteran y la cocina se suscribe sin tocar nada', () => {
-    expect(evaluate(level, { socket: socket('observer') }).metrics.delivered).toBe(9)
-    expect(evaluate(level, { socket: socket('observer'), ticket: 'cocina' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
+    expect(evaluate(level, { sockets: [socket('observer')] }).metrics.delivered).toBe(9)
+    expect(evaluate(level, { sockets: [socket('observer')], ticket: 'cocina' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
   })
 
   it.each(['strategy', 'chain-of-responsibility'] as const)('%s: solo uno se entera', (p) => {
-    expect(evaluate(level, { socket: socket(p) }).metrics.delivered).toBe(3)
+    expect(evaluate(level, { sockets: [socket(p)] }).metrics.delivered).toBe(3)
   })
 })

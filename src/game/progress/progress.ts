@@ -18,10 +18,20 @@ export const emptyProgress = (): Progress => ({ version: 1, completed: [], notes
 
 export const noteKey = (levelId: string, pattern: PatternId) => `${levelId}:${pattern}`
 
+export function parseNoteKey(key: string): { levelId: string; pattern: PatternId } {
+  const [levelId, pattern] = key.split(':') as [string, PatternId]
+  return { levelId, pattern }
+}
+
+// Nivel con el que arranca el juego: el primero sin completar (o el primero, si ya se terminó todo).
+export const firstUnfinished = <L extends { id: string }>(levels: L[], p: Progress): L => levels.find((l) => !p.completed.includes(l.id)) ?? levels[0]
+
 export const withCompleted = (p: Progress, levelId: string): Progress =>
   p.completed.includes(levelId) ? p : { ...p, completed: [...p.completed, levelId] }
 
 export const withNote = (p: Progress, key: string): Progress => (p.notes.includes(key) ? p : { ...p, notes: [...p.notes, key] })
+
+export const withNotes = (p: Progress, levelId: string, patterns: PatternId[]): Progress => patterns.reduce((acc, pattern) => withNote(acc, noteKey(levelId, pattern)), p)
 
 export class MemoryProgressStore implements ProgressStore {
   private value: Progress

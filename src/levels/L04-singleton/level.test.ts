@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'singleton' | 'factory-method' | 'strategy') => ({ socket: { id: 'contador', pattern } })
+const socket = (pattern: 'singleton' | 'factory-method' | 'strategy') => ({ sockets: [{ id: 'contador', pattern }] })
 
 describe('L04 · Singleton', () => {
   it('sin patrón: cada caja reparte los mismos turnos', () => {

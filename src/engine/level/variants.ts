@@ -1,18 +1,18 @@
 import { applyPatch, nodesTouched } from '../circuit/patch'
 import type { Assertion, Circuit, LevelDef, MetricName, PatternId, Scenario, SocketDef, SocketOption } from '../schema'
-import { createSim, runToEnd, type SimConfig } from '../sim/sim'
+import { createSim, runToEnd } from '../sim/sim'
+import type { SimMetrics } from '../sim/types'
 
 export type Plug = { id: string; pattern: PatternId }
 
 // Una variante es una combinación de decisiones del jugador sobre el circuito base.
 export type Variant = {
   repairs?: string[]
-  socket?: Plug // atajo para niveles de un solo socket
   sockets?: Plug[]
   ticket?: string
 }
 
-export const plugsOf = (v: Variant): Plug[] => v.sockets ?? (v.socket ? [v.socket] : [])
+const plugsOf = (v: Variant): Plug[] => v.sockets ?? []
 
 // Opciones enchufadas en el orden en que el nivel declara sus sockets.
 export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef; option: SocketOption }[] {
@@ -27,8 +27,6 @@ export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef
     return option ? [{ socket, option }] : []
   })
 }
-
-export const socketOption = (level: LevelDef, v: Variant): SocketOption | undefined => pluggedOptions(level, v)[0]?.option
 
 // Un ticket se aplica "a la manera correcta" solo con todos los sockets resueltos.
 export const solvesAll = (level: LevelDef, v: Variant) => {
@@ -87,10 +85,15 @@ export type Evaluation = {
   won: boolean
 }
 
-export function evaluate(level: LevelDef, v: Variant, config?: Partial<SimConfig>): Evaluation {
+// Corre la variante completa y la califica. Si ya se tiene la simulación terminada, basta con `score`.
+export function evaluate(level: LevelDef, v: Variant): Evaluation {
   const { circuit, touched } = buildCircuit(level, v)
-  const { sim } = runToEnd(createSim(circuit, scenarioFor(level, v), config))
-  const metrics = { ...sim.state.metrics, nodesTouched: touched.length }
+  const { sim } = runToEnd(createSim(circuit, scenarioFor(level, v)))
+  return score(level, sim.state.metrics, touched)
+}
+
+export function score(level: LevelDef, simMetrics: SimMetrics, touched: string[]): Evaluation {
+  const metrics = { ...simMetrics, nodesTouched: touched.length }
   const results = level.winWhen.map((assertion) => {
     const actual = metrics[assertion.metric]
     return { assertion, actual, pass: compare(actual, assertion.op, assertion.value) }

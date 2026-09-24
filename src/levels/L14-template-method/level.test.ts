@@ -14,7 +14,7 @@ describe('L14 · Template Method', () => {
   })
 
   it('Template Method: pasos comunes una sola vez', () => {
-    expect(evaluate(level, { socket }).metrics.invalidAtSink).toBe(0)
-    expect(evaluate(level, { socket, ticket: 'manga' }).touched).toEqual(['tapa'])
+    expect(evaluate(level, { sockets: [socket] }).metrics.invalidAtSink).toBe(0)
+    expect(evaluate(level, { sockets: [socket], ticket: 'manga' }).touched).toEqual(['tapa'])
   })
 })

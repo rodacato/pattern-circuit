@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialFlow, reduceFlow, variantFor, type FlowEvent, type FlowState } from './levelFlow'
+import { initialFlow, lastPluggedOption, pendingSockets, pluggedPatterns, reduceFlow, stagesFor, targetSocket, variantFor, type FlowEvent, type FlowState } from './levelFlow'
 
 const socket = { id: 's', at: 'n', label: 'S', inventory: [], options: {} }
 const ticket = { id: 't', text: '', scenario: 'x', without: {}, with: {}, code: {} }
@@ -7,7 +7,7 @@ const L0 = { sockets: [], changeTickets: [] }
 const L1 = { sockets: [socket], changeTickets: [ticket] }
 const L3 = { sockets: [socket], changeTickets: [] }
 
-const run = (level: typeof L1 | typeof L0 | typeof L3, ...events: FlowEvent[]): FlowState =>
+const run = (level: Parameters<typeof reduceFlow>[0], ...events: FlowEvent[]): FlowState =>
   events.reduce((s, e) => reduceFlow(level, s, e), initialFlow())
 
 const plug = (outcome: 'solves' | 'partial' | 'misfit'): FlowEvent => ({ type: 'plug', socketId: 's', pattern: 'strategy', outcome })
@@ -90,5 +90,36 @@ describe('flujo con varios sockets', () => {
   it('desenchufar un socket deja el otro', () => {
     const s = run(L2, finished(false), plugAt('s', 'solves'), plugAt('o', 'misfit'), { type: 'unplug', socketId: 'o' })
     expect(Object.keys(s.plugs)).toEqual(['s'])
+  })
+})
+
+describe('selectores del flujo', () => {
+  const option = (outcome: 'solves' | 'misfit') => ({ outcome, code: '', note: { title: outcome, body: '' }, patch: {} })
+  const a = { id: 'a', at: 'n', label: 'A', inventory: ['strategy' as const], options: { strategy: option('solves') } }
+  const b = { id: 'b', at: 'm', label: 'B', inventory: ['strategy' as const, 'observer' as const], options: { strategy: option('solves'), observer: option('misfit') } }
+  const level = { sockets: [a, b], changeTickets: [ticket] }
+  const plugAt = (socketId: string, pattern: 'strategy' | 'observer', outcome: 'solves' | 'misfit'): FlowEvent => ({ type: 'plug', socketId, pattern, outcome })
+
+  it('stagesFor salta las etapas que el nivel no usa', () => {
+    expect(stagesFor(L0)).toEqual(['observe'])
+    expect(stagesFor(L3)).toEqual(['observe', 'choose', 'compare'])
+    expect(stagesFor(L1)).toEqual(['observe', 'choose', 'change', 'compare'])
+  })
+
+  it('targetSocket respeta el socket pedido y, si no hay, prefiere uno sin resolver', () => {
+    const start = run(level, finished(false))
+    expect(targetSocket(level, start, 'observer')?.id).toBe('b')
+    expect(targetSocket(level, start, 'strategy')?.id).toBe('a')
+    expect(targetSocket(level, start, 'strategy', 'b')?.id).toBe('b')
+    expect(targetSocket(level, start, 'observer', 'a')).toBeUndefined()
+    const aSolved = reduceFlow(level, start, plugAt('a', 'strategy', 'solves'))
+    expect(targetSocket(level, aSolved, 'strategy')?.id).toBe('b')
+  })
+
+  it('patrones, sockets pendientes y última nota siguen el orden del nivel', () => {
+    const s = run(level, finished(false), plugAt('b', 'observer', 'misfit'), plugAt('a', 'strategy', 'solves'))
+    expect(pluggedPatterns(level, s)).toEqual(['strategy', 'observer'])
+    expect(pendingSockets(level, s).map((k) => k.id)).toEqual(['b'])
+    expect(lastPluggedOption(level, s)?.note.title).toBe('solves')
   })
 })

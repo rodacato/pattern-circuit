@@ -437,14 +437,13 @@ export class NeonStage {
   // Cada socket late mientras espera un patrón; al enchufar toma el color de la familia del patrón.
   private drawSockets(d: Graphics, gl: Graphics, time: number) {
     const s = this.session
-    const plugs = s.variant.sockets ?? (s.variant.socket ? [s.variant.socket] : [])
     for (const socket of s.sockets) {
       const text = this.socketLabels.get(socket.id) ?? this.socketLayer.addChild(label('', 11, C.violet))
       text.anchor.set(0.5, 1)
       this.socketLabels.set(socket.id, text)
       text.visible = false
       const at = this.socketPoint(socket.id)
-      const plugged = plugs.find((p) => p.id === socket.id)?.pattern
+      const plugged = s.pluggedAt(socket.id)
       if (!at || (!s.inventoryOpen && !plugged)) continue
       const color = plugged ? FAMILY_COLORS[PATTERNS[plugged].family] : C.violet
       const waiting = !plugged && s.inventoryOpen

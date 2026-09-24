@@ -9,6 +9,7 @@ import {
   pointAt,
   resolveRegion,
   scenarioFor,
+  solvesAll,
   Timeline,
   type Level,
   type PatternId,
@@ -186,8 +187,16 @@ export default function DebugApp() {
 }
 
 function VariantControls({ level, variant, onChange }: { level: Level; variant: Variant; onChange: (v: Variant) => void }) {
-  const socket = level.sockets[0]
-  const solves = variant.socket && socket?.options[variant.socket.pattern]?.outcome === 'solves'
+  const plugs = variant.sockets ?? []
+  // Un ticket solo corre sobre el circuito base o con todos los sockets resueltos.
+  const ticketAllowed = plugs.length === 0 || solvesAll(level, variant)
+  const setPlug = (socketId: string, pattern: PatternId | '') => {
+    const others = plugs.filter((p) => p.id !== socketId)
+    const sockets = pattern ? [...others, { id: socketId, pattern }] : others
+    const next: Variant = { ...variant, sockets: sockets.length ? sockets : undefined }
+    if (sockets.length && !solvesAll(level, next)) delete next.ticket
+    onChange(next)
+  }
   return (
     <>
       {level.repairs.map((r) => (
@@ -205,16 +214,8 @@ function VariantControls({ level, variant, onChange }: { level: Level; variant: 
           {r.prompt}
         </label>
       ))}
-      {socket && (
-        <select
-          value={variant.socket?.pattern ?? ''}
-          onChange={(e) => {
-            const pattern = e.target.value as PatternId | ''
-            const next: Variant = { ...variant, socket: pattern ? { id: socket.id, pattern } : undefined }
-            if (pattern && socket.options[pattern]?.outcome !== 'solves') delete next.ticket
-            onChange(next)
-          }}
-        >
+      {level.sockets.map((socket) => (
+        <select key={socket.id} value={plugs.find((p) => p.id === socket.id)?.pattern ?? ''} onChange={(e) => setPlug(socket.id, e.target.value as PatternId | '')}>
           <option value="">{socket.label}: sin patrón</option>
           {socket.inventory.map((p) => (
             <option key={p} value={p}>
@@ -222,12 +223,12 @@ function VariantControls({ level, variant, onChange }: { level: Level; variant: 
             </option>
           ))}
         </select>
-      )}
+      ))}
       {level.changeTickets.map((t) => (
         <label key={t.id}>
           <input
             type="checkbox"
-            disabled={!!variant.socket && !solves}
+            disabled={!ticketAllowed}
             checked={variant.ticket === t.id}
             onChange={(e) => onChange({ ...variant, ticket: e.target.checked ? t.id : undefined })}
           />

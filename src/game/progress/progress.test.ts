@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { emptyProgress, KeyValueProgressStore, noteKey, withCompleted, withNote } from './progress'
+import { emptyProgress, firstUnfinished, KeyValueProgressStore, noteKey, parseNoteKey, withCompleted, withNote, withNotes } from './progress'
 
 const fakeStorage = (initial: Record<string, string> = {}) => {
   const data = { ...initial }
@@ -37,5 +37,23 @@ describe('progreso', () => {
     })
     expect(store.load()).toEqual(emptyProgress())
     expect(() => store.save(emptyProgress())).not.toThrow()
+  })
+})
+
+describe('progreso: ayudantes', () => {
+  it('parseNoteKey es el inverso de noteKey', () => {
+    expect(parseNoteKey(noteKey('L10-observer', 'chain-of-responsibility'))).toEqual({ levelId: 'L10-observer', pattern: 'chain-of-responsibility' })
+  })
+
+  it('withNotes anota cada patrón una sola vez', () => {
+    const p = withNotes(withNotes(emptyProgress(), 'L1', ['strategy', 'observer']), 'L1', ['strategy'])
+    expect(p.notes).toEqual(['L1:strategy', 'L1:observer'])
+  })
+
+  it('firstUnfinished arranca en el primer nivel sin completar, o en el primero si ya se terminó todo', () => {
+    const levels = [{ id: 'a' }, { id: 'b' }]
+    expect(firstUnfinished(levels, emptyProgress()).id).toBe('a')
+    expect(firstUnfinished(levels, { ...emptyProgress(), completed: ['a'] }).id).toBe('b')
+    expect(firstUnfinished(levels, { ...emptyProgress(), completed: ['b', 'a'] }).id).toBe('a')
   })
 })

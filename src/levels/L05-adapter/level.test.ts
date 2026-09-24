@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'adapter' | 'decorator' | 'facade') => ({ socket: { id: 'pasarela', pattern } })
+const socket = (pattern: 'adapter' | 'decorator' | 'facade') => ({ sockets: [{ id: 'pasarela', pattern }] })
 
 describe('L05 · Adapter', () => {
   it('sin patrón: la terminal rechaza todos los pagos', () => {

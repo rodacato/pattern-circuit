@@ -8,6 +8,6 @@ describe('L21 · Null Object', () => {
   })
 
   it('Null Object: todos pasan sin cambiar a quienes usan la tarjeta', () => {
-    expect(evaluate(level, { socket: { id: 'tarjeta', pattern: 'null-object' } }).metrics).toMatchObject({ delivered: 4, dropped: 0 })
+    expect(evaluate(level, { sockets: [{ id: 'tarjeta', pattern: 'null-object' }] }).metrics).toMatchObject({ delivered: 4, dropped: 0 })
   })
 })
