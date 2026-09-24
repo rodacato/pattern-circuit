@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { KeyValueProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
-import { LEVELS } from '../levels'
+import { chapterName, LEVELS } from '../levels'
 import { NeonStage } from '../render/NeonStage'
 import { BriefCard } from './BriefCard'
 import { StageCard } from './cards/StageCard'
@@ -71,11 +71,15 @@ export default function GameApp() {
             📓 Cuaderno <span>{progress.notes.length}</span>
           </button>
           <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label="Nivel">
-            {LEVELS.map((l) => (
-              <option key={l.id} value={l.id}>
-                {progress.completed.includes(l.id) ? '✓ ' : ''}
-                {l.order}. {l.title}
-              </option>
+            {[...new Set(LEVELS.map((l) => l.chapter))].map((chapter) => (
+              <optgroup key={chapter} label={chapterName(chapter)}>
+                {LEVELS.filter((l) => l.chapter === chapter).map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {progress.completed.includes(l.id) ? '✓ ' : ''}
+                    {l.order}. {l.title}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate, reachableVariants } from '../engine'
-import { LEVELS } from '.'
+import { CHAPTERS, LEVELS } from '.'
 
 describe('registro de niveles', () => {
   it('los niveles van en orden consecutivo desde 0', () => {
     expect(LEVELS.map((l) => l.order)).toEqual(LEVELS.map((_, i) => i))
+  })
+
+  it('cada nivel pertenece a un capítulo con nombre', () => {
+    for (const l of LEVELS) expect(CHAPTERS[l.chapter], l.id).toBeDefined()
   })
 
   it('cada nivel con socket tiene exactamente una opción que resuelve', () => {

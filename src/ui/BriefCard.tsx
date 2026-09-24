@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Level } from '../engine'
+import { chapterName } from '../levels'
 import type { Stage } from '../game/flow/levelFlow'
 import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
@@ -24,7 +25,7 @@ export function BriefCard({ session }: { session: GameSession }) {
     <div className={`brief card${open ? '' : ' closed'}`}>
       <button className="brief-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="eyebrow">
-          Nivel {level.order} · {level.chapter}
+          Nivel {level.order} · {chapterName(level.chapter)}
         </span>
         <span className="title">{level.title}</span>
         {level.checklist.length > 0 && (

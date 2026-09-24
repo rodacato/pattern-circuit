@@ -18,7 +18,7 @@ import {
   toPx,
   withinSocket,
 } from './layout'
-import { createSkins, type DrawContext, type Skin } from './skins'
+import { createSkins, stateColor, type DrawContext, type Skin } from './skins'
 import { DROP_TEXT, FAMILY_COLORS, FONT_MONO, FONT_UI, INVALID_TEXT, NEON as C, pulseColor } from './theme'
 
 const PORT_R = 6
@@ -48,6 +48,9 @@ export class NeonStage {
   private appear = new Map<string, number>()
   private positions = new Map<number, Point>()
   private views = new Map<string, Container>()
+  private stateLabels = new Map<string, Text>()
+  private badges: Text[] = []
+  private readonly badgeLayer = new Container()
   private hovered?: string
   private drag?: Drag
   private dropHover = false
@@ -65,7 +68,7 @@ export class NeonStage {
     glowLayer.blendMode = 'add'
     stage.followLabel.anchor.set(0.5, 1)
     stage.socketLabel.anchor.set(0.5, 1)
-    stage.world.addChild(stage.base, glowLayer, stage.dynamic, stage.nodesLayer, stage.fxLayer, stage.followLabel, stage.socketLabel)
+    stage.world.addChild(stage.base, glowLayer, stage.dynamic, stage.nodesLayer, stage.badgeLayer, stage.fxLayer, stage.followLabel, stage.socketLabel)
     stage.app.stage.addChild(stage.world)
     stage.bindPointer()
     stage.app.ticker.add((t) => stage.tick(t.deltaTime))
@@ -102,13 +105,14 @@ export class NeonStage {
 
     const d = this.dynamic.clear()
     const gl = this.glow.clear()
-    const ctx: DrawContext = { d, gl, time, circuit: s.playback.circuit }
+    const ctx: DrawContext = { d, gl, time, circuit: s.playback.circuit, state: s.playback.timeline.current.state }
     this.drawFlow(d, time)
     this.drawHint(d, gl, time)
     this.drawNodes(ctx)
     this.drawSocket(d, gl, time)
     this.drawDrag(d, gl)
     this.drawPulses(ctx)
+    this.drawBadges()
     this.fx.draw(d, gl)
   }
 
@@ -134,6 +138,7 @@ export class NeonStage {
 
     this.nodesLayer.removeChildren().forEach((c) => c.destroy({ children: true }))
     this.views.clear()
+    this.stateLabels.clear()
     for (const n of nodes) {
       const view = this.nodeView(n)
       this.views.set(n.id, view)
@@ -174,6 +179,13 @@ export class NeonStage {
     sub.anchor.set(0.5, 0)
     sub.y = 6
     box.addChild(title, sub)
+    if (n.behavior.type === 'machine') {
+      const current = label('', 11, C.bg, FONT_UI, '700')
+      current.anchor.set(0.5)
+      current.y = NODE_H / 2 + 13
+      box.addChild(current)
+      this.stateLabels.set(n.id, current)
+    }
 
     const port = new Graphics().circle(0, 0, PORT_R + 6).fill({ color: 0xffffff, alpha: 0.001 })
     port.position.set(NODE_W / 2, 0)
@@ -269,6 +281,10 @@ export class NeonStage {
       case 'pulse.clone':
         this.fx.burst(at, C.amber, 10, 1.6)
         break
+      case 'pulse.merge':
+      case 'pulse.cancel':
+        this.trails.delete(e.pulseId)
+        break
     }
   }
 
@@ -324,7 +340,7 @@ export class NeonStage {
       const selected = s.playback.inspected === n.id
       const hover = this.hovered === n.id || (!!this.drag && !!nodeAt([n], this.drag.to))
       const beat = touched ? 0.5 + 0.5 * Math.sin(time / 180) : 0
-      const color = touched ? C.red : n.behavior.type === 'slot' ? C.violet : n.kind === 'actor' ? C.amber : C.cyan
+      const color = touched ? C.red : n.behavior.type === 'slot' ? C.violet : n.kind === 'actor' || n.kind === 'external' ? C.amber : C.cyan
       const scale = grow * (1 + (f ? f.t * 0.06 : 0) + (hover ? 0.03 : 0))
       const w = NODE_W * scale
       const h = NODE_H * scale
@@ -335,6 +351,8 @@ export class NeonStage {
       d.roundRect(x, y, w, h, 12).stroke({ width: selected ? 3 : 2, color: selected ? C.white : f ? f.color : color, alpha: 0.95 })
       gl.roundRect(x, y, w, h, 12).stroke({ width: 5, color: f ? f.color : color, alpha: 0.3 + (f ? f.t * 0.5 : 0) + beat * 0.6 + (hover ? 0.3 : 0) })
 
+      if (n.kind === 'external') dashed(d, { x: x + 10, y: y - 5 }, { x: x + w - 10, y: y - 5 }, C.amber, 0.6)
+      this.drawMachineState(d, gl, n, p, h)
       if (grow >= 1) this.skinOf(n)?.drawNode?.(ctx, n, p)
       if (n.behavior.type === 'branch') drawBranchGlyph(d, p, Object.keys(n.behavior.cases).length)
       if (connecting && n.behavior.type !== 'sink') {
@@ -355,6 +373,35 @@ export class NeonStage {
         else this.appear.set(n.id, t)
       }
     }
+  }
+
+  // Toda máquina muestra su estado actual en una etiqueta del color de ese estado.
+  private drawMachineState(d: Graphics, gl: Graphics, n: NodeDef, p: Point, h: number) {
+    const text = this.stateLabels.get(n.id)
+    if (!text || n.behavior.type !== 'machine') return
+    const current = this.session.playback.timeline.current.state.nodeState[n.id] ?? n.behavior.initial
+    const color = stateColor(current)
+    text.text = current
+    const w = text.width + 16
+    d.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color })
+    gl.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color, alpha: 0.5 })
+  }
+
+  // Número de turno u otros datos visibles del pulso, en una etiqueta pequeña.
+  private drawBadges() {
+    const pb = this.session.playback
+    let used = 0
+    for (const p of pb.timeline.current.state.pulses) {
+      const pos = this.positions.get(p.id)
+      if (!pos || p.data.ticket === undefined) continue
+      const badge = (this.badges[used] ??= this.badgeLayer.addChild(label('', 10, C.amber, FONT_MONO, '700')))
+      badge.anchor.set(0, 0.5)
+      badge.text = `#${p.data.ticket}`
+      badge.position.set(pos.x + 10, pos.y + 10)
+      badge.visible = true
+      used++
+    }
+    for (let i = used; i < this.badges.length; i++) this.badges[i].visible = false
   }
 
   // El socket late mientras espera un patrón; al enchufar toma el color de la familia del patrón.

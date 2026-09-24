@@ -6,3 +6,5 @@ const modules = import.meta.glob<{ default: Level }>('./*/level.ts', { eager: tr
 export const LEVELS: Level[] = Object.values(modules)
   .map((m) => m.default)
   .sort((a, b) => a.order - b.order)
+
+export { chapterName, CHAPTERS } from './chapters'
