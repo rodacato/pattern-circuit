@@ -4,7 +4,7 @@ class Cashier
     @barista = barista
   end
 
-  # Intacto: el pago con app no tocó esta clase.
+  # Cashier ya no sabe cómo se cobra: solo a quién delegar.
   # region: Cashier#charge
   def charge(order)
     @payment_methods.fetch(order.payment).charge(order)

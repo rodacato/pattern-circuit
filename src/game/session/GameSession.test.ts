@@ -190,3 +190,40 @@ describe('GameSession · predicciones', () => {
     expect(s.touched).toEqual([])
   })
 })
+
+describe('GameSession · cambios en el código', () => {
+  const toCompare = (id: string) => {
+    const s = session(id)
+    runOut(s)
+    const solution = s.sockets.map((k) => k.inventory.find((p) => k.options[p]?.outcome === 'solves')!)
+    for (const p of solution) s.plug(p)
+    runOut(s)
+    s.continue()
+    if (s.flow.stage === 'change') {
+      s.skipPrediction()
+      runOut(s)
+      s.continue()
+    }
+    return s
+  }
+
+  it('Strategy + ticket: con el patrón solo cambia el registro; sin patrón se abre Cashier', () => {
+    const s = toCompare('L01-strategy')
+    const removed = () => s.codeChange!.lines.filter((l) => l.kind === 'del').map((l) => l.text.trim())
+    expect(removed()).toEqual(['{ cash: CashPayment.new, card: CardPayment.new, voucher: VoucherPayment.new },'])
+    s.showSide('without')
+    const added = s.codeChange!.lines.filter((l) => l.kind === 'add').map((l) => l.text.trim())
+    expect(added.some((l) => l.startsWith('elsif order.payment == :app'))).toBe(true) // una rama nueva dentro de Cashier
+    expect(s.codeChange?.title).toContain('sin patrón')
+  })
+
+  it('sin ticket compara el código sin patrón con el código con patrón', () => {
+    const s = toCompare('L03-builder')
+    expect(s.codeChange?.title).toContain('Builder')
+    expect(s.codeChange!.added + s.codeChange!.removed).toBeGreaterThan(0)
+  })
+
+  it('antes de comparar no hay cambios que mostrar', () => {
+    expect(session('L01-strategy').codeChange).toBeUndefined()
+  })
+})
