@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import { LEVELS } from '../../levels'
-import { MemoryProgressStore } from '../progress/progress'
+import { emptyProgress, MemoryProgressStore } from '../progress/progress'
 import { GameSession } from './GameSession'
 
 const session = (id: string, store = new MemoryProgressStore()) => new GameSession(LEVELS.find((l) => l.id === id)!, store)
@@ -142,9 +142,51 @@ describe('GameSession · detalles', () => {
   })
 
   it('borrar el progreso lo vacía en el almacén', () => {
-    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'] })
+    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'], predictions: { right: 1, total: 2 } })
     const s = session('L01-strategy', store)
     s.resetProgress()
-    expect(store.load()).toEqual({ version: 1, completed: [], notes: [] })
+    expect(store.load()).toEqual(emptyProgress())
+  })
+})
+
+describe('GameSession · predicciones', () => {
+  const inChoose = (id: string, store = new MemoryProgressStore()) => {
+    const s = session(id, store)
+    runOut(s)
+    return s
+  }
+
+  it('enchufar abre una pregunta y no corre hasta responderla', () => {
+    const store = new MemoryProgressStore()
+    const s = inChoose('L01-strategy', store)
+    s.plug('observer')
+    expect(s.awaitingPrediction).toBe(true)
+    expect(s.playback.playing).toBe(false)
+    s.predict('solves')
+    expect(s.playback.playing).toBe(true)
+    expect(s.prediction).toMatchObject({ guess: 'solves', answer: 'misfit' })
+    expect(store.load().predictions).toEqual({ right: 0, total: 1 })
+  })
+
+  it('darle play sin responder omite la pregunta y no cuenta', () => {
+    const store = new MemoryProgressStore()
+    const s = inChoose('L01-strategy', store)
+    s.plug('strategy')
+    s.play()
+    expect(s.prediction).toBeUndefined()
+    expect(store.load().predictions.total).toBe(0)
+  })
+
+  it('el ticket pregunta cuántas piezas se tocarán y responder lo aplica', () => {
+    const s = inChoose('L01-strategy')
+    s.plug('strategy')
+    s.predict('solves')
+    runOut(s)
+    s.continue()
+    expect(s.prediction).toMatchObject({ kind: 'touched', answer: '0' })
+    s.predict('0')
+    expect(s.flow.ticketApplied).toBe(true)
+    runOut(s)
+    expect(s.touched).toEqual([])
   })
 })

@@ -86,14 +86,28 @@ describe('StageCard', () => {
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     act(() => void s.plug('strategy'))
-    runOut(s)
+    runOut(s) // correr sin responder omite la predicción
     fireEvent.click(screen.getByRole('button', { name: /Siguiente: llega un cambio/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Aplicar el cambio' }))
+    fireEvent.click(screen.getByRole('button', { name: /Ninguna/ }))
+    expect(s.flow.ticketApplied).toBe(true)
     runOut(s)
     fireEvent.click(screen.getByRole('button', { name: /Comparar sin\/con/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Sin patrón' }))
     expect(screen.getByRole('button', { name: 'Sin patrón' }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.getAllByRole('row').length).toBe(1 + s.comparisonRows.length)
+  })
+})
+
+describe('predicciones', () => {
+  it('al enchufar pregunta primero y, tras la corrida, dice si acertó', () => {
+    const s = session('L01-strategy')
+    render(<StageCard session={s} onNext={() => {}} />)
+    runOut(s)
+    act(() => void s.plug('observer'))
+    expect(screen.getByRole('status').textContent).toContain('¿qué hará Observer')
+    fireEvent.click(screen.getByRole('button', { name: 'No encaja aquí' }))
+    runOut(s)
+    expect(screen.getByRole('status').textContent).toContain('Acertaste')
   })
 })
 

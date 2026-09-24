@@ -100,7 +100,7 @@ export default function GameApp() {
         <CodePanel key={session.level.id} session={session} />
       </main>
 
-      {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
+      {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
       <p className="desktop-only">Pattern Circuit está pensado para pantallas de escritorio. Ábrelo en una ventana más ancha para jugar.</p>
     </div>
   )

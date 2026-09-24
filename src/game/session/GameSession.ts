@@ -2,6 +2,7 @@ import {
   buildCircuit,
   codeKey,
   evaluate,
+  PATTERNS,
   scenarioFor,
   score,
   type ChangeTicket,
@@ -15,6 +16,7 @@ import {
   type Variant,
 } from '../../engine'
 import { Emitter } from '../events/Emitter'
+import { guessed, isRight, outcomePrediction, touchedPrediction, type Prediction } from '../learning/prediction'
 import {
   initialFlow,
   lastPluggedOption,
@@ -28,7 +30,7 @@ import {
   type Side,
 } from '../flow/levelFlow'
 import { Playback } from '../playback/Playback'
-import { emptyProgress, withCompleted, withNotes, type Progress, type ProgressStore } from '../progress/progress'
+import { emptyProgress, withCompleted, withNotes, withPrediction, type Progress, type ProgressStore } from '../progress/progress'
 
 export type ConnectResult = 'repaired' | 'wrong' | 'none'
 export type Comparison = Record<Side, Evaluation>
@@ -46,6 +48,7 @@ export class GameSession {
   comparison?: Comparison
   failedRuns = 0
   progress: Progress
+  prediction?: Prediction // la pregunta abierta (sin `guess`) o la última respondida
 
   private readonly emitter = new Emitter()
   private readonly store: ProgressStore
@@ -115,6 +118,11 @@ export class GameSession {
     return !!this.level.sockets.find((s) => s.id === socketId)?.options[pattern]
   }
 
+  // Hay una pregunta esperando respuesta: la corrida no arranca hasta responderla u omitirla.
+  get awaitingPrediction(): boolean {
+    return !!this.prediction && this.prediction.guess === undefined
+  }
+
   get inventoryOpen() {
     return this.flow.stage === 'choose'
   }
@@ -128,6 +136,7 @@ export class GameSession {
   }
 
   play() {
+    if (this.awaitingPrediction && this.prediction?.kind === 'outcome') this.prediction = undefined // correr sin responder = omitir
     if (this.playback.done) this.result = undefined
     this.playback.play()
     this.did('play')
@@ -193,13 +202,31 @@ export class GameSession {
     const option = socket?.options[pattern]
     if (!socket || !option || !this.inventoryOpen) return undefined
     this.dispatch({ type: 'plug', socketId: socket.id, pattern, outcome: option.outcome })
-    this.rerun()
+    this.prediction = outcomePrediction(PATTERNS[pattern].name, option.outcome)
+    this.rerun(false)
     return option
   }
 
   unplug(socketId: string) {
     this.dispatch({ type: 'unplug', socketId })
+    this.prediction = undefined
     this.rerun(false)
+  }
+
+  // Responder la pregunta abierta: se anota el acierto y sigue lo que estaba esperando.
+  predict(guess: string) {
+    if (!this.prediction || !this.awaitingPrediction) return
+    this.prediction = guessed(this.prediction, guess)
+    this.saveProgress(withPrediction(this.progress, isRight(this.prediction)))
+    if (this.prediction.kind === 'touched') this.applyTicket()
+    else this.play()
+  }
+
+  skipPrediction() {
+    const kind = this.prediction?.kind
+    this.prediction = undefined
+    if (kind === 'touched') this.applyTicket()
+    else this.play()
   }
 
   continue() {
@@ -207,6 +234,7 @@ export class GameSession {
     this.dispatch({ type: 'continue' })
     if (this.flow.stage === before) return
     if (this.flow.stage === 'compare') this.comparison = this.compare()
+    this.prediction = this.flow.stage === 'change' && this.ticket ? touchedPrediction(this.ticketTouched()) : undefined
     this.rerun(false)
   }
 
@@ -229,6 +257,11 @@ export class GameSession {
   resetProgress() {
     this.saveProgress(emptyProgress())
     this.emitter.emit()
+  }
+
+  // Nodos que tocaría el ticket con lo enchufado ahora: la respuesta de la predicción del cambio.
+  private ticketTouched(): number {
+    return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticketApplied: true }, this.repairs)).touched.length
   }
 
   private compare(): Comparison {

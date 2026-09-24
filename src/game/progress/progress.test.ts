@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { emptyProgress, firstUnfinished, KeyValueProgressStore, noteKey, parseNoteKey, withCompleted, withNote, withNotes } from './progress'
+import { emptyProgress, firstUnfinished, KeyValueProgressStore, noteKey, parseNoteKey, withCompleted, withNote, withNotes, withPrediction } from './progress'
 
 const fakeStorage = (initial: Record<string, string> = {}) => {
   const data = { ...initial }
@@ -10,7 +10,7 @@ describe('progreso', () => {
   it('marcar completado y anotar notas es idempotente', () => {
     const p = withNote(withCompleted(withCompleted(emptyProgress(), 'L1'), 'L1'), noteKey('L1', 'observer'))
     expect(withNote(p, 'L1:observer')).toBe(p)
-    expect(p).toEqual({ version: 1, completed: ['L1'], notes: ['L1:observer'] })
+    expect(p).toMatchObject({ version: 1, completed: ['L1'], notes: ['L1:observer'] })
   })
 
   it('guarda y recupera del almacenamiento', () => {
@@ -55,5 +55,17 @@ describe('progreso: ayudantes', () => {
     expect(firstUnfinished(levels, emptyProgress()).id).toBe('a')
     expect(firstUnfinished(levels, { ...emptyProgress(), completed: ['a'] }).id).toBe('b')
     expect(firstUnfinished(levels, { ...emptyProgress(), completed: ['b', 'a'] }).id).toBe('a')
+  })
+})
+
+describe('progreso: compatibilidad y predicciones', () => {
+  it('el progreso guardado por 1.0 (sin predicciones) sigue cargando', () => {
+    const storage = fakeStorage({ 'pattern-circuit:progress': JSON.stringify({ version: 1, completed: ['L00-tutorial'], notes: [] }) })
+    expect(new KeyValueProgressStore(storage).load()).toEqual({ ...emptyProgress(), completed: ['L00-tutorial'] })
+  })
+
+  it('withPrediction cuenta aciertos sobre el total', () => {
+    const p = withPrediction(withPrediction(emptyProgress(), true), false)
+    expect(p.predictions).toEqual({ right: 1, total: 2 })
   })
 })
