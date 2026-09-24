@@ -229,3 +229,6 @@ export type PlayerAction = z.infer<typeof PlayerAction>
 export type MetricName = (typeof METRICS)[number]
 export type LevelDef = z.infer<typeof LevelDef>
 export type LevelInput = z.input<typeof LevelDef>
+export type NodeInput = z.input<typeof NodeDef>
+export type WireInput = z.input<typeof WireDef>
+export type BehaviorInput = z.input<typeof Behavior>
