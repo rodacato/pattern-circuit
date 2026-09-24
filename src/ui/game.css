@@ -1102,3 +1102,38 @@
   }
 }
 
+.review .review-question .where {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review .problem {
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.choices button small {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.choices button.right {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.choices button.wrong {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.choices button:disabled {
+  cursor: default;
+}
+
+.review .note {
+  margin-top: 14px;
+}
+

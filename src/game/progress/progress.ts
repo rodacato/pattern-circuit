@@ -13,10 +13,11 @@ export const Progress = z.object({
   notes: z.array(z.string()), // `${levelId}:${pattern}`
   // Campos agregados después de 1.0: con default, el progreso guardado antes sigue siendo válido.
   predictions: z.object({ right: z.number().int(), total: z.number().int() }).default({ right: 0, total: 0 }),
+  review: z.record(z.string(), z.object({ box: z.number().int(), due: z.number() })).default({}), // tarjeta → caja Leitner
 })
 export type Progress = z.infer<typeof Progress>
 
-export const emptyProgress = (): Progress => ({ version: 1, completed: [], notes: [], predictions: { right: 0, total: 0 } })
+export const emptyProgress = (): Progress => ({ version: 1, completed: [], notes: [], predictions: { right: 0, total: 0 }, review: {} })
 
 export const withPrediction = (p: Progress, right: boolean): Progress => ({
   ...p,

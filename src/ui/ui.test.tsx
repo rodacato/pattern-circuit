@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { MemoryProgressStore } from '../game/progress/progress'
+import { emptyProgress, MemoryProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { LEVELS } from '../levels'
 import { BriefCard } from './BriefCard'
@@ -9,6 +9,7 @@ import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
 import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
+import { Review } from './Review'
 import { isShortcut } from './shortcuts'
 import { Transport } from './Transport'
 
@@ -150,6 +151,25 @@ describe('Notebook', () => {
     expect(onReset).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Borrar progreso' }))
     expect(onReset).toHaveBeenCalledOnce()
+  })
+})
+
+describe('Review', () => {
+  it('pregunta por un nivel completado, explica la respuesta y la anota en el progreso', () => {
+    const store = new MemoryProgressStore({ ...emptyProgress(), completed: ['L01-strategy'] })
+    const s = session('L00-tutorial', store)
+    render(<Review session={s} levels={LEVELS} onClose={() => {}} />)
+    expect(screen.getByRole('dialog').textContent).toContain('¿Efectivo o tarjeta?')
+    fireEvent.click(screen.getByRole('button', { name: /^Observer/ }))
+    expect(screen.getByText(/La respuesta era Strategy/)).toBeTruthy()
+    expect(store.load().review['L01-strategy/metodo-de-pago']).toMatchObject({ box: 1 })
+    fireEvent.click(screen.getByRole('button', { name: 'Ver resultado' }))
+    expect(screen.getByRole('dialog').textContent).toContain('Acertaste 0 de 1')
+  })
+
+  it('sin niveles completados no hay nada pendiente', () => {
+    render(<Review session={session('L00-tutorial')} levels={LEVELS} onClose={() => {}} />)
+    expect(screen.getByRole('dialog').textContent).toContain('Nada pendiente')
   })
 })
 

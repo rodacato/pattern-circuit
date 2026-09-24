@@ -19,6 +19,7 @@ import {
   type Variant,
 } from '../../engine'
 import { Emitter } from '../events/Emitter'
+import { recordAnswer } from '../learning/review'
 import { guessed, isRight, outcomePrediction, touchedPrediction, type Prediction } from '../learning/prediction'
 import {
   initialFlow,
@@ -271,6 +272,12 @@ export class GameSession {
   finishLevel() {
     this.dispatch({ type: 'finish' })
     this.completeIfDone()
+    this.emitter.emit()
+  }
+
+  // El repaso escribe a través de la sesión: así hay un solo dueño del progreso y nada se pisa.
+  recordReview(itemId: string, correct: boolean, now = Date.now()) {
+    this.saveProgress({ ...this.progress, review: recordAnswer(this.progress.review, itemId, correct, now) })
     this.emitter.emit()
   }
 
