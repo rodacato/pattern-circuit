@@ -87,14 +87,15 @@ describe('primitivas con memoria', () => {
     expect(run(true).metrics.invalidAtSink).toBe(2)
   })
 
-  it('join: espera una parte por cable de entrada y sigue con un solo pulso', () => {
+  it('join: espera una parte por cable de entrada y sigue con un solo pulso que junta lo de todas', () => {
     const c = graph(
-      [node('src', 0, { type: 'source' }), node('bc', 2, { type: 'broadcast' }), node('a', 4, { type: 'pass' }, -1), node('b', 4, { type: 'pass' }, 1), node('j', 6, { type: 'join' }), node('out', 8, { type: 'sink' })],
+      [node('src', 0, { type: 'source' }), node('bc', 2, { type: 'broadcast' }), node('a', 4, { type: 'transform', addTags: ['de-a'] }, -1), node('b', 4, { type: 'transform', addTags: ['de-b'] }, 1), node('j', 6, { type: 'join' }), node('out', 8, { type: 'sink' })],
       [{ from: 'src', to: 'bc' }, { from: 'bc', to: 'a' }, { from: 'bc', to: 'b' }, { from: 'a', to: 'j' }, { from: 'b', to: 'j' }, { from: 'j', to: 'out' }],
     )
     const { sim } = runToEnd(createSim(c, scenario({ at: 0 })))
     expect(sim.state.metrics).toMatchObject({ delivered: 1, duplicatesAtSink: 0 })
     expect(sim.state.pulses.filter((p) => p.status === 'merged')).toHaveLength(1)
+    expect(sim.state.pulses.find((p) => p.status === 'delivered')?.tags.sort()).toEqual(['de-a', 'de-b'])
   })
 
   it('join: si una parte se pierde, el resto queda retenido sin colgar la simulación', () => {

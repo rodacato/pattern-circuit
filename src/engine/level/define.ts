@@ -1,23 +1,24 @@
 import { parseCode, resolveRegion, type CodeFile } from '../code/regions'
 import { compile } from '../circuit/compile'
-import { buildCircuit, codeKey, scenarioFor, type Variant } from './variants'
+import { buildCircuit, codeKey, scenarioFor, solvesAll, type Plug, type Variant } from './variants'
 import { LevelDef, type LevelInput } from '../schema'
 
 export type Level = LevelDef & { codeFiles: Record<string, CodeFile> }
 
-// Los tickets de cambio solo se lanzan sobre el circuito base o sobre una solución real.
+// Los tickets de cambio solo se lanzan sobre el circuito base o con todos los sockets resueltos.
 export function reachableVariants(level: LevelDef): Variant[] {
   const repairs = level.repairs.map((r) => r.id)
-  const variants: Variant[] = [{}]
-  if (repairs.length) variants.push({ repairs })
-  for (const socket of level.sockets) {
-    for (const pattern of socket.inventory) {
-      variants.push({ repairs, socket: { id: socket.id, pattern } })
-      if (socket.options[pattern]?.outcome !== 'solves') continue
-      for (const t of level.changeTickets) variants.push({ repairs, socket: { id: socket.id, pattern }, ticket: t.id })
-    }
+  const combos = level.sockets.reduce<Plug[][]>(
+    (acc, socket) => acc.flatMap((plugs) => [plugs, ...socket.inventory.map((pattern) => [...plugs, { id: socket.id, pattern }])]),
+    [[]],
+  )
+  const variants: Variant[] = []
+  for (const sockets of combos) {
+    const v: Variant = sockets.length ? { repairs, sockets } : repairs.length ? { repairs } : {}
+    variants.push(v)
+    if (sockets.length === 0 && repairs.length) variants.push({})
+    if (sockets.length === 0 || solvesAll(level, v)) for (const t of level.changeTickets) variants.push({ ...v, ticket: t.id })
   }
-  for (const t of level.changeTickets) variants.push({ repairs, ticket: t.id })
   return variants
 }
 
@@ -46,7 +47,9 @@ export function defineLevel(input: LevelInput): Level {
       const { circuit } = buildCircuit(level, v)
       compile(circuit)
       scenarioFor(level, v)
-      const file = codeFiles[codeKey(level, v)]
+      const key = codeKey(level, v)
+      if (!codeFiles[key] && key.includes('+')) codeFiles[key] = parseCode(key.split('+').map((k) => level.code.rb[k] ?? '').join('\n'))
+      const file = codeFiles[key]
       if (!file) {
         errors.push(`${label}: falta el código ${codeKey(level, v)}`)
         continue

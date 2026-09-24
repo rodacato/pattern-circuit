@@ -236,6 +236,7 @@ class Tick {
     }
     for (const id of held) {
       const sibling = this.s.pulses.find((p) => p.id === id)!
+      pulse.tags = [...new Set([...pulse.tags, ...sibling.tags])] // lo que cada parte aportó llega junto
       sibling.status = 'merged'
       sibling.loc = { kind: 'gone', nodeId: node.id }
       this.emit({ type: 'pulse.merge', pulseId: id, nodeId: node.id, intoId: pulse.id })

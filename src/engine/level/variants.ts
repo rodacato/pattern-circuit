@@ -1,19 +1,39 @@
 import { applyPatch, nodesTouched } from '../circuit/patch'
-import type { Assertion, Circuit, LevelDef, MetricName, PatternId, Scenario, SocketOption } from '../schema'
+import type { Assertion, Circuit, LevelDef, MetricName, PatternId, Scenario, SocketDef, SocketOption } from '../schema'
 import { createSim, runToEnd, type SimConfig } from '../sim/sim'
+
+export type Plug = { id: string; pattern: PatternId }
 
 // Una variante es una combinación de decisiones del jugador sobre el circuito base.
 export type Variant = {
   repairs?: string[]
-  socket?: { id: string; pattern: PatternId }
+  socket?: Plug // atajo para niveles de un solo socket
+  sockets?: Plug[]
   ticket?: string
 }
 
-export function socketOption(level: LevelDef, v: Variant): SocketOption | undefined {
-  if (!v.socket) return undefined
-  const socket = level.sockets.find((s) => s.id === v.socket!.id)
-  if (!socket) throw new Error(`${level.id}: socket inexistente ${v.socket.id}`)
-  return socket.options[v.socket.pattern]
+export const plugsOf = (v: Variant): Plug[] => v.sockets ?? (v.socket ? [v.socket] : [])
+
+// Opciones enchufadas en el orden en que el nivel declara sus sockets.
+export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef; option: SocketOption }[] {
+  const plugs = plugsOf(v)
+  for (const p of plugs) {
+    if (!level.sockets.some((s) => s.id === p.id)) throw new Error(`${level.id}: socket inexistente ${p.id}`)
+  }
+  return level.sockets.flatMap((socket) => {
+    const plug = plugs.find((p) => p.id === socket.id)
+    const option = plug && socket.options[plug.pattern]
+    if (plug && !option) throw new Error(`${level.id}: ${plug.pattern} no es opción de ${socket.id}`)
+    return option ? [{ socket, option }] : []
+  })
+}
+
+export const socketOption = (level: LevelDef, v: Variant): SocketOption | undefined => pluggedOptions(level, v)[0]?.option
+
+// Un ticket se aplica "a la manera correcta" solo con todos los sockets resueltos.
+export const solvesAll = (level: LevelDef, v: Variant) => {
+  const plugged = pluggedOptions(level, v)
+  return plugged.length === level.sockets.length && plugged.every((p) => p.option.outcome === 'solves')
 }
 
 function beforeTicket(level: LevelDef, v: Variant): Circuit {
@@ -23,8 +43,8 @@ function beforeTicket(level: LevelDef, v: Variant): Circuit {
     if (!repair) throw new Error(`${level.id}: reparación inexistente ${id}`)
     c = applyPatch(c, repair.patch)
   }
-  const option = socketOption(level, v)
-  return option ? applyPatch(c, option.patch) : c
+  for (const { option } of pluggedOptions(level, v)) c = applyPatch(c, option.patch)
+  return c
 }
 
 export function buildCircuit(level: LevelDef, v: Variant): { circuit: Circuit; touched: string[] } {
@@ -32,9 +52,9 @@ export function buildCircuit(level: LevelDef, v: Variant): { circuit: Circuit; t
   if (!v.ticket) return { circuit: before, touched: [] }
   const ticket = level.changeTickets.find((t) => t.id === v.ticket)
   if (!ticket) throw new Error(`${level.id}: ticket inexistente ${v.ticket}`)
-  const option = socketOption(level, v)
-  if (option && option.outcome !== 'solves') throw new Error(`${level.id}: el ticket ${ticket.id} requiere una solución`)
-  const after = applyPatch(before, option ? ticket.with : ticket.without)
+  const plugged = plugsOf(v).length > 0
+  if (plugged && !solvesAll(level, v)) throw new Error(`${level.id}: el ticket ${ticket.id} requiere una solución`)
+  const after = applyPatch(before, plugged ? ticket.with : ticket.without)
   return { circuit: after, touched: nodesTouched(before, after) }
 }
 
@@ -45,12 +65,17 @@ export function scenarioFor(level: LevelDef, v: Variant): Scenario {
   return scenario
 }
 
+// Con varios sockets el código se compone: 'base' + el fragmento de cada socket (vacío o enchufado).
 export function codeKey(level: LevelDef, v: Variant): string {
-  const option = socketOption(level, v)
+  const plugged = pluggedOptions(level, v)
   const ticket = level.changeTickets.find((t) => t.id === v.ticket)
-  const ticketCode = option ? ticket?.code.with : ticket?.code.without
+  const ticketCode = plugged.length ? ticket?.code.with : ticket?.code.without
   if (ticketCode) return ticketCode
-  if (option) return option.code
+  if (level.sockets.length > 1) {
+    const parts = level.sockets.map((s) => plugged.find((p) => p.socket.id === s.id)?.option.code ?? s.code)
+    return ['base', ...parts.filter((k): k is string => !!k)].join('+')
+  }
+  if (plugged[0]) return plugged[0].option.code
   const repaired = [...(v.repairs ?? [])].reverse().map((id) => level.repairs.find((r) => r.id === id)?.code)
   return repaired.find((k) => k !== undefined) ?? 'base'
 }

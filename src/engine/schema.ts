@@ -146,6 +146,7 @@ export const SocketDef = z.object({
   label: z.string(),
   inventory: z.array(PatternId),
   options: z.partialRecord(PatternId, SocketOption),
+  code: z.string().optional(), // con varios sockets: fragmento de código mientras está vacío
 })
 
 export const ScenarioPulse = z.object({
