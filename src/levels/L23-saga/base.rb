@@ -17,6 +17,6 @@ end
 
 # region: Inventory.reserve
 module Inventory
-  def self.reserve(order) = raise(OutOfStock) unless Stock.available?(order.items)
+  def self.reserve(order) = (raise OutOfStock unless Stock.available?(order.items))
 end
 # endregion

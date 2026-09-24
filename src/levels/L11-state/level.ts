@@ -69,8 +69,8 @@ export default defineLevel({
           outcome: 'misfit',
           code: 'strategy',
           note: {
-            title: 'Strategy no tiene memoria',
-            body: 'Una estrategia por evento reparte el código, pero ninguna sabe en qué estado está el pedido: cada una aplica su cambio igual. State es parecido, con una diferencia clave: el objeto que decide es el estado actual.',
+            title: 'Strategy la elige el cliente; State se reemplaza a sí mismo',
+            body: 'Una estrategia por evento reparte el código, pero la elige quien llama y ninguna sabe en qué estado está el pedido: cada una aplica su cambio igual. En State, el objeto que decide es el estado actual, y él mismo indica cuál es el siguiente.',
           },
           patch: { update: [{ id: 'pedido', skin: 'strategy', codeRef: 'EventHandlers' }] },
         },

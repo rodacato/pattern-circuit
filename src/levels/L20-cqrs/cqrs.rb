@@ -3,6 +3,7 @@ class PlaceOrder
   # Lado de escritura: valida reglas del negocio, una orden a la vez.
   # region: PlaceOrder#call
   def call(command)
+    raise InvalidOrder unless command.valid? # reglas del negocio, solo en el lado de escritura
     order = Order.create!(command.attributes)
     @events.publish(:order_placed, order)
   end

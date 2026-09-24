@@ -14,7 +14,9 @@ class CircuitBreaker
   # region: CircuitBreaker#charge
   def charge(order)
     return @fallback.charge(order) if open?
-    @service.charge(order)
+    result = @service.charge(order)
+    @failures = 0 # un éxito reinicia la cuenta: lo que abre el circuito son fallos seguidos
+    result
   rescue Timeout::Error
     @failures += 1
     @fallback.charge(order)

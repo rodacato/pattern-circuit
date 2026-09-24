@@ -83,7 +83,7 @@ export default defineLevel({
           code: 'builder',
           note: {
             title: 'Builder: paso a paso, y valida al final',
-            body: 'Cada parte del pedido se fija con un método con nombre, así que no se puede cruzar la leche con el jarabe. build() revisa el pedido completo y rechaza lo imposible en el mostrador, antes de cobrar.',
+            body: 'Cada parte del pedido se fija con un método con nombre, así que no se puede cruzar la leche con el jarabe. Como build() recibe el pedido completo, puede revisarlo antes de crearlo y rechazar lo imposible en el mostrador, antes de cobrar.',
           },
           patch: {
             remove: ['pedido'],
@@ -110,7 +110,7 @@ export default defineLevel({
           outcome: 'misfit',
           code: 'factory',
           note: {
-            title: 'Factory Method: un molde por combinación',
+            title: 'Factory Method: un molde (una subclase) por combinación',
             body: 'Una fábrica crea productos de catálogo. Un pedido a la medida no está en el catálogo: harían falta cientos de moldes, uno por combinación, y los pedidos sin molde se pierden.',
           },
           patch: {

@@ -84,11 +84,11 @@ export default defineLevel({
           },
         },
         strategy: {
-          outcome: 'misfit',
+          outcome: 'partial',
           code: 'strategy',
           note: {
-            title: 'Strategy cambia el algoritmo entero',
-            body: 'Elegir la receta como estrategia deja dos algoritmos completos y duplicados. Template Method reparte distinto: lo común arriba, lo variable abajo. Aquí el té sigue sin tapa.',
+            title: 'Strategy es la versión por composición… si la usas en el paso correcto',
+            body: 'Si la estrategia fuera solo el paso "preparar" y la receta común viviera en quien la usa, también funcionaría: es la alternativa por composición a Template Method. Pero aquí se eligió la receta completa como estrategia: dos algoritmos duplicados, y el té sigue sin tapa.',
           },
           patch: {
             removeWires: ['barra.cafe->hervirC', 'barra.te->hervirT'],

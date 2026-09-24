@@ -4,6 +4,9 @@
 class OrderBuilder
   # region: OrderBuilder#size
   def size(value) = tap { @size = value }
+  def hot = tap { @hot = true }
+  def iced = tap { @iced = true }
+  def extra(name) = tap { (@extras ||= []) << name }
   # endregion
 
   # region: OrderBuilder#build

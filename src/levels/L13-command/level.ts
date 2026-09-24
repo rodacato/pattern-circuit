@@ -40,7 +40,7 @@ export default defineLevel({
           code: 'command',
           note: {
             title: 'Command: la petición convertida en objeto',
-            body: 'Cada pedido se vuelve una tarjeta que se encola y se ejecuta cuando el barista se libera. Mientras espera, se puede deshacer: la cancelación saca la tarjeta de la cola antes de que corra.',
+            body: 'Cada pedido se vuelve una tarjeta que se encola y se ejecuta cuando el barista se libera. Mientras espera, se puede cancelar: la cancelación saca la tarjeta de la cola antes de que corra. (Un Command también puede revertir lo ya ejecutado con un undo que guarde el estado previo.)',
           },
           patch: {
             remove: ['deshacer'],

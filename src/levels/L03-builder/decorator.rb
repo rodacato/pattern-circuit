@@ -19,6 +19,10 @@ class WithSyrup < SimpleDelegator
 end
 # endregion
 
+class WithIce < SimpleDelegator
+  def ice? = true
+end
+
 class OrderTaker
   def initialize(cashier) = @cashier = cashier
 

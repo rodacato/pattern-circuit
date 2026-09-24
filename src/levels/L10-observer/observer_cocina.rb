@@ -14,5 +14,5 @@ end
 
 # region: wiring
 order = Order.new
-[Display.new, PushNotifier.new, LoyaltyProgram.new, Kitchen.new # ← solo una suscripción más].each { |s| order.subscribe(s) }
+[Display.new, PushNotifier.new, LoyaltyProgram.new, Kitchen.new].each { |s| order.subscribe(s) } # ← solo una suscripción más
 # endregion

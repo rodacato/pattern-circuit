@@ -6,9 +6,9 @@ import avisosObserver from '../L10-observer/observer.rb?raw'
 import estadosBase from '../L11-state/base.rb?raw'
 import estadosCommon from '../L11-state/common.rb?raw'
 import { permissive, strict } from '../L11-state/level'
+import eventosCommand from './events_command.rb?raw'
 import estadosState from '../L11-state/state.rb?raw'
 import eventosBase from '../L13-command/base.rb?raw'
-import eventosCommand from '../L13-command/command.rb?raw'
 
 const notFuera = { not: { hasTag: 'fuera-de-orden' } }
 const event = (at: number, name: string, cmd: number, label = name) => pulse(at, label, ['cmd:evento', name], { cmd }, 'eventos')
@@ -90,7 +90,7 @@ export default defineLevel({
             },
           },
         },
-        strategy: { outcome: 'misfit', code: 'estados_base', note: { title: 'Strategy no recuerda el estado', body: 'Cada estrategia aplica su cambio sin saber en qué estado está el pedido.' }, patch: reskin('pedido', 'strategy') },
+        strategy: { outcome: 'misfit', code: 'estados_base', note: { title: 'Strategy la elige el cliente; State se reemplaza a sí mismo', body: 'Una estrategia por evento aplica su cambio sin saber en qué estado está el pedido. En State, el estado actual decide y elige al siguiente.' }, patch: reskin('pedido', 'strategy') },
         'template-method': {
           outcome: 'misfit',
           code: 'estados_base',

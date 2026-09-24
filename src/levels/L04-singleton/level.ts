@@ -85,7 +85,7 @@ export default defineLevel({
           code: 'strategy',
           note: {
             title: 'Strategy intercambia comportamiento, no comparte estado',
-            body: 'Cada caja recibe su estrategia de numeración, pero cada una lleva su propia cuenta. El problema era de identidad (una sola cuenta), no de algoritmo.',
+            body: 'Cada caja recibe su estrategia de numeración, pero cada una crea su propia cuenta. El problema era de identidad (una sola cuenta), no de algoritmo. Inyectar el mismo contador a ambas cajas también funcionaría, sin nada global: lo verás en Ports & Adapters.',
           },
           patch: {
             update: [

@@ -55,9 +55,12 @@ export default defineLevel({
           },
         },
         command: {
-          outcome: 'misfit',
+          outcome: 'partial',
           code: 'command',
-          note: { title: 'Command deshace lo pendiente, no lo ya hecho', body: 'Deshacer un comando sirve mientras espera en la cola. El cobro ya pasó por el banco: hace falta una acción nueva que lo compense.' },
+          note: {
+            title: 'Command deshace en memoria; una saga compensa entre servicios',
+            body: 'El undo de Command revierte estado local que el propio objeto guardó. Un cobro en el banco no se revierte: se compensa con una acción nueva (un reembolso), y alguien tiene que coordinar qué compensar cuando falla un paso en otro servicio. Command puede ser la pieza de cada paso, pero no orquesta la compensación.',
+          },
           patch: { update: [{ id: 'cobrar', skin: 'command', codeRef: 'ChargeCommand' }] },
         },
         observer: {

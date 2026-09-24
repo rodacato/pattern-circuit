@@ -88,7 +88,7 @@ export default defineLevel({
         proxy: {
           outcome: 'misfit',
           code: 'proxy',
-          note: { title: 'Un proxy reenvía el problema', body: 'El intermediario le pasa cada cobro al proveedor caído y espera el mismo timeout.' },
+          note: { title: 'Un proxy que solo reenvía no protege', body: 'Este proxy le pasa cada cobro al proveedor caído y espera el mismo timeout. Un Circuit Breaker es, de hecho, un proxy con memoria de fallos.' },
           patch: { update: [{ id: 'pasarela', skin: 'proxy' }] },
         },
       },

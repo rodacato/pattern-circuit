@@ -6,8 +6,9 @@ import decoratorCashier from './decorator.rb?raw'
 import observerCashier from './observer.rb?raw'
 import strategyCashier from './strategy.rb?raw'
 import strategyAppCashier from './strategy_app.rb?raw'
+import { withCommon as withCommonCode } from '../kit'
 
-const withCommon = (cashier: string) => `${cashier}\n${common}`
+const withCommon = withCommonCode(common)
 
 const PAYMENTS = [
   { key: 'cash', id: 'pagoEfectivo', label: 'Efectivo', className: 'CashPayment', row: 0 },

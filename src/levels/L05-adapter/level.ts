@@ -73,8 +73,8 @@ export default defineLevel({
           outcome: 'misfit',
           code: 'facade',
           note: {
-            title: 'Facade simplifica, no traduce',
-            body: 'Una fachada esconde un subsistema complejo detrás de una puerta simple. Aquí el problema no era la complejidad sino el idioma: la fachada reenvía el mismo formato y la terminal lo rechaza.',
+            title: 'Facade simplifica un subsistema; Adapter encaja una interfaz',
+            body: 'Facade define una interfaz nueva y más simple sobre un subsistema de varias piezas. Aquí no hay subsistema: hay una sola clase cuya interfaz no coincide con la que Cobrar ya espera. Esta fachada reenvía charge tal cual y la terminal lo rechaza; si tradujera a la interfaz existente, sería un Adapter.',
           },
           patch: {
             removeWires: ['cobrar->terminal'],

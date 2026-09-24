@@ -41,7 +41,7 @@ export default defineLevel({
           code: 'proxy',
           note: {
             title: 'Proxy: un sustituto que controla el acceso',
-            body: 'El proxy tiene la misma interfaz que el almacén, así que quien pregunta no nota el cambio. Solo viaja al almacén cuando no conoce la respuesta; lo demás rebota en el proxy sin hacer fila.',
+            body: 'El proxy tiene la misma interfaz que el almacén, así que quien pregunta no nota el cambio. Solo viaja al almacén cuando no conoce la respuesta; lo demás rebota en el proxy sin hacer fila. El precio: la respuesta guardada puede quedar vieja, así que un proxy real le pone caducidad.',
           },
           patch: {
             removeWires: ['tomar->almacen'],

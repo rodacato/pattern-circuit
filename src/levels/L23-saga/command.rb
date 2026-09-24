@@ -1,7 +1,8 @@
 
-# Command deshace lo que todavía no se ejecutó; el cobro ya pasó por el banco.
+# Un comando con undo sirve para estado local; aquí nadie coordina qué deshacer cuando falla otro servicio.
 # region: ChargeCommand
 class ChargeCommand
-  def undo = raise("El cobro ya se procesó: no está en ninguna cola")
+  def execute(order) = Payments.charge(order)
+  def undo(order) = Payments.refund(order) # ¿quién lo llama cuando falla Inventory, en otro servicio?
 end
 # endregion

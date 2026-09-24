@@ -109,7 +109,7 @@ export default defineLevel({
           code: 'singleton',
           note: {
             title: 'Singleton: una sola instancia para todos',
-            body: 'Una fábrica única y compartida no sabe de qué sucursal viene cada pedido. Todas recibieron lo mismo: el problema pedía que la creación variara, no que se compartiera.',
+            body: 'Singleton solo garantiza que exista una única fábrica; no aporta nada a este problema. Lo que tenía que variar por sucursal era qué se crea, y la fábrica única sigue decidiendo igual para todas.',
           },
           patch: {
             remove: ['frappe', 'latte'],

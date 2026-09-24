@@ -1,3 +1,5 @@
+require "securerandom"
+
 class Cashier
   def initialize(gateway, barista)
     @gateway = gateway

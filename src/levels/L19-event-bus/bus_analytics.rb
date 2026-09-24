@@ -21,5 +21,5 @@ end
 
 # region: wiring
 bus = EventBus.new
-[Inventory.new, Billing.new, Loyalty.new, Analytics.new # ← un suscriptor más, nada más].each { |s| bus.subscribe(s) }
+[Inventory.new, Billing.new, Loyalty.new, Analytics.new].each { |s| bus.subscribe(s) } # ← un suscriptor más, nada más
 # endregion

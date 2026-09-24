@@ -32,6 +32,6 @@ end
 
 class TeaRecipe < Recipe
   # region: TeaRecipe#brew
-  def brew = steep(3.minutes)
+  def brew = steep(180) # segundos
   # endregion
 end

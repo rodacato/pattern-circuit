@@ -2,6 +2,7 @@
 class Latte
   def initialize(extra = NoExtra.new) = @extra = extra
   def cost = 45 + @extra.cost
+  def description = "Latte"
 end
 # endregion
 
