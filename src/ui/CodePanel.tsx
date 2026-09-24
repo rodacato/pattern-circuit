@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { resolveRegion } from '../engine'
 import { highlightRuby, plainTokens, type Token } from './code/highlight'
 import type { GameSession } from '../game/session/GameSession'
+import { prefersReducedMotion } from '../render/motion'
 import { useSession } from './useSession'
 
 export function CodePanel({ session }: { session: GameSession }) {
@@ -26,7 +27,7 @@ export function CodePanel({ session }: { session: GameSession }) {
   }, [file.text])
 
   useEffect(() => {
-    body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
   }, [region?.start, file.text])
 
   const source = followed !== undefined && activeRef ? `pulso #${followed}` : inspected ? `nodo · ${inspected}` : undefined
@@ -42,7 +43,7 @@ export function CodePanel({ session }: { session: GameSession }) {
           </span>
         )}
       </div>
-      <div className="code-body" ref={body}>
+      <div className="code-body" ref={body} tabIndex={0} aria-label="Código Ruby del circuito">
         {tokens.map((line, i) => {
           const on = !!region && i + 1 >= region.start && i + 1 <= region.end
           return (

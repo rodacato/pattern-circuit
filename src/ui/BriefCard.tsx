@@ -1,25 +1,19 @@
 import { useState } from 'react'
-import type { Level } from '../engine'
 import { chapterName } from '../levels'
-import type { Stage } from '../game/flow/levelFlow'
+import { stagesFor, type Stage } from '../game/flow/levelFlow'
 import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
-const STAGES: { id: Stage; label: string; when: (l: Level) => boolean }[] = [
-  { id: 'observe', label: 'Observar', when: () => true },
-  { id: 'choose', label: 'Elegir patrón', when: (l) => l.sockets.length > 0 },
-  { id: 'change', label: 'Cambio', when: (l) => l.changeTickets.length > 0 },
-  { id: 'compare', label: 'Comparar', when: (l) => l.sockets.length > 0 },
-]
+const STAGE_LABEL: Record<Exclude<Stage, 'complete'>, string> = { observe: 'Observar', choose: 'Elegir patrón', change: 'Cambio', compare: 'Comparar' }
 
 export function BriefCard({ session }: { session: GameSession }) {
   const { level } = session
-  const done = useSession(session, (s) => [...s.actions].join(','))
+  const done = useSession(session, (s) => [...s.actions].join(',')) // string: el selector debe ser estable
   const [open, setOpen] = useState(true)
   const completed = level.checklist.filter((c) => done.split(',').includes(c.on)).length
   const stage = useSession(session, (s) => s.flow.stage)
-  const steps = STAGES.filter((st) => st.when(level))
-  const current = stage === 'complete' ? steps.length : steps.findIndex((st) => st.id === stage)
+  const steps = stagesFor(level)
+  const current = stage === 'complete' ? steps.length : steps.indexOf(stage)
 
   return (
     <div className={`brief card${open ? '' : ' closed'}`}>
@@ -56,8 +50,8 @@ export function BriefCard({ session }: { session: GameSession }) {
           {steps.length > 1 && (
             <ol className="stages">
               {steps.map((st, i) => (
-                <li key={st.id} className={i < current ? 'done' : i === current ? 'now' : ''}>
-                  {st.label}
+                <li key={st} className={i < current ? 'done' : i === current ? 'now' : ''} aria-current={i === current ? 'step' : undefined}>
+                  {STAGE_LABEL[st]}
                 </li>
               ))}
             </ol>

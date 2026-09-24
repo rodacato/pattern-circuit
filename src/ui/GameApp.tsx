@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { KeyValueProgressStore } from '../game/progress/progress'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { firstUnfinished, KeyValueProgressStore, MemoryProgressStore, type ProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { chapterName, LEVELS } from '../levels'
 import { NeonStage } from '../render/NeonStage'
@@ -8,17 +8,24 @@ import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
 import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
+import { isShortcut, SHORTCUTS } from './shortcuts'
 import { Transport } from './Transport'
 import { useSession } from './useSession'
 import './game.css'
 
-const progressStore = new KeyValueProgressStore(window.localStorage)
+// Con el almacenamiento bloqueado (modo privado estricto, cookies desactivadas) el juego sigue, sin guardar.
+function browserProgressStore(): ProgressStore {
+  try {
+    return new KeyValueProgressStore(window.localStorage)
+  } catch {
+    return new MemoryProgressStore()
+  }
+}
+
+const progressStore = browserProgressStore()
 
 export default function GameApp() {
-  const [levelId, setLevelId] = useState(() => {
-    const done = progressStore.load().completed
-    return (LEVELS.find((l) => !done.includes(l.id)) ?? LEVELS[0]).id
-  })
+  const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, progressStore.load()).id)
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = LEVELS[index + 1]
   const session = useMemo(() => new GameSession(LEVELS[index], progressStore), [index])
@@ -26,6 +33,7 @@ export default function GameApp() {
   const [stage, setStage] = useState<NeonStage>()
   const [notebookOpen, setNotebookOpen] = useState(false)
   const progress = useSession(session, (s) => s.progress)
+  const closeNotebook = useCallback(() => setNotebookOpen(false), [])
 
   useEffect(() => {
     let created: NeonStage | undefined
@@ -38,26 +46,21 @@ export default function GameApp() {
     return () => {
       cancelled = true
       created?.destroy()
+      setStage(undefined)
     }
   }, [session])
 
   useEffect(() => {
+    if (notebookOpen) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLSelectElement || e.target instanceof HTMLInputElement) return
-      const actions: Record<string, () => void> = {
-        ' ': () => session.toggle(),
-        ArrowRight: () => session.step(),
-        ArrowLeft: () => session.back(),
-        r: () => session.reset(),
-      }
-      const action = actions[e.key]
-      if (!action) return
+      const action = SHORTCUTS[e.key]
+      if (!action || !isShortcut(e)) return
       e.preventDefault()
-      action()
+      action(session)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [session])
+  }, [session, notebookOpen])
 
   return (
     <div className="game">
@@ -67,8 +70,8 @@ export default function GameApp() {
           Pattern Circuit
         </div>
         <div className="topbar-actions">
-          <button className="notebook-button" onClick={() => setNotebookOpen(true)}>
-            📓 Cuaderno <span>{progress.notes.length}</span>
+          <button className="notebook-button" onClick={() => setNotebookOpen(true)} aria-haspopup="dialog">
+            📓 Cuaderno <span aria-label={`${progress.notes.length} notas`}>{progress.notes.length}</span>
           </button>
           <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label="Nivel">
             {[...new Set(LEVELS.map((l) => l.chapter))].map((chapter) => (
@@ -87,7 +90,7 @@ export default function GameApp() {
 
       <main>
         <section className="stage-wrap">
-          <div className="stage" ref={host} />
+          <div className="stage" ref={host} role="img" aria-label={`Circuito del nivel ${session.level.order}: ${session.level.title}`} />
           <BriefCard key={session.level.id} session={session} />
           <StageCard key={`card-${session.level.id}`} session={session} onNext={next ? () => setLevelId(next.id) : undefined} />
           <Inventory session={session} stage={stage} />
@@ -97,7 +100,8 @@ export default function GameApp() {
         <CodePanel key={session.level.id} session={session} />
       </main>
 
-      {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} onClose={() => setNotebookOpen(false)} />}
+      {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
+      <p className="desktop-only">Pattern Circuit está pensado para pantallas de escritorio. Ábrelo en una ventana más ancha para jugar.</p>
     </div>
   )
 }
@@ -114,7 +118,7 @@ function Legend() {
       <span>
         <i className="dashed" /> depende de una interfaz
       </span>
-      <span className="camera">rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar</span>
+      <span className="camera">rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar · espacio, ←, →, R: reproducción</span>
     </div>
   )
 }

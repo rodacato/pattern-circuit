@@ -63,16 +63,24 @@ function Close({ onClose }: { onClose?: () => void }) {
   ) : null
 }
 
+// Sin mouse no se puede arrastrar un cable: el botón "Conectar" hace la misma reparación.
 function FailCard({ session, result, onClose }: { session: GameSession; result: Evaluation; onClose?: () => void }) {
-  const hint = session.pendingRepairs[0]?.prompt
+  const repair = session.pendingRepairs[0]
+  const wire = repair?.patch.add?.wires?.[0]
+  const nodeLabel = (id: string) => session.playback.circuit.nodes.get(id)?.label ?? id
   return (
-    <div className="stage-card card bad">
+    <div className="stage-card card bad" role="status">
       <Close onClose={onClose} />
       <span className="eyebrow">Algo salió mal</span>
       <Failures result={result} />
-      {hint && <p className="hint">💡 {hint}</p>}
+      {repair && <p className="hint">💡 {repair.prompt}</p>}
       <div className="actions">
         <button onClick={() => session.play()}>Reintentar</button>
+        {wire && (
+          <button className="link" onClick={() => session.connect(wire.from, wire.to)}>
+            Conectar {nodeLabel(wire.from)} → {nodeLabel(wire.to)} sin arrastrar
+          </button>
+        )}
       </div>
     </div>
   )
@@ -80,11 +88,11 @@ function FailCard({ session, result, onClose }: { session: GameSession; result: 
 
 function ProblemCard({ result, onClose }: { result: Evaluation; onClose?: () => void }) {
   return (
-    <div className="stage-card card bad">
+    <div className="stage-card card bad" role="status">
       <Close onClose={onClose} />
       <span className="eyebrow">Problema detectado</span>
       <Failures result={result} />
-      <p className="hint">Arrastra un patrón del inventario al socket ⬡ que late sobre el circuito. Probar uno equivocado también enseña.</p>
+      <p className="hint">Arrastra un patrón del inventario al socket ⬡ que late sobre el circuito (o elígelo con clic o teclado). Probar uno equivocado también enseña.</p>
     </div>
   )
 }
@@ -93,9 +101,9 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
   const option = session.pluggedOption!
   const solved = session.flow.solved
   const outcome = OUTCOME[option.outcome]
-  const pending = session.sockets.filter((s) => session.flow.plugs[s.id]?.outcome !== 'solves')
+  const pending = session.pendingSockets
   return (
-    <div className={`stage-card card ${outcome.tone}`}>
+    <div className={`stage-card card ${outcome.tone}`} role="status">
       <Close onClose={solved ? undefined : onClose} />
       <span className={`badge ${outcome.tone}`}>{outcome.label}</span>
       <h3>{option.note.title}</h3>
@@ -122,7 +130,7 @@ function TicketCard({ session }: { session: GameSession }) {
   const touched = useSession(session, (s) => s.touched.length)
   const running = useSession(session, (s) => s.playback.playing)
   return (
-    <div className="stage-card card ticket">
+    <div className="stage-card card ticket" role="status">
       <span className="eyebrow">📋 Ticket de cambio</span>
       <h3>{session.ticket?.text}</h3>
       {!applied && (
@@ -157,16 +165,15 @@ function CompareCard({ session }: { session: GameSession }) {
   const side = useSession(session, (s) => s.flow.side)
   const cmp = session.comparison!
   const name = session.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
-  // Se comparan justo las métricas que el nivel usa como objetivo.
-  const rows = [...new Set(session.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
+  const rows = session.comparisonRows
   return (
-    <div className="stage-card card compare">
+    <div className="stage-card card compare" role="status">
       <span className="eyebrow">Comparación</span>
       <div className="seg">
-        <button className={side === 'without' ? 'on bad' : ''} onClick={() => session.showSide('without')}>
+        <button className={side === 'without' ? 'on bad' : ''} aria-pressed={side === 'without'} onClick={() => session.showSide('without')}>
           Sin patrón
         </button>
-        <button className={side === 'with' ? 'on good' : ''} onClick={() => session.showSide('with')}>
+        <button className={side === 'with' ? 'on good' : ''} aria-pressed={side === 'with'} onClick={() => session.showSide('with')}>
           Con {name}
         </button>
       </div>
@@ -200,7 +207,7 @@ function CompareCard({ session }: { session: GameSession }) {
 function WinCard({ session, onNext }: { session: GameSession; onNext?: () => void }) {
   const patterns = session.pluggedPatterns
   return (
-    <div className="stage-card card won">
+    <div className="stage-card card won" role="status">
       <span className="eyebrow">{onNext ? 'Nivel superado' : 'Fin del recorrido'}</span>
       <h2>{!onNext ? '¡Terminaste Pattern Circuit!' : patterns.length ? `Aprendiste ${patterns.map((p) => PATTERNS[p].name).join(' + ')}` : '¡La cafetería funciona!'}</h2>
       {!onNext && <p className="muted">La cafetería entera corre sobre los patrones que fuiste enchufando. Tu cuaderno guarda lo que aprendiste de cada uno, también de los que no encajaban.</p>}
