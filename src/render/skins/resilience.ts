@@ -1,3 +1,4 @@
+// Skins del capítulo Resiliencia (Null Object, Circuit Breaker, Saga), con su color propio.
 import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'

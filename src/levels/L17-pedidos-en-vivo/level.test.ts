@@ -16,7 +16,7 @@ describe('L17 · State + Observer + Command', () => {
   })
 
   it('sin State, cancelar lo entregado llega como válido', () => {
-    expect(evaluate(level, { sockets: [command, observer] }).metrics.invalidAtSink).toBeGreaterThan(0)
+    expect(evaluate(level, { sockets: [command, observer] }).metrics.invalidAtSink).toBe(2)
   })
 
   it('sin Observer, Lealtad no se entera', () => {

@@ -45,7 +45,7 @@ export default defineLevel({
           code: 'ports',
           note: {
             title: 'Ports & Adapters: el núcleo define los enchufes',
-            body: 'El núcleo declara puertos (guardar pedidos, cobrar) y no sabe quién los implementa. En pruebas se enchufan adaptadores en memoria; en producción, Postgres y Stripe. Es la respuesta al Singleton del nivel 4: nada global, todo se inyecta.',
+            body: 'El núcleo declara puertos (guardar pedidos, cobrar) y no sabe quién los implementa. En pruebas se enchufan adaptadores en memoria; en producción, Postgres y Stripe. Es la respuesta al Singleton del nivel 4: nada global: los adaptadores se enchufan desde afuera (por ejemplo, inyectados).',
           },
           patch: {
             remove: ['postgres', 'stripe'],

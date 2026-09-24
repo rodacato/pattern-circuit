@@ -16,6 +16,6 @@ describe('L22 · Circuit Breaker', () => {
   it('Circuit Breaker: tras los primeros fallos, el resto va directo al respaldo', () => {
     const r = evaluate(level, socket('circuit-breaker')).metrics
     expect(r.dropped).toBe(0)
-    expect(r.invalidAtSink).toBeLessThanOrEqual(3)
+    expect(r.invalidAtSink).toBe(3) // solo las llamadas que fallaron antes de abrir el interruptor
   })
 })

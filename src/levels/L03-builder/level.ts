@@ -2,10 +2,11 @@ import { defineLevel, type NodeDef, type Predicate } from '../../engine'
 import base from './base.rb?raw'
 import builder from './builder.rb?raw'
 import common from './common.rb?raw'
+import { withCommon } from '../kit'
 import decorator from './decorator.rb?raw'
 import factory from './factory.rb?raw'
 
-const withCommon = (code: string) => `${code}\n${common}`
+const code = withCommon(common)
 
 const impossible: Predicate = { all: [{ hasTag: 'caliente' }, { hasTag: 'hielo' }] }
 
@@ -173,10 +174,10 @@ export default defineLevel({
   ],
   code: {
     rb: {
-      base: withCommon(base),
-      builder: withCommon(builder),
-      factory: withCommon(factory),
-      decorator: withCommon(decorator),
+      base: code(base),
+      builder: code(builder),
+      factory: code(factory),
+      decorator: code(decorator),
     },
   },
 })

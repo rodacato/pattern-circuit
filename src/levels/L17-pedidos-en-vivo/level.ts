@@ -90,7 +90,7 @@ export default defineLevel({
             },
           },
         },
-        strategy: { outcome: 'misfit', code: 'estados_base', note: { title: 'Strategy la elige el cliente; State se reemplaza a sí mismo', body: 'Una estrategia por evento aplica su cambio sin saber en qué estado está el pedido. En State, el estado actual decide y elige al siguiente.' }, patch: reskin('pedido', 'strategy') },
+        strategy: { outcome: 'misfit', code: 'estados_base', note: { title: 'Strategy la elige quien llama; en State decide el estado actual', body: 'Una estrategia por evento aplica su cambio sin saber en qué estado está el pedido. En State decide el estado actual, y normalmente él mismo indica el siguiente.' }, patch: reskin('pedido', 'strategy') },
         'template-method': {
           outcome: 'misfit',
           code: 'estados_base',

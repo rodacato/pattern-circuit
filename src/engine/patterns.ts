@@ -5,14 +5,16 @@ export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'archit
 export type PatternInfo = { name: string; family: PatternFamily; gist: string }
 
 // Catálogo de patrones: nombre visible, familia y la idea en una frase.
+// Familias GoF según Gamma et al. (1994); Null Object es "object structural" según Woolf (1997).
+// Las fuentes de cada patrón están en docs/DESIGN.md.
 export const PATTERNS: Record<PatternId, PatternInfo> = {
   'factory-method': { name: 'Factory Method', family: 'creational', gist: 'Una subclase decide qué objeto crear.' },
-  builder: { name: 'Builder', family: 'creational', gist: 'Arma un objeto complejo paso a paso; build() entrega el resultado (y puede validarlo).' },
-  singleton: { name: 'Singleton', family: 'creational', gist: 'Una sola instancia compartida por todos.' },
+  builder: { name: 'Builder', family: 'creational', gist: 'Arma un objeto complejo paso a paso y lo entrega al final con build(), que puede validarlo.' },
+  singleton: { name: 'Singleton', family: 'creational', gist: 'Una sola instancia de la clase, con un punto de acceso global.' },
   adapter: { name: 'Adapter', family: 'structural', gist: 'Convierte una interfaz en la que el cliente espera.' },
   decorator: { name: 'Decorator', family: 'structural', gist: 'Envuelve un objeto para sumarle comportamiento.' },
   proxy: { name: 'Proxy', family: 'structural', gist: 'Un sustituto que controla el acceso al objeto real.' },
-  composite: { name: 'Composite', family: 'structural', gist: 'Trata igual a una hoja y a un grupo de hojas.' },
+  composite: { name: 'Composite', family: 'structural', gist: 'Trata igual a un objeto suelto y a un grupo, aunque el grupo contenga otros grupos.' },
   facade: { name: 'Facade', family: 'structural', gist: 'Una puerta simple a un subsistema complicado.' },
   strategy: { name: 'Strategy', family: 'behavioral', gist: 'Alternativas intercambiables detrás de una misma interfaz.' },
   observer: { name: 'Observer', family: 'behavioral', gist: 'Avisa a todos los suscriptores cuando algo pasa.' },
@@ -22,10 +24,10 @@ export const PATTERNS: Record<PatternId, PatternInfo> = {
   'template-method': { name: 'Template Method', family: 'behavioral', gist: 'Un esqueleto fijo con pasos que las subclases rellenan.' },
   'ports-and-adapters': { name: 'Ports & Adapters', family: 'architecture', gist: 'El núcleo no conoce el mundo exterior, solo sus puertos.' },
   'event-bus': { name: 'Event Bus', family: 'architecture', gist: 'Los componentes se hablan por eventos, sin conocerse.' },
-  cqrs: { name: 'CQRS', family: 'architecture', gist: 'Escribir y leer por caminos separados.' },
-  'null-object': { name: 'Null Object', family: 'behavioral', gist: 'Un objeto que no hace nada en lugar de nil: sin ifs de "¿existe?".' },
-  'circuit-breaker': { name: 'Circuit Breaker', family: 'resilience', gist: 'Tras varios fallos seguidos deja de llamar al servicio caído y falla rápido (o usa un respaldo).' },
-  saga: { name: 'Saga', family: 'resilience', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
+  cqrs: { name: 'CQRS', family: 'architecture', gist: 'Un modelo para escribir y otro distinto para leer.' },
+  'null-object': { name: 'Null Object', family: 'structural', gist: 'Un objeto que no hace nada en lugar de nil: sin ifs de "¿existe?".' },
+  'circuit-breaker': { name: 'Circuit Breaker', family: 'resilience', gist: 'Tras varios fallos deja de llamar al servicio caído y falla rápido (o usa un respaldo).' },
+  saga: { name: 'Saga', family: 'architecture', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
 }
 
 export const FAMILY_NAMES: Record<PatternFamily, string> = {

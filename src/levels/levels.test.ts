@@ -18,8 +18,20 @@ describe('registro de niveles', () => {
     for (const l of LEVELS) for (const s of l.sockets) expect(Object.values(s.options).filter((o) => o?.outcome === 'solves'), l.id).toHaveLength(1)
   })
 
-  it.each(LEVELS.map((l) => [l.id, l] as const))('%s: cada variante alcanzable termina su simulación', (_id, l) => {
-    for (const v of reachableVariants(l)) expect(() => evaluate(l, v)).not.toThrow()
+  it('cada opción de un socket está en su inventario (si no, el jugador nunca la vería)', () => {
+    for (const l of LEVELS) for (const s of l.sockets) expect(s.inventory, `${l.id}/${s.id}`).toEqual(expect.arrayContaining(Object.keys(s.options)))
+  })
+
+  it.each(LEVELS.map((l) => [l.id, l] as const))('%s: cada variante alcanzable termina y entrega o pierde cada pulso', (_id, l) => {
+    for (const v of reachableVariants(l)) {
+      const { metrics } = evaluate(l, v)
+      expect(metrics.spawned, JSON.stringify(v)).toBeGreaterThan(0)
+      expect(metrics.delivered + metrics.dropped + metrics.cancelled, JSON.stringify(v)).toBeGreaterThan(0)
+    }
+  })
+
+  it.each(LEVELS.filter((l) => !l.sockets.length).map((l) => [l.id, l] as const))('%s (sin sockets): se gana con todas las reparaciones', (_id, l) => {
+    expect(evaluate(l, { repairs: l.repairs.map((r) => r.id) }).won).toBe(true)
   })
 
   it.each(LEVELS.filter((l) => l.sockets.length).map((l) => [l.id, l] as const))('%s: sin patrón falla y con el correcto gana', (_id, l) => {

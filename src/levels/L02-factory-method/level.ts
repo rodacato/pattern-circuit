@@ -3,11 +3,12 @@ import base from './base.rb?raw'
 import basePuerto from './base_puerto.rb?raw'
 import builder from './builder.rb?raw'
 import common from './common.rb?raw'
+import { withCommon } from '../kit'
 import factory from './factory.rb?raw'
 import factoryPuerto from './factory_puerto.rb?raw'
 import singleton from './singleton.rb?raw'
 
-const withCommon = (code: string) => `${code}\n${common}`
+const code = withCommon(common)
 
 // Cada sucursal tiene su bebida; entregar otra es un pedido equivocado.
 const MENU: Record<string, string> = { centro: 'latte', playa: 'frappe', montana: 'chocolate', puerto: 'te' }
@@ -189,12 +190,12 @@ export default defineLevel({
   ],
   code: {
     rb: {
-      base: withCommon(base),
-      base_puerto: withCommon(basePuerto),
-      factory: withCommon(factory),
-      factory_puerto: withCommon(factoryPuerto),
-      singleton: withCommon(singleton),
-      builder: withCommon(builder),
+      base: code(base),
+      base_puerto: code(basePuerto),
+      factory: code(factory),
+      factory_puerto: code(factoryPuerto),
+      singleton: code(singleton),
+      builder: code(builder),
     },
   },
 })

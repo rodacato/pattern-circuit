@@ -69,8 +69,8 @@ export default defineLevel({
           outcome: 'misfit',
           code: 'strategy',
           note: {
-            title: 'Strategy la elige el cliente; State se reemplaza a sí mismo',
-            body: 'Una estrategia por evento reparte el código, pero la elige quien llama y ninguna sabe en qué estado está el pedido: cada una aplica su cambio igual. En State, el objeto que decide es el estado actual, y él mismo indica cuál es el siguiente.',
+            title: 'Strategy la elige quien llama; en State decide el estado actual',
+            body: 'Una estrategia por evento reparte el código, pero la elige quien llama y ninguna sabe en qué estado está el pedido: cada una aplica su cambio igual. En State decide el estado actual, y normalmente él mismo indica el siguiente.',
           },
           patch: { update: [{ id: 'pedido', skin: 'strategy', codeRef: 'EventHandlers' }] },
         },

@@ -15,7 +15,7 @@ export default defineLevel({
   title: 'Me equivoqué de pedido',
   targetPattern: 'command',
   brief: {
-    problem: 'Un cliente pide un latte y a los pocos segundos lo cancela. Pero el mostrador ejecuta cada pedido en el acto: cuando llega la cancelación ya no hay nada que deshacer.',
+    problem: 'Un cliente pide un latte y a los pocos segundos lo cancela. Pero el mostrador ejecuta cada pedido en el acto: cuando llega la cancelación, el latte ya se está preparando.',
     goal: 'Que un pedido cancelado a tiempo no se prepare, sin perder ningún otro pedido.',
   },
   circuit: {
@@ -62,7 +62,7 @@ export default defineLevel({
           code: 'strategy',
           note: {
             title: 'Strategy no puede volver en el tiempo',
-            body: 'Cambiar cómo se cancela no sirve si la acción ya se ejecutó. Para deshacer, la petición tiene que existir como objeto antes de ejecutarse.',
+            body: 'Cambiar cómo se cancela no sirve si la acción ya se ejecutó. Para cancelarla a tiempo, la petición tiene que existir como objeto antes de ejecutarse.',
           },
           patch: { update: [{ id: 'deshacer', behavior: { type: 'slot' }, skin: 'strategy', codeRef: 'CancelStrategy' }] },
         },
