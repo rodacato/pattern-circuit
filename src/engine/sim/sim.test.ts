@@ -24,6 +24,16 @@ describe('simulación', () => {
     expect(events.filter((e) => e.type === 'pulse.branch').map((e) => e.branch)).toEqual(['x', 'else'])
   })
 
+  it('transform con `when` solo cambia los pulsos que cumplen la condición', () => {
+    const c = line({
+      src: { type: 'source' },
+      fix: { type: 'transform', when: { hasTag: 'bad' }, removeTags: ['bad'], addTags: ['fixed'] },
+      out: { type: 'sink' },
+    })
+    const { sim } = runToEnd(createSim(c, scenario({ at: 0, tags: ['bad'] }, { at: 5, tags: ['ok'] })))
+    expect(sim.state.pulses.map((p) => p.tags)).toEqual([['fixed'], ['ok']])
+  })
+
   it('broadcast clona el pulso y el sink cuenta duplicados por origen', () => {
     const c = Circuit.parse({
       nodes: [

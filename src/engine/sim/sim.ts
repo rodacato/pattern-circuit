@@ -154,6 +154,7 @@ class Tick {
       case 'sink':
         return this.deliver(pulse, node, b.expects ? matches(b.expects, pulse) : true)
       case 'transform':
+        if (b.when && !matches(b.when, pulse)) return this.exitVia(pulse, node, 'out')
         if (b.addTags) pulse.tags = [...new Set([...pulse.tags, ...b.addTags])]
         if (b.removeTags) pulse.tags = pulse.tags.filter((t) => !b.removeTags!.includes(t))
         if (b.setShape) pulse.shape = b.setShape

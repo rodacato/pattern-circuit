@@ -45,6 +45,7 @@ export const Behavior = z.discriminatedUnion('type', [
   z.object({ type: z.literal('pass') }),
   z.object({
     type: z.literal('transform'),
+    when: Predicate.optional(), // si no se cumple, el pulso pasa sin cambios
     addTags: z.array(z.string()).optional(),
     removeTags: z.array(z.string()).optional(),
     setShape: PulseShape.optional(),

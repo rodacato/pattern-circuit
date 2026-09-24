@@ -1,5 +1,6 @@
 // API pública del motor: lo único que el resto de la app puede importar de `engine/`.
 export * from './schema'
+export * from './patterns'
 export * from './sim/types'
 export * from './sim/sim'
 export * from './sim/timeline'
