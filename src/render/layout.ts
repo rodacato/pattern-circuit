@@ -54,3 +54,15 @@ export function pulsePosition(circuit: CompiledCircuit, pulse: Pulse, before: Pu
   const c = nodeCenter(circuit.nodes.get(pulse.loc.nodeId)!)
   return { x: c.x - NODE_W / 2 + 16 + slot * 16, y: c.y - NODE_H / 2 }
 }
+
+export const SOCKET_R = 13
+
+// El socket vive sobre el nodo del circuito base: no se mueve aunque el patrón reemplace ese nodo.
+export function socketCenter(baseNodes: NodeDef[], nodeId: string): Point | undefined {
+  const n = baseNodes.find((b) => b.id === nodeId)
+  if (!n) return undefined
+  const c = nodeCenter(n)
+  return { x: c.x, y: c.y - NODE_H / 2 - 22 }
+}
+
+export const withinSocket = (socket: Point, p: Point, slack = 26) => Math.hypot(p.x - socket.x, p.y - socket.y) <= SOCKET_R + slack

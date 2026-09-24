@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Circuit, compile, type Pulse } from '../engine'
-import { CELL, circuitBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition } from './layout'
+import { CELL, circuitBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition, socketCenter, withinSocket } from './layout'
 
 const circuit = compile(
   Circuit.parse({
@@ -47,5 +47,15 @@ describe('layout', () => {
     const end = pulsePosition(circuit, now, before, 1, 0)
     expect(halfway.x + halfway.y).toBeLessThan(end.x + end.y)
     expect(pulsePosition(circuit, now, undefined, 0.5, 0)).toEqual(end)
+  })
+
+  it('coloca el socket sobre su nodo del circuito base y acepta soltar cerca', () => {
+    const base = [...circuit.nodes.values()]
+    const at = socketCenter(base, 'b')!
+    expect(at.x).toBe(4 * CELL)
+    expect(at.y).toBeLessThan(2 * CELL)
+    expect(withinSocket(at, { x: at.x + 20, y: at.y })).toBe(true)
+    expect(withinSocket(at, { x: at.x + 200, y: at.y })).toBe(false)
+    expect(socketCenter(base, 'nope')).toBeUndefined()
   })
 })

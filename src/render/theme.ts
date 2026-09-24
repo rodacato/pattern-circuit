@@ -33,3 +33,12 @@ export const DROP_TEXT = {
   unhandled: 'nadie lo maneja (else)',
   guard: 'rechazado',
 } as const
+
+export const FAMILY_COLORS = {
+  creational: NEON.amber,
+  structural: NEON.cyan,
+  behavioral: NEON.violet,
+  architecture: NEON.green,
+} as const
+
+export const INVALID_TEXT = '¡esto no es lo que pedí!'
