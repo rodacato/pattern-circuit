@@ -17,13 +17,20 @@ export function circuitBounds(nodes: Iterable<NodeDef>): { w: number; h: number 
   }
 }
 
-// Escala y centra el circuito dejando margen para las tarjetas flotantes; nunca amplía de más.
-export function fitWorld(screen: { width: number; height: number }, bounds: { w: number; h: number }) {
-  const zoom = Math.min(screen.width / (bounds.w + CELL * 3.6), screen.height / (bounds.h + CELL * 3.4), 1.7)
+export type Insets = { top: number; bottom: number }
+
+// Franjas reservadas para las tarjetas (arriba) y los controles (abajo), si la pantalla da para ello.
+export const insetsFor = (screen: { height: number }): Insets =>
+  screen.height > 560 ? { top: Math.min(210, screen.height * 0.26), bottom: 90 } : { top: 0, bottom: 0 }
+
+// Escala y centra el circuito en el área libre; nunca amplía de más.
+export function fitWorld(screen: { width: number; height: number }, bounds: { w: number; h: number }, insets: Insets = { top: 0, bottom: 0 }) {
+  const free = screen.height - insets.top - insets.bottom
+  const zoom = Math.min(screen.width / (bounds.w + CELL * 3.6), free / (bounds.h + CELL * 3.4), 1.7)
   return {
     zoom,
     x: Math.round((screen.width - bounds.w * zoom) / 2),
-    y: Math.round((screen.height - bounds.h * zoom) / 2),
+    y: Math.round(insets.top + (free - bounds.h * zoom) / 2),
   }
 }
 
@@ -32,11 +39,13 @@ export const ZOOM_LIMITS = [0.5, 3] as const
 
 // Vista final = encuadre automático × zoom del jugador, desplazada por su paneo.
 export function worldTransform(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View) {
-  const scale = fitWorld(screen, bounds).zoom * view.zoom
+  const insets = insetsFor(screen)
+  const scale = fitWorld(screen, bounds, insets).zoom * view.zoom
+  const free = screen.height - insets.top - insets.bottom
   return {
     scale,
     x: Math.round((screen.width - bounds.w * scale) / 2 + view.x),
-    y: Math.round((screen.height - bounds.h * scale) / 2 + view.y),
+    y: Math.round(insets.top + (free - bounds.h * scale) / 2 + view.y),
   }
 }
 

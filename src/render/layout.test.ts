@@ -19,6 +19,12 @@ describe('layout', () => {
     expect(circuitBounds(circuit.nodes.values())).toEqual({ w: 4 * CELL, h: 2 * CELL })
   })
 
+  it('deja libres las franjas de tarjetas y controles', () => {
+    const fit = fitWorld({ width: 2000, height: 800 }, { w: 1000, h: 100 }, { top: 200, bottom: 100 })
+    expect(fit.y).toBeGreaterThanOrEqual(200)
+    expect(fit.y + 100 * fit.zoom).toBeLessThanOrEqual(700)
+  })
+
   it('centra el circuito y limita el zoom', () => {
     const fit = fitWorld({ width: 10_000, height: 10_000 }, { w: 100, h: 100 })
     expect(fit.zoom).toBe(1.7)

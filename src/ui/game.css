@@ -787,7 +787,7 @@
 .legend {
   position: absolute;
   right: 20px;
-  bottom: 30px;
+  bottom: 96px;
   display: grid;
   gap: 6px;
   font-size: 12px;
