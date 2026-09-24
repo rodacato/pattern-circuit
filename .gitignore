@@ -25,3 +25,4 @@ dist-ssr
 
 # Configuración local de Claude Code
 .claude/
+coverage
