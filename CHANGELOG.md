@@ -14,6 +14,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - **Capítulo "Criterio: cuándo no"** (niveles 24 y 25): problemas donde gana arreglar lo justo, sin agregar un patrón que nada pide todavía (YAGNI). Nueva métrica: piezas en el circuito.
 - **Dónde lo has visto**: cada patrón muestra un ejemplo real en Ruby o Rails (Rack middleware, SimpleDelegator, `Post.none`, ActiveJob…) con enlace a su documentación, en el Cuaderno y al superar el nivel.
 - **Pistas escalonadas**: en vez de la respuesta, primero una pregunta guía según el síntoma, luego la familia del patrón (con las definiciones de GoF), después un descarte y, al final, el patrón.
+- **Táctil y tablet**: pellizcar para zoom, doble toque para encuadrar, blancos más grandes con el dedo y layout vertical (circuito arriba, código abajo) hasta 1000 px. En teléfonos (menos de 600 px) sigue el aviso.
 
 ### Changed
 
@@ -24,6 +25,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ### Fixed
 
 - En escritorios angostos (1024 px), la tarjeta del nivel ya no tapa la tarjeta de etapa, y la leyenda no tapa el inventario.
+- El título del panel de código ya no queda separado por un espacio enorme cuando aparecen las pestañas.
 
 ## [1.0.0] - 2026-09-24
 
