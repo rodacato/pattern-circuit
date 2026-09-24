@@ -1,3 +1,5 @@
+import { N } from '../i18n'
+
 export const NEON = {
   bg: 0x060a13,
   grid: 0x141d33,
@@ -34,6 +36,7 @@ const TAG_COLORS: Record<string, number> = {
 
 export const pulseColor = (tags: string[]) => TAG_COLORS[tags.find((t) => t in TAG_COLORS) ?? ''] ?? NEON.white
 
+// i18n
 export const DROP_TEXT = {
   'no-wire': 'sin cable de salida',
   unhandled: 'nadie lo maneja (else)',
@@ -49,4 +52,4 @@ export const FAMILY_COLORS = {
   principle: NEON.white,
 } as const
 
-export const INVALID_TEXT = '¡esto no es lo que pedí!'
+export const INVALID_TEXT = N('¡esto no es lo que pedí!')

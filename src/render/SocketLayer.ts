@@ -1,6 +1,7 @@
 import { Container, type Graphics, type Text } from 'pixi.js'
 import { PATTERNS, type Point } from '../engine'
 import type { GameSession } from '../game/session/GameSession'
+import { msg, N, type Translate } from '../i18n'
 import { hexagon, label } from './draw'
 import type { Effects } from './fx'
 import { NODE_H, nodeCenter, SOCKET_R, socketCenter, withinSocket } from './layout'
@@ -14,10 +15,12 @@ export class SocketLayer {
   private readonly lastPlugs: Record<string, string> = {}
   private readonly session: GameSession
   private readonly fx: Effects
+  private readonly t: Translate
 
-  constructor(session: GameSession, fx: Effects) {
+  constructor(session: GameSession, fx: Effects, t: Translate) {
     this.session = session
     this.fx = fx
+    this.t = t
   }
 
   point(socketId: string): Point | undefined {
@@ -42,7 +45,7 @@ export class SocketLayer {
       const color = FAMILY_COLORS[PATTERNS[plug.pattern].family]
       this.fx.ring(at, color, 110)
       this.fx.burst(at, color, 34, 3.2)
-      this.fx.float(at, `${PATTERNS[plug.pattern].name} enchufado`, color)
+      this.fx.float(at, msg('{pattern} enchufado', { pattern: PATTERNS[plug.pattern].name }), color)
     }
   }
 
@@ -71,7 +74,7 @@ export class SocketLayer {
         d.moveTo(at.x - 5, at.y).lineTo(at.x + 5, at.y).moveTo(at.x, at.y - 5).lineTo(at.x, at.y + 5).stroke({ width: 2, color })
         gl.circle(at.x, at.y, r + 10 + beat * 8).stroke({ width: 2, color, alpha: 0.3 * (1 - beat) })
       }
-      text.text = plugged ? PATTERNS[plugged].name : hovered ? 'suéltalo aquí' : socket.label
+      text.text = this.t(plugged ? PATTERNS[plugged].name : hovered ? N('suéltalo aquí') : socket.label)
       text.style.fill = color
       text.position.set(at.x, at.y - r - 6)
       text.visible = true

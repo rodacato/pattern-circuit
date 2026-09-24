@@ -16,6 +16,7 @@ Pattern Circuit se organiza en **capas con dependencias en una sola dirección**
 
 | Capa | Carpeta | Responsabilidad | Puede importar |
 |---|---|---|---|
+| **i18n** | `src/i18n/` | Idiomas: traductor, catálogos (inglés) y extracción de textos para los tests. | nada |
 | **engine** | `src/engine/` | Dominio puro: formato de niveles, simulación determinista, parches de circuito, evaluación. Sin DOM, sin React, sin Pixi. | solo `zod` |
 | **levels** | `src/levels/` | Contenido. Un nivel = carpeta con `level.ts` + fragmentos `.rb`. | `engine` |
 | **game** | `src/game/` | Aplicación: la partida (reproducción, foco, decisiones del jugador), el flujo del nivel y el progreso. Sin DOM ni Pixi. | `engine`, `zod` |
@@ -125,6 +126,14 @@ Cosas que se dejan así a sabiendas, con su razón:
 - **Nivel nuevo**: carpeta `src/levels/LNN-nombre/` con `level.ts`, sus `.rb` y un `level.test.ts`. Las invariantes comunes se comprueban solas.
 - **Patrón nuevo**: añadirlo a `PATTERN_IDS` en `schema.ts` y a `PATTERNS` en `patterns.ts` (con su fuente en `docs/DESIGN.md`), su skin en `render/skins/`, y enseñarlo en algún nivel (los tests lo exigen).
 - **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`. Primitivas actuales: `source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`, `breaker`.
+
+## Idiomas
+
+- **El español es el idioma fuente**: cada texto se escribe en español donde vive (niveles, catálogo, tarjetas). Los catálogos de otros idiomas lo traducen usando ese texto como clave, al estilo gettext; lo que no tiene traducción se muestra en español.
+- `t(texto)` traduce; `msg('Nivel {n}', { n })` arma textos con huecos (los valores también se traducen y pueden ser otros mensajes); `N('texto')` marca un texto para traducir sin cambiarlo; un comentario `// i18n` marca un mapa de textos.
+- `engine` y `game` devuelven textos en español o `Message`; la traducción ocurre al mostrar, en `ui` (contexto `useT`) y en `render` (el traductor entra por `NeonStage.create` y los textos flotantes se traducen en `Effects`).
+- Cada nivel trae su `en.ts`. `i18n/coverage.test.ts` exige traducción para cada texto visible (código fuente, catálogo de patrones, temas y cada nivel con todas sus variantes) y que los huecos `{x}` se conserven.
+- El idioma es una preferencia del navegador (`localStorage`), aparte del progreso. Pendiente: los comentarios del código Ruby siguen en español.
 
 ## Temas nuevos
 

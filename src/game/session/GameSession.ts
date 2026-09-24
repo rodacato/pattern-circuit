@@ -18,6 +18,7 @@ import {
   type SocketOption,
   type Variant,
 } from '../../engine'
+import { msg, N, type Message } from '../../i18n'
 import { Emitter } from '../events/Emitter'
 import { hintLadder } from '../learning/hints'
 import { recordAnswer } from '../learning/review'
@@ -38,7 +39,7 @@ import { Playback } from '../playback/Playback'
 import { emptyProgress, withCompleted, withNotes, withPrediction, type Progress, type ProgressStore } from '../progress/progress'
 
 export type ConnectResult = 'repaired' | 'wrong' | 'none'
-export type CodeChange = { title: string; lines: DiffLine[]; added: number; removed: number }
+export type CodeChange = { title: Message; lines: DiffLine[]; added: number; removed: number }
 export type Comparison = Record<Side, Evaluation>
 
 // Fachada de una partida: render y ui solo hablan con esto. Coordina flujo, reproducción y progreso.
@@ -123,8 +124,8 @@ export class GameSession {
     const names = this.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
     // 'observe' = circuito base y 'choose' = con patrón, ambos sin ticket; 'compare' = el lado elegido, con ticket.
     const [before, after, title] = this.ticket
-      ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), `Lo que cambió con el ticket, ${side === 'with' ? `con ${names}` : 'sin patrón'}`]
-      : [code('compare', 'without'), code('compare', 'with'), `Del código sin patrón al código con ${names}`]
+      ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), side === 'with' ? msg('Lo que cambió con el ticket, con {names}', { names }) : N('Lo que cambió con el ticket, sin patrón')]
+      : [code('compare', 'without'), code('compare', 'with'), msg('Del código sin patrón al código con {names}', { names })]
     if (!before || !after) return undefined
     const lines = diffLines(before.text, after.text)
     return { title, lines, ...diffStats(lines) }
@@ -147,7 +148,7 @@ export class GameSession {
   }
 
   // Pistas escalonadas para el socket pendiente: se revelan de a una, a pedido del jugador.
-  get hintLadder(): string[] {
+  get hintLadder(): Message[] {
     return this.flow.stage === 'choose' ? hintLadder(this.level, this.flow, this.result) : []
   }
 

@@ -1,6 +1,7 @@
 import { Container, type Text } from 'pixi.js'
 import type { NodeDef, PatternId, Point } from '../engine'
 import type { Playback } from '../game/playback/Playback'
+import { identity, type Translate } from '../i18n'
 import { drawShape, label } from './draw'
 import { pulsePosition } from './layout'
 import type { DrawContext, Skin } from './skins'
@@ -16,9 +17,11 @@ export class PulseLayer {
   private readonly badges: Text[] = []
   private readonly followLabel = label('', 11, C.white)
   private readonly skins: Partial<Record<PatternId, Skin>>
+  private readonly t: Translate
 
-  constructor(skins: Partial<Record<PatternId, Skin>>) {
+  constructor(skins: Partial<Record<PatternId, Skin>>, t: Translate = identity) {
     this.skins = skins
+    this.t = t
     this.followLabel.anchor.set(0.5, 1)
     this.container.addChild(this.followLabel)
   }
@@ -56,7 +59,7 @@ export class PulseLayer {
       }
 
       if (pb.followed === p.id) {
-        this.followLabel.text = `#${p.id}${p.label ? ` · ${p.label}` : ''}`
+        this.followLabel.text = `#${p.id}${p.label ? ` · ${this.t(p.label)}` : ''}`
         this.followLabel.position.set(pos.x, pos.y - 16)
         this.followLabel.visible = true
         d.circle(pos.x, pos.y, 12).stroke({ width: 1.5, color: C.white, alpha: 0.9 })

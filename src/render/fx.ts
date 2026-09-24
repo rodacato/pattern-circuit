@@ -1,5 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js'
 import type { Point } from '../engine'
+import { identity, type Message, type Translate } from '../i18n'
 import { FONT_UI } from './theme'
 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: number; size: number }
@@ -14,10 +15,13 @@ export class Effects {
   private floaters: Floater[] = []
   private readonly layer: Container
   private readonly reduced: boolean
+  private readonly t: Translate
 
-  constructor(layer: Container, reduced = false) {
+  // Los textos flotantes se traducen aquí: los skins escriben en español, como todo el contenido.
+  constructor(layer: Container, reduced = false, t: Translate = identity) {
     this.layer = layer
     this.reduced = reduced
+    this.t = t
   }
 
   burst(at: Point, color: number, count = 20, speed = 2.4) {
@@ -34,8 +38,8 @@ export class Effects {
     this.rings.push({ x: at.x, y: at.y, r: 8, max, life: 1, color })
   }
 
-  float(at: Point, text: string, color: number) {
-    const t = new Text({ text, style: { fontFamily: FONT_UI, fontSize: 12, fontWeight: '700', fill: color } })
+  float(at: Point, message: Message, color: number) {
+    const t = new Text({ text: this.t(message), style: { fontFamily: FONT_UI, fontSize: 12, fontWeight: '700', fill: color } })
     t.anchor.set(0.5)
     t.position.set(at.x, at.y - 44)
     this.layer.addChild(t)

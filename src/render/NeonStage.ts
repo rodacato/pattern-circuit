@@ -1,6 +1,7 @@
 import { Application, BlurFilter, Container, FederatedPointerEvent, Graphics, Rectangle, Text } from 'pixi.js'
 import { initialNodeState, pointAt, timesDelivered, wirePath, type NodeDef, type PatternId, type Point, type SimEvent } from '../engine'
 import type { GameSession } from '../game/session/GameSession'
+import { msg, N, type Translate } from '../i18n'
 import { dashed, drawBranchGlyph, label } from './draw'
 import { Effects } from './fx'
 import { coarsePointer, DoubleTap, Pinch } from './gestures'
@@ -29,11 +30,12 @@ export class NeonStage {
   private readonly nodesLayer = new Container()
   private readonly fxLayer = new Container()
   private readonly reduced = prefersReducedMotion()
-  private readonly fx = new Effects(this.fxLayer, this.reduced)
   private readonly motion = new NodeAnimations(this.reduced)
   private readonly skins: Record<PatternId, Skin> = createSkins()
-  private readonly pulses = new PulseLayer(this.skins)
   private readonly session: GameSession
+  private readonly t: Translate
+  private readonly fx: Effects
+  private readonly pulses: PulseLayer
   private readonly sockets: SocketLayer
   private builtVersion = -1
   private bounds = { w: 0, h: 0 }
@@ -45,13 +47,16 @@ export class NeonStage {
   private panning?: { x: number; y: number }
   private time = 0
 
-  private constructor(session: GameSession) {
+  private constructor(session: GameSession, t: Translate) {
     this.session = session
-    this.sockets = new SocketLayer(session, this.fx)
+    this.t = t
+    this.fx = new Effects(this.fxLayer, this.reduced, t)
+    this.pulses = new PulseLayer(this.skins, t)
+    this.sockets = new SocketLayer(session, this.fx, t)
   }
 
-  static async create(host: HTMLElement, session: GameSession): Promise<NeonStage> {
-    const stage = new NeonStage(session)
+  static async create(host: HTMLElement, session: GameSession, t: Translate): Promise<NeonStage> {
+    const stage = new NeonStage(session, t)
     await stage.app.init({ resizeTo: host, background: C.bg, antialias: true, resolution: devicePixelRatio, autoDensity: true })
     host.appendChild(stage.app.canvas)
 
@@ -161,10 +166,10 @@ export class NeonStage {
     box.on('pointerout', () => this.hovered === n.id && (this.hovered = undefined))
     box.on('pointertap', () => this.session.inspect(this.session.playback.inspected === n.id ? undefined : n.id))
 
-    const title = label(n.label, 13, C.text, FONT_UI, '600')
+    const title = label(this.t(n.label), 13, C.text, FONT_UI, '600')
     title.anchor.set(0.5, 1)
     title.y = 3
-    const sub = label(n.className ?? (n.kind === 'actor' ? 'actor' : ''), 10, C.muted, FONT_MONO, '400')
+    const sub = label(n.className ?? (n.kind === 'actor' ? this.t('actor') : ''), 10, C.muted, FONT_MONO, '400')
     sub.anchor.set(0.5, 0)
     sub.y = 6
     box.addChild(title, sub)
@@ -294,14 +299,14 @@ export class NeonStage {
       case 'pulse.drop':
         this.fx.burst(at, C.red, 28, 3.4)
         this.motion.shake(e.nodeId, 1)
-        this.fx.float(at, `¡pedido perdido! · ${DROP_TEXT[e.reason]}`, C.red)
+        this.fx.float(at, msg('¡pedido perdido! · {reason}', { reason: DROP_TEXT[e.reason] }), C.red)
         this.pulses.forget(e.pulseId)
         break
       case 'pulse.deliver': {
         const dup = timesDelivered(state, e.nodeId, pulse!.originId) > 1
         const tone = !e.valid ? C.red : dup ? C.amber : C.green
         const message = node.behavior.type === 'sink' ? node.behavior.message : undefined
-        const text = !e.valid ? INVALID_TEXT : dup ? '¡cobrado otra vez!' : (message ?? `☕ ${pulse?.label ?? 'pedido'} entregado`)
+        const text = !e.valid ? INVALID_TEXT : dup ? N('¡cobrado otra vez!') : (message ?? msg('☕ {label} entregado', { label: pulse?.label ?? N('pedido') }))
         this.fx.burst(at, tone, 20, 2.4)
         this.fx.float(at, text, tone)
         if (!e.valid) this.motion.shake(e.nodeId, 0.7)
@@ -401,7 +406,7 @@ export class NeonStage {
     if (!text) return
     const current = this.session.playback.timeline.current.state.nodeState[n.id] ?? initialNodeState(n.behavior)!
     const color = stateColor(current)
-    text.text = current
+    text.text = this.t(current)
     const w = text.width + 16
     d.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color })
     gl.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color, alpha: 0.5 })

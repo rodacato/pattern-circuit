@@ -1,0 +1,42 @@
+import type { Catalog } from '../../i18n'
+
+// Traducción al inglés del contenido de este nivel (texto en español → inglés).
+const en: Catalog = {
+  'Combos con extras': 'Combos with extras',
+  'El Desayuno trae un café con extras, pan y un mini combo. La cocina no sabe desarmar el combo anidado, y el menú del café solo conoce una subclase por extra: avena y shot a la vez no existe.': 'The Breakfast comes with a coffee with extras, bread and a mini combo. The kitchen can\'t break down the nested combo, and the coffee menu only knows one subclass per extra: oat milk and a shot at the same time doesn\'t exist.',
+  'Que el combo completo llegue a la bandeja con todos los extras del café aplicados.': 'Get the full combo to the tray with all the coffee extras applied.',
+  'Cliente': 'Customer',
+  'Cocina': 'Kitchen',
+  'Desayuno': 'Breakfast',
+  'Café': 'Coffee',
+  'Con avena': 'With oat milk',
+  'Con shot': 'With extra shot',
+  'Café listo': 'Coffee ready',
+  'Pan': 'Bread',
+  'Mini combo': 'Mini combo',
+  'Juntar': 'Merge',
+  'Servir': 'Serve',
+  'Entregar': 'Hand over',
+  'Jugo': 'Juice',
+  'Fruta': 'Fruit',
+  'Ventanilla': 'Window',
+  'Combos': 'Combos',
+  'Composite recorre el árbol': 'Composite walks the tree',
+  'El combo trata igual a sus partes, sean productos u otros combos. Que una de esas partes sea un café decorado no le importa: sigue respondiendo al mismo mensaje.': 'The combo treats its parts the same, whether they are products or other combos. It doesn\'t care that one of those parts is a decorated coffee: it still answers the same message.',
+  'Strategy no recursa': 'Strategy doesn\'t recurse',
+  'Una estrategia por tipo de ítem sigue sin saber qué hacer con un combo dentro de otro.': 'One strategy per item type still doesn\'t know what to do with a combo inside another combo.',
+  'Facade no cambia lo que hay detrás': 'Facade doesn\'t change what\'s behind it',
+  'Una ventanilla única para pedir combos simplifica la entrada, pero la cocina de atrás sigue sin desarmar el combo anidado.': 'A single window for ordering combos simplifies the entry point, but the kitchen behind it still can\'t break down the nested combo.',
+  'Extras': 'Extras',
+  'Decorator apila los extras': 'Decorator stacks the extras',
+  'El café se envuelve con cada extra y sigue siendo una hoja más del combo. Composite organiza el árbol; Decorator enriquece una hoja sin que el árbol se entere.': 'The coffee is wrapped with each extra and is still just another leaf of the combo. Composite organizes the tree; Decorator enriches a leaf without the tree noticing.',
+  'Adapter traduce, no compone': 'Adapter translates, it doesn\'t compose',
+  'Adaptar el pedido al punto de venta viejo no hace que exista la combinación de dos extras.': 'Adapting the order to the old point of sale doesn\'t make the two-extra combination exist.',
+  'Singleton comparte, no combina': 'Singleton shares, it doesn\'t combine',
+  'Un único menú compartido sigue eligiendo una sola subclase por café.': 'A single shared menu still picks just one subclass per coffee.',
+  'Café suelto': 'Single coffee',
+  'Desayuno (café con avena)': 'Breakfast (coffee with oat milk)',
+  'Desayuno (avena + shot)': 'Breakfast (oat milk + shot)',
+}
+
+export default en

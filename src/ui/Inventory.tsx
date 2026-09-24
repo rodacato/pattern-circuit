@@ -3,17 +3,25 @@ import { FAMILY_NAMES, PATTERNS, type PatternId } from '../engine'
 import { noteKey } from '../game/progress/progress'
 import type { GameSession } from '../game/session/GameSession'
 import type { NeonStage } from '../render/NeonStage'
+import { msg } from '../i18n'
+import { useT } from './i18nContext'
 import { useSession } from './useSession'
 
 type Ghost = { pattern: PatternId; x: number; y: number; startX: number; startY: number; moved: boolean; over: boolean }
 
 const OUTCOME_MARK = { solves: '✓', partial: '≈', misfit: '✗' } as const
-const OUTCOME_TEXT = { solves: 'resuelve', partial: 'parcial', misfit: 'no encaja' } as const
+// i18n
+const OUTCOME_TEXT = {
+  solves: 'resuelve',
+  partial: 'parcial',
+  misfit: 'no encaja',
+} as const
 const DRAG_THRESHOLD = 6
 
 // Cartuchos de patrones: se arrastran al socket del canvas, o se enchufan con clic o teclado (Enter/Espacio).
 // Un cartucho ya enchufado se desenchufa con otro clic.
 export function Inventory({ session, stage }: { session: GameSession; stage?: NeonStage }) {
+  const t = useT()
   const open = useSession(session, (s) => s.inventoryOpen)
   const plugs = useSession(session, (s) => s.flow.plugs)
   const notes = useSession(session, (s) => s.progress.notes)
@@ -68,18 +76,18 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
     if (!ghost) return
     dragged.current = ghost.moved
     const socketId = ghost.moved ? stage?.socketAtClient(e.clientX, e.clientY) : undefined
-    if (socketId && !session.plug(ghost.pattern, socketId)) warn(`${PATTERNS[ghost.pattern].name} no va en ese socket`)
+    if (socketId && !session.plug(ghost.pattern, socketId)) warn(t(msg('{pattern} no va en ese socket', { pattern: PATTERNS[ghost.pattern].name })))
     stage?.setDropHover(undefined)
     setGhost(undefined)
   }
 
   return (
     <>
-      <div className="inventory card" role="group" aria-label="Inventario de patrones">
+      <div className="inventory card" role="group" aria-label={t('Inventario de patrones')}>
         <div className="inventory-head">
-          <span className="eyebrow">Inventario</span>
+          <span className="eyebrow">{t('Inventario')}</span>
           <span className={`hint${warning ? ' warning' : ''}`} role="status">
-            {warning ?? (sockets.length > 1 ? 'Arrastra cada patrón a su socket ⬡' : 'Arrastra un patrón al socket ⬡')}
+            {warning ?? t(sockets.length > 1 ? 'Arrastra cada patrón a su socket ⬡' : 'Arrastra un patrón al socket ⬡')}
           </span>
         </div>
         <div className="cartridges">
@@ -97,12 +105,12 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
                 onPointerUp={onUp}
                 onClick={(e) => onClick(id, e.detail === 0)}
                 aria-pressed={plugged}
-                aria-label={`${info.name}, ${FAMILY_NAMES[info.family]}${outcome ? `, probado: ${OUTCOME_TEXT[outcome]}` : ''}`}
-                title={info.gist}
+                aria-label={`${t(info.name)}, ${t(FAMILY_NAMES[info.family])}${outcome ? `, ${t(msg('probado: {outcome}', { outcome: OUTCOME_TEXT[outcome] }))}` : ''}`}
+                title={t(info.gist)}
               >
                 <span className="stripe" />
-                <span className="name">{info.name}</span>
-                <span className="family">{FAMILY_NAMES[info.family]}</span>
+                <span className="name">{t(info.name)}</span>
+                <span className="family">{t(FAMILY_NAMES[info.family])}</span>
                 {outcome && <span className={`mark ${outcome}`}>{OUTCOME_MARK[outcome]}</span>}
               </button>
             )
@@ -112,7 +120,7 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
       {ghost?.moved && (
         <div className={`cartridge ghost ${PATTERNS[ghost.pattern].family}${ghost.over ? ' over' : ''}`} style={{ left: ghost.x, top: ghost.y }}>
           <span className="stripe" />
-          <span className="name">{PATTERNS[ghost.pattern].name}</span>
+          <span className="name">{t(PATTERNS[ghost.pattern].name)}</span>
         </div>
       )}
     </>

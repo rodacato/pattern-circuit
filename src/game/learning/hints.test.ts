@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import { LEVELS } from '../../levels'
 import { initialFlow } from '../flow/levelFlow'
-import { hintLadder } from './hints'
+import { identity } from '../../i18n'
+import { hintLadder as ladder } from './hints'
+
+const hintLadder = (...args: Parameters<typeof ladder>) => ladder(...args).map(identity)
 
 const level = (id: string) => LEVELS.find((l) => l.id === id)!
 
