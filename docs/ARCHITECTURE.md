@@ -46,7 +46,9 @@ engine/
 
 - `defineLevel` valida el esquema y **todas las variantes alcanzables** (reparaciones × patrones × tickets): si una no compila, no tiene escenario o apunta a una región de Ruby inexistente, el nivel no carga y el test falla.
 - El registro (`levels/index.ts`) descubre carpetas con `import.meta.glob`: añadir un nivel no toca ningún otro archivo.
-- Cada nivel tiene tests de comportamiento pedagógico en `levels.test.ts` ("Observer cobra tres veces", "Strategy + app toca 0 nodos").
+- `levels/kit.ts` trae ayudantes (`node`, `wire`, `abstract`, `chain`, `pulse`…) para escribir niveles con poco ruido.
+- Cada nivel tiene su `level.test.ts` con el comportamiento pedagógico de cada patrón ("Observer cobra tres veces", "Strategy + app toca 0 nodos").
+- `levels.test.ts` verifica en **todos** los niveles, sin escribir nada extra: que sin patrón se falla, que el patrón correcto gana (también con su ticket), que ningún patrón incorrecto gana y que el capítulo existe.
 
 ## game: aplicación
 
@@ -70,7 +72,7 @@ game/
 render/
   NeonStage.ts    capas Pixi, bucle por frame, gestos → comandos de la sesión
   layout.ts       geometría de pantalla pura (fit, hit test, interpolación) — con tests
-  skins/          firma visual por patrón: registro PatternId → Skin
+  skins/          firma visual por patrón: creational · structural · behavioral + registro PatternId → Skin
   fx.ts           partículas y textos flotantes
   theme.ts        paleta y tipografías
 ```
@@ -88,7 +90,7 @@ render/
 | Qué | Dónde | Estilo |
 |---|---|---|
 | Motor | `engine/**/*.test.ts` | unitarios sobre circuitos mínimos (`engine/testing.ts`) |
-| Niveles | `levels/levels.test.ts` | comportamiento pedagógico por variante |
+| Niveles | `levels/*/level.test.ts` + `levels/levels.test.ts` | comportamiento por patrón + invariantes comunes a todos los niveles |
 | Aplicación | `game/**/*.test.ts` | sesión, flujo y progreso con adaptador en memoria |
 | Render | `render/layout.test.ts` | geometría pura |
 | Arquitectura | `architecture.test.ts` | reglas de dependencia entre capas |
@@ -97,6 +99,6 @@ render/
 
 ## Cómo extender
 
-- **Nivel nuevo**: carpeta `src/levels/LNN-nombre/` con `level.ts` + `.rb`; añadir sus expectativas a `levels.test.ts`.
+- **Nivel nuevo**: carpeta `src/levels/LNN-nombre/` con `level.ts`, sus `.rb` y un `level.test.ts`. Las invariantes comunes se comprueban solas.
 - **Patrón nuevo**: añadirlo a `PATTERN_IDS` en `schema.ts` (si no existe), su skin en `render/skins/`, y usarlo en un socket de un nivel.
-- **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`.
+- **Primitiva nueva**: variante en `Behavior` (`schema.ts`), caso en `sim.ts`, test en `sim/sim.test.ts`. Primitivas actuales: `source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`.

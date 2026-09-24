@@ -62,7 +62,7 @@ session ─► render PixiJS neón + skins · panel de código · HUD · progres
 
 - `step(sim) → { sim, events }` es puro y determinista (tick fijo). Velocidad = ticks por frame.
 - `Timeline` guarda referencias a snapshots cada N ticks; retroceder = restaurar + re-simular.
-- **Primitivas cerradas** (`source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`; vendrán `accumulate`, `spawn`, `store`). Un patrón es un `GraphPatch` de primitivas + un skin. Nivel nuevo = solo datos.
+- **Primitivas cerradas** (`source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`). Un patrón es un `GraphPatch` de primitivas + un skin. Nivel nuevo = solo datos.
 - `nodesTouched`: un nodo existente cuenta si cambia su definición, desaparece o gana/pierde una dependencia **concreta** de salida. Registrar un cable abstracto en un `slot` no cuenta.
 - Código Ruby con marcadores `# region: Clase#metodo` anidables; `Clase#metodo:rama` cae a la región padre.
 - `defineLevel` recorre todas las variantes alcanzables (reparaciones × sockets × tickets) y falla si alguna no compila, no tiene escenario o apunta a una región de código inexistente.
@@ -106,6 +106,6 @@ El esquema completo está en [`src/engine/schema.ts`](../src/engine/schema.ts).
 1. **Motor** ✅: primitivas, `step` determinista, Timeline, zod, GraphPatch, `nodesTouched`, niveles 0–1 como datos, tests, vista de depuración.
 2. **Lenguaje visual** ✅: render PixiJS neón (brillo, estelas, partículas, cables animados), controles con teclado, panel de código Ruby con Shiki que sigue al pulso o al nodo, cable arrastrable para reparar, lista de pasos por nivel, tarjetas de resultado. Nivel 0 jugable de punta a punta.
 3. **Sockets y patrones** ✅: inventario arrastrable, socket que late, skins por patrón, notas de campo y cuaderno, ticket de cambio, comparación sin/con, flujo del nivel como máquina de estados, progreso en localStorage. Niveles 1–3 jugables.
-4. **Capítulos 1–3**: niveles 4–14 con sus skins. Ninguno toca `engine/`.
+4. **Capítulos 1–3** ✅: niveles 4–14 con sus skins. El motor sumó cinco primitivas genéricas (`counter`, `join`, `cache`, `machine`, `buffer`); ningún nivel necesitó lógica propia en el motor.
 5. **Combinaciones y arquitectura**: niveles 15–21, cámara para circuitos grandes.
 6. **Sandbox y pulido**: plantillas genéricas por patrón, transiciones, reduced-motion, teclado.
