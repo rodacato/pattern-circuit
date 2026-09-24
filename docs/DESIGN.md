@@ -48,6 +48,8 @@ Juego educativo para entender patrones de diseño viéndolos, no leyéndolos. Un
 
 ## Arquitectura
 
+Detalle de capas, reglas de dependencia y cómo extender en [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ```
 levels/*/level.ts (datos + .rb) ─► defineLevel (zod + validación de variantes)
                                       │
@@ -96,14 +98,14 @@ El esquema completo está en [`src/engine/schema.ts`](../src/engine/schema.ts).
 
 - **0 · Abre la cafetería**: `Cliente → Tomar → Cobrar → Preparar → Entregar`, falta el cable a Entregar. Enseña controles, clic en nodo → código, cable = dependencia. *(implementado)*
 - **1 · ¿Efectivo o tarjeta?** (Strategy): `Cobrar` es un árbol if; el vale se pierde. Ticket "pago con app" abre `Cobrar`. Strategy: cartuchos, ticket con 0 nodos tocados. Observer cobra 3 veces; Decorator envuelve pero el vale se pierde igual. *(implementado)*
-- **2 · Dos sucursales, dos menús** (Factory Method): el flujo compartido hace `new` de cada bebida concreta y se llena de `if sucursal`. Factory Method: moldes por sucursal. Strategy = parcial; Singleton y Builder no encajan.
-- **3 · Pedido a la medida** (Builder): constructor de 9 argumentos, orden cruzado, combinación inválida que explota en cocina. Builder: estaciones + `build()` que valida en el mostrador; Director como bonus. Factory Method explota en 48 moldes; Decorator = parcial.
+- **2 · Dos sucursales, dos menús** (Factory Method): el flujo compartido decide con `if` qué bebida crear y Montaña recibe lattes. Factory Method: una subclase (molde) por sucursal; abrir Puerto no toca nada existente. Singleton y Builder no encajan. *(implementado)*
+- **3 · Pedido a la medida** (Builder): constructor de 9 argumentos, orden cruzado, combinación imposible que explota en cocina ya cobrada. Builder: estaciones con nombre + `build()` que rechaza antes de cobrar. Factory Method pierde los pedidos sin molde; Decorator = parcial. *(implementado)*
 
 ## Plan por fases
 
 1. **Motor** ✅: primitivas, `step` determinista, Timeline, zod, GraphPatch, `nodesTouched`, niveles 0–1 como datos, tests, vista de depuración.
 2. **Lenguaje visual** ✅: render PixiJS neón (brillo, estelas, partículas, cables animados), controles con teclado, panel de código Ruby con Shiki que sigue al pulso o al nodo, cable arrastrable para reparar, lista de pasos por nivel, tarjetas de resultado. Nivel 0 jugable de punta a punta.
-3. **Sockets y patrones**: inventario arrastrable, microinteracciones, resultados, cuaderno, tickets, comparación sin/con, director de nivel, progreso. Niveles 1–3.
+3. **Sockets y patrones** ✅: inventario arrastrable, socket que late, skins por patrón, notas de campo y cuaderno, ticket de cambio, comparación sin/con, flujo del nivel como máquina de estados, progreso en localStorage. Niveles 1–3 jugables.
 4. **Capítulos 1–3**: niveles 4–14 con sus skins. Ninguno toca `engine/`.
 5. **Combinaciones y arquitectura**: niveles 15–21, cámara para circuitos grandes.
 6. **Sandbox y pulido**: plantillas genéricas por patrón, transiciones, reduced-motion, teclado.
