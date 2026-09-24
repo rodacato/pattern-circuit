@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { dueItems, reviewItems } from '../game/learning/review'
 import { firstUnfinished, KeyValueProgressStore, MemoryProgressStore, type ProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
-import { chapterName, LEVELS } from '../levels'
+import { chapterName, LEVELS, nextLevel, TRACKS, trackOf } from '../levels'
 import { NeonStage } from '../render/NeonStage'
 import { BriefCard } from './BriefCard'
 import { StageCard } from './cards/StageCard'
@@ -29,7 +29,7 @@ const progressStore = browserProgressStore()
 export default function GameApp() {
   const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, progressStore.load()).id)
   const index = LEVELS.findIndex((l) => l.id === levelId)
-  const next = LEVELS[index + 1]
+  const next = nextLevel(LEVELS[index])
   const session = useMemo(() => new GameSession(LEVELS[index], progressStore), [index])
   const host = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<NeonStage>()
@@ -88,7 +88,7 @@ export default function GameApp() {
           </button>
           <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label="Nivel">
             {[...new Set(LEVELS.map((l) => l.chapter))].map((chapter) => (
-              <optgroup key={chapter} label={chapterName(chapter)}>
+              <optgroup key={chapter} label={TRACKS.length > 1 ? `${trackOf(chapter)?.name} · ${chapterName(chapter)}` : chapterName(chapter)}>
                 {LEVELS.filter((l) => l.chapter === chapter).map((l) => (
                   <option key={l.id} value={l.id}>
                     {progress.completed.includes(l.id) ? '✓ ' : ''}
