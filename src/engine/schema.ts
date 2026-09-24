@@ -9,6 +9,7 @@ export const PATTERN_IDS = [
   'strategy', 'observer', 'state', 'command', 'chain-of-responsibility', 'template-method',
   'ports-and-adapters', 'event-bus', 'cqrs',
   'null-object', 'circuit-breaker', 'saga',
+  'keep-simple', // no aplicar un patrón también es una decisión de diseño
 ] as const
 
 export const PulseShape = z.enum(PULSE_SHAPES)
@@ -191,7 +192,7 @@ export const ChecklistItem = z.object({
   on: PlayerAction,
 })
 
-export const METRICS = ['spawned', 'delivered', 'dropped', 'invalidAtSink', 'duplicatesAtSink', 'cancelled', 'maxLoad', 'nodesTouched'] as const
+export const METRICS = ['spawned', 'delivered', 'dropped', 'invalidAtSink', 'duplicatesAtSink', 'cancelled', 'maxLoad', 'nodesTouched', 'nodes'] as const
 
 export const Assertion = z.object({
   metric: z.enum(METRICS),

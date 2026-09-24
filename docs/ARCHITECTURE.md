@@ -40,7 +40,7 @@ engine/
 
 - **Determinismo**: `step(sim) → { sim, events }` es puro. Todo lo que dependa del tiempo real vive fuera.
 - **Una primitiva, un método**: `Tick.resolve` solo despacha; cada primitiva con estado (`transform`, `counter`, `cache`, `machine`, `breaker`, `join`, `buffer`) tiene su método en `sim.ts`.
-- **Calificar sin re-simular**: `evaluate = simular + score`. La sesión ya tiene la corrida terminada, así que solo llama a `score` con sus métricas.
+- **Calificar sin re-simular**: `evaluate = simular + score`. La sesión ya tiene la corrida terminada, así que solo llama a `score` con sus métricas. `score` agrega las métricas del circuito: `nodesTouched` (lo que tocó un ticket) y `nodes` (piezas, para medir la complejidad que suma un patrón).
 - **Primitivas cerradas**: un patrón nunca es código del motor, es un `GraphPatch` de primitivas. Añadir una primitiva es un cambio de motor, con su test; añadir un patrón o un nivel no.
 - **Eventos como frontera**: el motor emite `SimEvent`; render y ui reaccionan a ellos sin conocer la simulación por dentro.
 

@@ -8,8 +8,8 @@ const payment = (id: string, label: string, className: string, y: number) =>
 const order = (at: number, label: string, tags: string[], id: number) => pulse(at, label, ['cmd:pedir', ...tags], { order: id })
 
 export default defineLevel({
-  id: 'L24-cafeteria-completa',
-  order: 24,
+  id: 'L26-cafeteria-completa',
+  order: 26,
   chapter: 'final',
   title: 'La cafetería completa',
   brief: {

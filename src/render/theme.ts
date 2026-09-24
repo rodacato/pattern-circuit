@@ -46,6 +46,7 @@ export const FAMILY_COLORS = {
   behavioral: NEON.violet,
   architecture: NEON.green,
   resilience: 0xff5fd2,
+  principle: NEON.white,
 } as const
 
 export const INVALID_TEXT = '¡esto no es lo que pedí!'

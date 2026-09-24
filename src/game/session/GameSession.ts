@@ -1,11 +1,14 @@
 import {
   buildCircuit,
   codeKey,
+  diffLines,
+  diffStats,
   evaluate,
   PATTERNS,
   scenarioFor,
   score,
   type ChangeTicket,
+  type DiffLine,
   type Evaluation,
   type Level,
   type MetricName,
@@ -16,6 +19,7 @@ import {
   type Variant,
 } from '../../engine'
 import { Emitter } from '../events/Emitter'
+import { recordAnswer } from '../learning/review'
 import { guessed, isRight, outcomePrediction, touchedPrediction, type Prediction } from '../learning/prediction'
 import {
   initialFlow,
@@ -33,6 +37,7 @@ import { Playback } from '../playback/Playback'
 import { emptyProgress, withCompleted, withNotes, withPrediction, type Progress, type ProgressStore } from '../progress/progress'
 
 export type ConnectResult = 'repaired' | 'wrong' | 'none'
+export type CodeChange = { title: string; lines: DiffLine[]; added: number; removed: number }
 export type Comparison = Record<Side, Evaluation>
 
 // Fachada de una partida: render y ui solo hablan con esto. Coordina flujo, reproducción y progreso.
@@ -105,6 +110,22 @@ export class GameSession {
     const cmp = this.comparison
     if (!cmp) return []
     return [...new Set(this.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
+  }
+
+  // En la comparación: qué líneas de Ruby cambian. Con ticket, lo que el ticket obligó a tocar en el lado
+  // que se está mirando (sin o con patrón); sin ticket, del código sin patrón al código con patrón.
+  get codeChange(): CodeChange | undefined {
+    if (this.flow.stage !== 'compare' && this.flow.stage !== 'complete') return undefined
+    const code = (stage: FlowState['stage'], side: Side) => this.level.codeFiles[codeKey(this.level, variantFor(this.level, { ...this.flow, stage, side }, this.repairs))]
+    const side = this.flow.side
+    const names = this.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
+    // 'observe' = circuito base y 'choose' = con patrón, ambos sin ticket; 'compare' = el lado elegido, con ticket.
+    const [before, after, title] = this.ticket
+      ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), `Lo que cambió con el ticket, ${side === 'with' ? `con ${names}` : 'sin patrón'}`]
+      : [code('compare', 'without'), code('compare', 'with'), `Del código sin patrón al código con ${names}`]
+    if (!before || !after) return undefined
+    const lines = diffLines(before.text, after.text)
+    return { title, lines, ...diffStats(lines) }
   }
 
   // Resultado del patrón en un socket concreto, o en el primero que lo ofrece.
@@ -254,6 +275,12 @@ export class GameSession {
     this.emitter.emit()
   }
 
+  // El repaso escribe a través de la sesión: así hay un solo dueño del progreso y nada se pisa.
+  recordReview(itemId: string, correct: boolean, now = Date.now()) {
+    this.saveProgress({ ...this.progress, review: recordAnswer(this.progress.review, itemId, correct, now) })
+    this.emitter.emit()
+  }
+
   resetProgress() {
     this.saveProgress(emptyProgress())
     this.emitter.emit()
@@ -271,7 +298,7 @@ export class GameSession {
 
   // La corrida ya terminó en la reproducción: basta con calificar su estado final.
   private runFinished() {
-    this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched)
+    this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched, this.playback.circuit.nodes.size)
     if (!this.result.won) this.failedRuns++
     if (this.flow.stage === 'choose') this.saveProgress(withNotes(this.progress, this.level.id, this.pluggedPatterns))
     this.dispatch({ type: 'run-finished', won: this.result.won })

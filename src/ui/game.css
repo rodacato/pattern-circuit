@@ -70,6 +70,7 @@
 
 /* escenario */
 .stage-wrap {
+  container-type: inline-size;
   position: relative;
   min-width: 0;
   background: radial-gradient(ellipse at 50% 40%, #0b1428 0%, var(--bg) 70%);
@@ -520,6 +521,11 @@
 .cartridge.resilience,
 .note-group.resilience {
   --fam: #ff5fd2;
+}
+
+.cartridge.principle,
+.note-group.principle {
+  --fam: #f5f1d8;
 }
 
 .cartridge .stripe {
@@ -1042,5 +1048,101 @@
 
 .prediction-result.bad {
   color: var(--amber);
+}
+
+.code-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px 0;
+}
+
+.code-tabs button {
+  padding: 6px 12px;
+  border-radius: 8px 8px 0 0;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.code-tabs button.on {
+  border-color: var(--line);
+  border-bottom-color: transparent;
+  color: var(--text);
+}
+
+.code-body.diff .line.add {
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  color: var(--green);
+}
+
+.code-body.diff .line.del {
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  color: var(--red);
+}
+
+.code-body.diff .line.skip {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.code-head .add {
+  color: var(--green);
+}
+
+.code-head .del {
+  color: var(--red);
+}
+
+/* Escritorio angosto (p. ej. 1024 px con el panel de código): las dos tarjetas comparten el ancho sin taparse. */
+@container (max-width: 760px) {
+  .brief,
+  .stage-card {
+    width: calc(50% - 28px);
+  }
+
+  .brief .problem,
+  .stage-card p {
+    font-size: 13px;
+  }
+
+  .inventory-open .legend {
+    display: none;
+  }
+}
+
+.review .review-question .where {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review .problem {
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.choices button small {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.choices button.right {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.choices button.wrong {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.choices button:disabled {
+  cursor: default;
+}
+
+.review .note {
+  margin-top: 14px;
 }
 

@@ -9,6 +9,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ### Added
 
 - **Predecir antes de ver**: al enchufar un patrón el juego pregunta qué hará (resuelve, a medias, no encaja), y antes de un ticket, cuántas piezas habrá que modificar. Después de correr, muestra si acertaste; el Cuaderno lleva la cuenta de predicciones acertadas.
+- **Cambios en el código**: en la comparación, la pestaña "Cambios" del panel muestra qué líneas de Ruby se agregaron o quitaron (con ticket: lo que el ticket obligó a tocar, sin y con patrón).
+- **Repaso espaciado**: el botón "Repasar" plantea problemas de niveles ya completados, sin circuito, para elegir el patrón. Cada respuesta se explica con su nota de campo; los aciertos vuelven cada vez más espaciados (1, 3, 7, 14 y 30 días) y los errores, en la próxima ronda.
+- **Capítulo "Criterio: cuándo no"** (niveles 24 y 25): problemas donde gana arreglar lo justo, sin agregar un patrón que nada pide todavía (YAGNI). Nueva métrica: piezas en el circuito.
+
+### Changed
+
+- La cafetería completa pasa a ser el nivel 26. El progreso guardado con el id anterior se traduce solo.
+
+### Fixed
+
+- En escritorios angostos (1024 px), la tarjeta del nivel ya no tapa la tarjeta de etapa, y la leyenda no tapa el inventario.
 
 ## [1.0.0] - 2026-09-24
 

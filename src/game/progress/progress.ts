@@ -13,10 +13,11 @@ export const Progress = z.object({
   notes: z.array(z.string()), // `${levelId}:${pattern}`
   // Campos agregados después de 1.0: con default, el progreso guardado antes sigue siendo válido.
   predictions: z.object({ right: z.number().int(), total: z.number().int() }).default({ right: 0, total: 0 }),
+  review: z.record(z.string(), z.object({ box: z.number().int(), due: z.number() })).default({}), // tarjeta → caja Leitner
 })
 export type Progress = z.infer<typeof Progress>
 
-export const emptyProgress = (): Progress => ({ version: 1, completed: [], notes: [], predictions: { right: 0, total: 0 } })
+export const emptyProgress = (): Progress => ({ version: 1, completed: [], notes: [], predictions: { right: 0, total: 0 }, review: {} })
 
 export const withPrediction = (p: Progress, right: boolean): Progress => ({
   ...p,
@@ -58,6 +59,20 @@ export class MemoryProgressStore implements ProgressStore {
 
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>
 
+// Ids de nivel que cambiaron entre versiones: el progreso guardado se traduce al cargar.
+const RENAMED_LEVELS: Record<string, string> = { 'L24-cafeteria-completa': 'L26-cafeteria-completa' } // 1.1: entró el capítulo Criterio
+
+export function migrateLevelIds(p: Progress): Progress {
+  const id = (levelId: string) => RENAMED_LEVELS[levelId] ?? levelId
+  const key = (k: string) => k.replace(/^[^:/]+/, (levelId) => id(levelId)) // `nivel:patrón` y `nivel/socket`
+  return {
+    ...p,
+    completed: p.completed.map(id),
+    notes: p.notes.map(key),
+    review: Object.fromEntries(Object.entries(p.review).map(([k, v]) => [key(k), v])),
+  }
+}
+
 // Datos corruptos o de otra versión no rompen el juego: se empieza de cero.
 export class KeyValueProgressStore implements ProgressStore {
   private readonly storage: KeyValueStorage
@@ -71,7 +86,7 @@ export class KeyValueProgressStore implements ProgressStore {
   load(): Progress {
     try {
       const parsed = Progress.safeParse(JSON.parse(this.storage.getItem(this.key) ?? 'null'))
-      return parsed.success ? parsed.data : emptyProgress()
+      return parsed.success ? migrateLevelIds(parsed.data) : emptyProgress()
     } catch {
       return emptyProgress()
     }

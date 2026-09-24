@@ -2,8 +2,8 @@
 
 Juego educativo para entender **patrones de diseño viéndolos, no leyéndolos**. Una cafetería es un circuito de nodos; cada pedido es un pulso de luz que lo recorre. Cuando algo falla (pedidos perdidos, cobros dobles, código que hay que abrir para cada cambio), enchufas un patrón en el socket y ves cómo cambia el recorrido, junto al código Ruby que lo implementa.
 
-- **25 niveles** en 8 capítulos, del tutorial a "la cafetería completa".
-- **20 patrones**: 14 del catálogo GoF, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker y Saga.
+- **27 niveles** en 9 capítulos, del tutorial a "la cafetería completa".
+- **20 patrones**: 14 del catálogo GoF, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker y Saga. Y un capítulo para lo contrario: cuándo **no** aplicar uno.
 - Cada nivel sigue el mismo ritmo: **observar el problema → elegir un patrón → aplicar un cambio → comparar sin/con**.
 - Probar el patrón equivocado también enseña: cada intento deja una nota en el **Cuaderno de patrones**.
 - El contenido está verificado contra las fuentes originales (GoF, Fowler, Cockburn, Nygard…); la bibliografía está en [docs/DESIGN.md](docs/DESIGN.md#fuentes).
@@ -32,7 +32,8 @@ El progreso se guarda en tu navegador (`localStorage`). Se borra desde el Cuader
 | Todo junto | 15–17 | combinaciones en circuitos con 2 y 3 sockets |
 | Arquitectura | 18–20 | Ports & Adapters, Event Bus, CQRS |
 | Resiliencia | 21–23 | Null Object, Circuit Breaker, Saga |
-| La cafetería completa | 24 | todo funcionando junto |
+| Criterio: cuándo no | 24–25 | mantenerlo simple frente a patrones que sobran |
+| La cafetería completa | 26 | todo funcionando junto |
 
 ## Desarrollo
 

@@ -41,7 +41,8 @@ export type SimEvent =
   | { type: 'node.state'; tick: number; nodeId: string; state: string }
   | { type: 'node.load'; tick: number; nodeId: string; load: number }
 
-export type SimMetrics = Record<Exclude<MetricName, 'nodesTouched'>, number>
+// Las métricas del circuito (nodos tocados, piezas) no salen de la simulación: las agrega `score`.
+export type SimMetrics = Record<Exclude<MetricName, 'nodesTouched' | 'nodes'>, number>
 
 export type SimState = {
   tick: number

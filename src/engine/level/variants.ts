@@ -89,11 +89,12 @@ export type Evaluation = {
 export function evaluate(level: LevelDef, v: Variant): Evaluation {
   const { circuit, touched } = buildCircuit(level, v)
   const { sim } = runToEnd(createSim(circuit, scenarioFor(level, v)))
-  return score(level, sim.state.metrics, touched)
+  return score(level, sim.state.metrics, touched, circuit.nodes.length)
 }
 
-export function score(level: LevelDef, simMetrics: SimMetrics, touched: string[]): Evaluation {
-  const metrics = { ...simMetrics, nodesTouched: touched.length }
+// `nodes` = piezas del circuito: mide la complejidad que agrega un patrón.
+export function score(level: LevelDef, simMetrics: SimMetrics, touched: string[], nodes: number): Evaluation {
+  const metrics = { ...simMetrics, nodesTouched: touched.length, nodes }
   const results = level.winWhen.map((assertion) => {
     const actual = metrics[assertion.metric]
     return { assertion, actual, pass: compare(actual, assertion.op, assertion.value) }

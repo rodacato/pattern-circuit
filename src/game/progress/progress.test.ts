@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { emptyProgress, firstUnfinished, KeyValueProgressStore, noteKey, parseNoteKey, withCompleted, withNote, withNotes, withPrediction } from './progress'
+import { emptyProgress, firstUnfinished, KeyValueProgressStore, migrateLevelIds, noteKey, parseNoteKey, withCompleted, withNote, withNotes, withPrediction } from './progress'
 
 const fakeStorage = (initial: Record<string, string> = {}) => {
   const data = { ...initial }
@@ -67,5 +67,18 @@ describe('progreso: compatibilidad y predicciones', () => {
   it('withPrediction cuenta aciertos sobre el total', () => {
     const p = withPrediction(withPrediction(emptyProgress(), true), false)
     expect(p.predictions).toEqual({ right: 1, total: 2 })
+  })
+})
+
+describe('progreso: ids renombrados', () => {
+  it('el nivel final de 1.0 (L24) se reconoce como L26', () => {
+    const storage = fakeStorage({ 'pattern-circuit:progress': JSON.stringify({ version: 1, completed: ['L01-strategy', 'L24-cafeteria-completa'], notes: [] }) })
+    expect(new KeyValueProgressStore(storage).load().completed).toEqual(['L01-strategy', 'L26-cafeteria-completa'])
+  })
+
+  it('traduce también notas y tarjetas de repaso', () => {
+    const p = migrateLevelIds({ ...emptyProgress(), notes: ['L24-cafeteria-completa:strategy'], review: { 'L24-cafeteria-completa/x': { box: 2, due: 0 } } })
+    expect(p.notes).toEqual(['L26-cafeteria-completa:strategy'])
+    expect(Object.keys(p.review)).toEqual(['L26-cafeteria-completa/x'])
   })
 })
