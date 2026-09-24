@@ -9,6 +9,7 @@ const METRIC_TEXT: Record<MetricName, string> = {
   dropped: 'pedidos perdidos',
   invalidAtSink: 'pedidos equivocados',
   duplicatesAtSink: 'cobros duplicados',
+  cancelled: 'pedidos cancelados a tiempo',
   maxLoad: 'carga máxima de un nodo',
   nodesTouched: 'nodos existentes modificados',
 }
@@ -149,13 +150,12 @@ function TicketCard({ session }: { session: GameSession }) {
   )
 }
 
-const COMPARE_ROWS: MetricName[] = ['dropped', 'duplicatesAtSink', 'invalidAtSink', 'nodesTouched']
-
 function CompareCard({ session }: { session: GameSession }) {
   const side = useSession(session, (s) => s.flow.side)
   const cmp = session.comparison!
   const name = PATTERNS[session.flow.plugged!.pattern].name
-  const rows = COMPARE_ROWS.filter((m) => cmp.with.metrics[m] !== 0 || cmp.without.metrics[m] !== 0)
+  // Se comparan justo las métricas que el nivel usa como objetivo.
+  const rows = [...new Set(session.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
   return (
     <div className="stage-card card compare">
       <span className="eyebrow">Comparación</span>
@@ -179,8 +179,8 @@ function CompareCard({ session }: { session: GameSession }) {
           {rows.map((m) => (
             <tr key={m}>
               <td>{METRIC_TEXT[m]}</td>
-              <td className={cmp.without.metrics[m] > cmp.with.metrics[m] ? 'bad' : ''}>{cmp.without.metrics[m]}</td>
-              <td className={cmp.with.metrics[m] < cmp.without.metrics[m] ? 'good' : ''}>{cmp.with.metrics[m]}</td>
+              <td className="bad">{cmp.without.metrics[m]}</td>
+              <td className="good">{cmp.with.metrics[m]}</td>
             </tr>
           ))}
         </tbody>

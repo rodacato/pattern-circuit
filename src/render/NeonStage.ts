@@ -256,7 +256,7 @@ export class NeonStage {
         this.trails.delete(e.pulseId)
         break
       case 'pulse.deliver': {
-        const dup = (s.playback.timeline.current.state.deliveredOrigins[pulse!.originId] ?? 0) > 1
+        const dup = (s.playback.timeline.current.state.deliveredOrigins[`${e.nodeId}:${pulse!.originId}`] ?? 0) > 1
         const tone = !e.valid ? C.red : dup ? C.amber : C.green
         const message = node.behavior.type === 'sink' ? node.behavior.message : undefined
         const text = !e.valid ? INVALID_TEXT : dup ? '¡cobrado otra vez!' : (message ?? `☕ ${pulse?.label ?? 'pedido'} entregado`)

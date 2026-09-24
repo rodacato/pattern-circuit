@@ -37,11 +37,22 @@ export const Predicate: z.ZodType<Predicate> = z.lazy(() =>
   ]),
 )
 
+const Transition = z.object({
+  to: z.string().optional(),
+  port: z.string().default('out'),
+  addTags: z.array(z.string()).optional(),
+})
+
 // Vocabulario cerrado de primitivas. Un patrón nunca es código del motor:
 // es una composición de estas primitivas más un skin visual.
 export const Behavior = z.discriminatedUnion('type', [
   z.object({ type: z.literal('source') }),
-  z.object({ type: z.literal('sink'), expects: Predicate.optional(), message: z.string().optional() }),
+  z.object({
+    type: z.literal('sink'),
+    expects: Predicate.optional(),
+    uniqueBy: z.string().optional(), // un valor repetido en este campo es una entrega inválida
+    message: z.string().optional(),
+  }),
   z.object({ type: z.literal('pass') }),
   z.object({
     type: z.literal('transform'),
@@ -66,6 +77,21 @@ export const Behavior = z.discriminatedUnion('type', [
     require: Predicate,
     onFail: z.union([z.literal('drop'), z.string()]).default('drop'),
   }),
+  // Numera cada pulso en `data[field]`. Nodos con la misma `key` comparten la cuenta; `fresh` empieza de cero cada vez.
+  z.object({ type: z.literal('counter'), key: z.string(), field: z.string().default('ticket'), fresh: z.boolean().default(false) }),
+  // Espera a todas las partes de un mismo pedido (una por cable de entrada) y sigue con una sola.
+  z.object({ type: z.literal('join') }),
+  // Recuerda valores de `data[key]`: los ya vistos salen por `hit`, los nuevos por `miss`.
+  z.object({ type: z.literal('cache'), key: z.string() }),
+  // Máquina de estados con memoria entre pulsos: estado actual × etiqueta → transición.
+  z.object({
+    type: z.literal('machine'),
+    initial: z.string(),
+    states: z.record(z.string(), z.record(z.string(), Transition)),
+    else: z.union([z.literal('drop'), z.string()]).default('drop'),
+  }),
+  // Retiene cada pulso `cost` ticks; un pulso con `cancelTag` anula al retenido con el mismo `data[match]`.
+  z.object({ type: z.literal('buffer'), cancelTag: z.string(), match: z.string() }),
 ])
 
 export const NodeDef = z.object({
@@ -161,7 +187,7 @@ export const ChecklistItem = z.object({
   on: PlayerAction,
 })
 
-export const METRICS = ['spawned', 'delivered', 'dropped', 'invalidAtSink', 'duplicatesAtSink', 'maxLoad', 'nodesTouched'] as const
+export const METRICS = ['spawned', 'delivered', 'dropped', 'invalidAtSink', 'duplicatesAtSink', 'cancelled', 'maxLoad', 'nodesTouched'] as const
 
 export const Assertion = z.object({
   metric: z.enum(METRICS),

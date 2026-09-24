@@ -38,13 +38,19 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
       load: Object.fromEntries(circuit.nodes.map((n) => [n.id, 0])),
       queues: Object.fromEntries(circuit.nodes.map((n) => [n.id, []])),
       deliveredOrigins: {},
-      metrics: { spawned: 0, delivered: 0, dropped: 0, invalidAtSink: 0, duplicatesAtSink: 0, maxLoad: 0 },
+      counters: {},
+      nodeState: {},
+      cacheKeys: {},
+      joins: {},
+      sinkSeen: {},
+      metrics: { spawned: 0, delivered: 0, dropped: 0, invalidAtSink: 0, duplicatesAtSink: 0, cancelled: 0, maxLoad: 0 },
     },
   }
 }
 
+// Un pulso retenido en un join cuyos hermanos se perdieron ya no avanzará: no bloquea el final.
 export function isDone(sim: Sim): boolean {
-  return sim.state.scenarioCursor >= sim.schedule.length && sim.state.pulses.every((p) => p.status !== 'alive')
+  return sim.state.scenarioCursor >= sim.schedule.length && sim.state.pulses.every((p) => p.status !== 'alive' || p.loc.kind === 'held')
 }
 
 // Paso puro: devuelve un Sim nuevo; el estado anterior queda intacto para la línea de tiempo.
@@ -137,6 +143,7 @@ class Tick {
       return
     }
     this.startProcessing(pulse, node)
+    if (node.behavior.type === 'buffer') this.tryCancel(pulse, node, node.behavior)
   }
 
   private startProcessing(pulse: Pulse, node: NodeDef) {
@@ -152,7 +159,7 @@ class Tick {
       case 'pass':
         return this.exitVia(pulse, node, 'out')
       case 'sink':
-        return this.deliver(pulse, node, b.expects ? matches(b.expects, pulse) : true)
+        return this.deliver(pulse, node, (b.expects ? matches(b.expects, pulse) : true) && this.firstSeen(node, b.uniqueBy, pulse))
       case 'transform':
         if (b.when && !matches(b.when, pulse)) return this.exitVia(pulse, node, 'out')
         if (b.addTags) pulse.tags = [...new Set([...pulse.tags, ...b.addTags])]
@@ -181,7 +188,94 @@ class Tick {
       case 'guard':
         if (matches(b.require, pulse)) return this.exitVia(pulse, node, 'out')
         return b.onFail === 'drop' ? this.drop(pulse, node, 'guard') : this.exitVia(pulse, node, b.onFail)
+      case 'counter': {
+        const value = b.fresh ? 1 : (this.s.counters[b.key] ?? 0) + 1
+        if (!b.fresh) this.s.counters[b.key] = value
+        pulse.data = { ...pulse.data, [b.field]: value }
+        this.emit({ type: 'pulse.count', pulseId: pulse.id, nodeId: node.id, value })
+        return this.exitVia(pulse, node, 'out')
+      }
+      case 'join':
+        return this.join(pulse, node)
+      case 'cache': {
+        const key = String(pulse.data[b.key])
+        const seen = (this.s.cacheKeys[node.id] ??= [])
+        const hit = seen.includes(key)
+        if (!hit) seen.push(key)
+        this.emit({ type: 'pulse.cache', pulseId: pulse.id, nodeId: node.id, hit })
+        return this.exitVia(pulse, node, hit ? 'hit' : 'miss')
+      }
+      case 'machine': {
+        const current = this.s.nodeState[node.id] ?? b.initial
+        const transitions = b.states[current] ?? {}
+        const tag = Object.keys(transitions).find((t) => pulse.tags.includes(t))
+        this.emitBranch(pulse, node, current)
+        if (!tag) return b.else === 'drop' ? this.drop(pulse, node, 'unhandled') : this.exitVia(pulse, node, b.else)
+        const t = transitions[tag]
+        if (t.addTags) pulse.tags = [...new Set([...pulse.tags, ...t.addTags])]
+        if (t.to && t.to !== current) {
+          this.s.nodeState[node.id] = t.to
+          this.emit({ type: 'node.state', nodeId: node.id, state: t.to })
+        }
+        return this.exitVia(pulse, node, t.port)
+      }
+      case 'buffer':
+        return this.exitVia(pulse, node, pulse.tags.includes(b.cancelTag) ? 'orphan' : 'out')
     }
+  }
+
+  private join(pulse: Pulse, node: NodeDef) {
+    const expected = [...this.c.wires.values()].filter((w) => w.to === node.id).length
+    const byOrigin = (this.s.joins[node.id] ??= {})
+    const held = (byOrigin[pulse.originId] ??= [])
+    if (held.length + 1 < expected) {
+      held.push(pulse.id)
+      pulse.loc = { kind: 'held', nodeId: node.id }
+      this.release(node)
+      return
+    }
+    for (const id of held) {
+      const sibling = this.s.pulses.find((p) => p.id === id)!
+      sibling.status = 'merged'
+      sibling.loc = { kind: 'gone', nodeId: node.id }
+      this.emit({ type: 'pulse.merge', pulseId: id, nodeId: node.id, intoId: pulse.id })
+    }
+    delete byOrigin[pulse.originId]
+    return this.exitVia(pulse, node, 'out')
+  }
+
+  // Deshacer: la orden de cancelar anula a la orden retenida que apunta al mismo pedido.
+  private tryCancel(pulse: Pulse, node: NodeDef, b: { cancelTag: string; match: string }) {
+    if (!pulse.tags.includes(b.cancelTag)) return
+    const target = this.s.pulses.find(
+      (p) =>
+        p.status === 'alive' &&
+        p.id !== pulse.id &&
+        (p.loc.kind === 'node' || p.loc.kind === 'queued') &&
+        p.loc.nodeId === node.id &&
+        !p.tags.includes(b.cancelTag) &&
+        p.data[b.match] === pulse.data[b.match],
+    )
+    if (!target) return
+    for (const p of [target, pulse]) {
+      const wasQueued = p.loc.kind === 'queued'
+      if (wasQueued) this.s.queues[node.id] = this.s.queues[node.id].filter((id) => id !== p.id)
+      p.status = 'cancelled'
+      p.loc = { kind: 'gone', nodeId: node.id }
+      this.emit({ type: 'pulse.cancel', pulseId: p.id, nodeId: node.id, byId: pulse.id })
+      if (wasQueued) this.setLoad(node.id, this.s.load[node.id] - 1)
+      else this.release(node)
+    }
+    this.s.metrics.cancelled++
+  }
+
+  private firstSeen(node: NodeDef, field: string | undefined, pulse: Pulse): boolean {
+    if (!field) return true
+    const value = String(pulse.data[field])
+    const seen = (this.s.sinkSeen[node.id] ??= [])
+    if (seen.includes(value)) return false
+    seen.push(value)
+    return true
   }
 
   private exitVia(pulse: Pulse, node: NodeDef, port: string) {
@@ -209,9 +303,10 @@ class Tick {
     const m = this.s.metrics
     m.delivered++
     if (!valid) m.invalidAtSink++
-    const prev = this.s.deliveredOrigins[pulse.originId] ?? 0
+    const key = `${node.id}:${pulse.originId}`
+    const prev = this.s.deliveredOrigins[key] ?? 0
     if (prev > 0) m.duplicatesAtSink++
-    this.s.deliveredOrigins[pulse.originId] = prev + 1
+    this.s.deliveredOrigins[key] = prev + 1
     this.emit({ type: 'pulse.deliver', pulseId: pulse.id, nodeId: node.id, valid })
     this.release(node)
   }
