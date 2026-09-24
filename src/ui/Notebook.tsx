@@ -20,7 +20,9 @@ function entriesFor(levels: Level[], notes: string[]): Map<PatternId, Entry[]> {
 }
 
 // Cuaderno de patrones: cada patrón probado deja una nota, también los que no encajaban.
-export function Notebook({ levels, notes, onClose, onReset }: { levels: Level[]; notes: string[]; onClose: () => void; onReset: () => void }) {
+type Props = { levels: Level[]; notes: string[]; predictions?: { right: number; total: number }; onClose: () => void; onReset: () => void }
+
+export function Notebook({ levels, notes, predictions, onClose, onReset }: Props) {
   const byPattern = entriesFor(levels, notes)
   const total = [...byPattern.values()].reduce((n, list) => n + list.length, 0)
   const closeButton = useRef<HTMLButtonElement>(null)
@@ -47,6 +49,11 @@ export function Notebook({ levels, notes, onClose, onReset }: { levels: Level[];
           <div>
             <span className="eyebrow">Cuaderno de patrones</span>
             <h2 id="notebook-title">{total} notas de campo</h2>
+            {!!predictions?.total && (
+              <span className="muted">
+                🔮 Predicciones acertadas: {predictions.right} de {predictions.total}
+              </span>
+            )}
           </div>
           <button ref={closeButton} className="close" onClick={onClose} aria-label="Cerrar cuaderno">
             ×

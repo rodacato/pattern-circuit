@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PATTERNS, type Evaluation, type MetricName } from '../../engine'
+import { choiceLabel, isRight, type Prediction } from '../../game/learning/prediction'
 import type { GameSession } from '../../game/session/GameSession'
 import { useSession } from '../useSession'
 
@@ -26,11 +27,13 @@ export function StageCard({ session, onNext }: { session: GameSession; onNext?: 
   const stage = useSession(session, (s) => s.flow.stage)
   const result = useSession(session, (s) => s.result)
   const plugged = useSession(session, (s) => s.flow.last)
+  const asking = useSession(session, (s) => s.awaitingPrediction)
   const [dismissed, setDismissed] = useState<Evaluation>()
 
   if (stage === 'complete') return <WinCard session={session} onNext={onNext} />
   if (stage === 'change') return <TicketCard session={session} />
   if (stage === 'compare') return <CompareCard session={session} />
+  if (stage === 'choose' && asking) return <PredictionCard session={session} />
   if (!result || dismissed === result) return null
   const close = () => setDismissed(result)
   if (stage === 'choose' && plugged) return <NoteCard session={session} onClose={close} />
@@ -97,6 +100,46 @@ function ProblemCard({ result, onClose }: { result: Evaluation; onClose?: () => 
   )
 }
 
+// Antes de correr: el jugador se compromete con una respuesta.
+function PredictionCard({ session }: { session: GameSession }) {
+  const p = session.prediction!
+  return (
+    <div className="stage-card card predict" role="status">
+      <span className="eyebrow">🔮 Predice</span>
+      <h3>{p.question}</h3>
+      <Choices prediction={p} onPick={(id) => session.predict(id)} />
+      <div className="actions">
+        <button className="link" onClick={() => session.skipPrediction()}>
+          Saltar y ver qué pasa
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function Choices({ prediction, onPick }: { prediction: Prediction; onPick: (id: string) => void }) {
+  return (
+    <div className="choices">
+      {prediction.choices.map((c) => (
+        <button key={c.id} onClick={() => onPick(c.id)}>
+          {c.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// Tras la corrida: la predicción contrastada con lo que pasó.
+function PredictionResult({ prediction }: { prediction?: Prediction }) {
+  if (!prediction?.guess) return null
+  const right = isRight(prediction)
+  return (
+    <p className={`prediction-result ${right ? 'good' : 'bad'}`}>
+      {right ? '🎯 Acertaste tu predicción' : `🔮 Predijiste "${choiceLabel(prediction, prediction.guess)}"; fue "${choiceLabel(prediction, prediction.answer)}"`}
+    </p>
+  )
+}
+
 function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => void }) {
   const option = session.pluggedOption!
   const solved = session.flow.solved
@@ -106,6 +149,7 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
     <div className={`stage-card card ${outcome.tone}`} role="status">
       <Close onClose={solved ? undefined : onClose} />
       <span className={`badge ${outcome.tone}`}>{outcome.label}</span>
+      <PredictionResult prediction={session.prediction?.kind === 'outcome' ? session.prediction : undefined} />
       <h3>{option.note.title}</h3>
       <p>{option.note.body}</p>
       {!solved && session.result && <Failures result={session.result} />}
@@ -129,19 +173,28 @@ function TicketCard({ session }: { session: GameSession }) {
   const done = useSession(session, (s) => s.flow.ticketDone)
   const touched = useSession(session, (s) => s.touched.length)
   const running = useSession(session, (s) => s.playback.playing)
+  const prediction = session.prediction?.kind === 'touched' ? session.prediction : undefined
   return (
     <div className="stage-card card ticket" role="status">
       <span className="eyebrow">📋 Ticket de cambio</span>
       <h3>{session.ticket?.text}</h3>
-      {!applied && (
+      {!applied && prediction && (
         <>
-          <p>¿Cuántas piezas que ya funcionaban hay que abrir para cumplirlo?</p>
+          <p>{prediction.question}</p>
+          <Choices prediction={prediction} onPick={(id) => session.predict(id)} />
           <div className="actions">
-            <button className="primary" onClick={() => session.applyTicket()}>
-              Aplicar el cambio
+            <button className="link" onClick={() => session.skipPrediction()}>
+              Aplicar sin predecir
             </button>
           </div>
         </>
+      )}
+      {!applied && !prediction && (
+        <div className="actions">
+          <button className="primary" onClick={() => session.applyTicket()}>
+            Aplicar el cambio
+          </button>
+        </div>
       )}
       {applied && (
         <>
@@ -149,6 +202,7 @@ function TicketCard({ session }: { session: GameSession }) {
             <b className={touched ? 'bad' : 'good'}>{touched}</b>
             <span>nodos existentes modificados</span>
           </div>
+          <PredictionResult prediction={prediction} />
           <p className="muted">{touched ? 'Hubo que abrir código que ya funcionaba.' : 'Solo se agregó una pieza nueva: nada existente cambió.'}</p>
           <div className="actions">
             <button className="primary" disabled={!done || running} onClick={() => session.continue()}>

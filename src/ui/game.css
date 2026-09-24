@@ -1008,3 +1008,39 @@
   }
 }
 
+.choices {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.choices button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  text-align: left;
+  transition: border-color 0.2s;
+}
+
+.choices button:hover {
+  border-color: var(--violet);
+}
+
+.stage-card.predict {
+  border-color: color-mix(in srgb, var(--violet) 60%, transparent);
+}
+
+.prediction-result {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.prediction-result.good {
+  color: var(--green);
+}
+
+.prediction-result.bad {
+  color: var(--amber);
+}
+
