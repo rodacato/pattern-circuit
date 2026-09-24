@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate, reachableVariants } from '../engine'
 import { CHAPTERS, LEVELS } from '.'
+import type { Level } from '../engine'
+
+const solution = (l: Level) => l.sockets.map((s) => ({ id: s.id, pattern: s.inventory.find((p) => s.options[p]?.outcome === 'solves')! }))
 
 describe('registro de niveles', () => {
   it('los niveles van en orden consecutivo desde 0', () => {
@@ -21,16 +24,18 @@ describe('registro de niveles', () => {
 
   it.each(LEVELS.filter((l) => l.sockets.length).map((l) => [l.id, l] as const))('%s: sin patrón falla y con el correcto gana', (_id, l) => {
     expect(evaluate(l, {}).won).toBe(false)
-    const socket = l.sockets[0]
-    const pattern = socket.inventory.find((p) => socket.options[p]?.outcome === 'solves')!
-    expect(evaluate(l, { socket: { id: socket.id, pattern } }).won).toBe(true)
-    for (const t of l.changeTickets) expect(evaluate(l, { socket: { id: socket.id, pattern }, ticket: t.id }).won).toBe(true)
+    const sockets = solution(l)
+    expect(evaluate(l, { sockets }).won).toBe(true)
+    for (const t of l.changeTickets) expect(evaluate(l, { sockets, ticket: t.id }).won).toBe(true)
   })
 
   it.each(LEVELS.filter((l) => l.sockets.length).map((l) => [l.id, l] as const))('%s: ningún patrón incorrecto gana', (_id, l) => {
-    const socket = l.sockets[0]
-    for (const p of socket.inventory.filter((x) => socket.options[x]?.outcome !== 'solves')) {
-      expect(evaluate(l, { socket: { id: socket.id, pattern: p } }).won, p).toBe(false)
+    // Con el resto de sockets resueltos, un patrón incorrecto en cualquiera de ellos impide ganar.
+    for (const socket of l.sockets) {
+      for (const p of socket.inventory.filter((x) => socket.options[x]?.outcome !== 'solves')) {
+        const sockets = solution(l).map((s) => (s.id === socket.id ? { id: s.id, pattern: p } : s))
+        expect(evaluate(l, { sockets }).won, `${socket.id}: ${p}`).toBe(false)
+      }
     }
   })
 })

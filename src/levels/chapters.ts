@@ -3,6 +3,9 @@ export const CHAPTERS: Record<string, string> = {
   mostrador: 'El mostrador',
   barra: 'La barra crece',
   'hora-pico': 'Hora pico',
+  'todo-junto': 'Todo junto',
+  arquitectura: 'Arquitectura',
+  final: 'La cafetería completa',
 }
 
 export const chapterName = (id: string) => CHAPTERS[id] ?? id
