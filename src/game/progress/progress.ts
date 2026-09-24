@@ -59,6 +59,20 @@ export class MemoryProgressStore implements ProgressStore {
 
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>
 
+// Ids de nivel que cambiaron entre versiones: el progreso guardado se traduce al cargar.
+const RENAMED_LEVELS: Record<string, string> = { 'L24-cafeteria-completa': 'L26-cafeteria-completa' } // 1.1: entró el capítulo Criterio
+
+export function migrateLevelIds(p: Progress): Progress {
+  const id = (levelId: string) => RENAMED_LEVELS[levelId] ?? levelId
+  const key = (k: string) => k.replace(/^[^:/]+/, (levelId) => id(levelId)) // `nivel:patrón` y `nivel/socket`
+  return {
+    ...p,
+    completed: p.completed.map(id),
+    notes: p.notes.map(key),
+    review: Object.fromEntries(Object.entries(p.review).map(([k, v]) => [key(k), v])),
+  }
+}
+
 // Datos corruptos o de otra versión no rompen el juego: se empieza de cero.
 export class KeyValueProgressStore implements ProgressStore {
   private readonly storage: KeyValueStorage
@@ -72,7 +86,7 @@ export class KeyValueProgressStore implements ProgressStore {
   load(): Progress {
     try {
       const parsed = Progress.safeParse(JSON.parse(this.storage.getItem(this.key) ?? 'null'))
-      return parsed.success ? parsed.data : emptyProgress()
+      return parsed.success ? migrateLevelIds(parsed.data) : emptyProgress()
     } catch {
       return emptyProgress()
     }

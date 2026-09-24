@@ -1,6 +1,6 @@
 import type { PatternId } from './schema'
 
-export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture' | 'resilience'
+export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture' | 'resilience' | 'principle'
 
 export type PatternInfo = { name: string; family: PatternFamily; gist: string }
 
@@ -27,6 +27,7 @@ export const PATTERNS: Record<PatternId, PatternInfo> = {
   cqrs: { name: 'CQRS', family: 'architecture', gist: 'Un modelo para escribir y otro distinto para leer.' },
   'null-object': { name: 'Null Object', family: 'structural', gist: 'Un objeto que no hace nada en lugar de nil: sin ifs de "¿existe?".' },
   'circuit-breaker': { name: 'Circuit Breaker', family: 'resilience', gist: 'Tras varios fallos deja de llamar al servicio caído y falla rápido (o usa un respaldo).' },
+  'keep-simple': { name: 'Mantenerlo simple', family: 'principle', gist: 'Sin variación real a la vista, la solución directa: el patrón se agrega cuando un cambio lo pida (YAGNI).' },
   saga: { name: 'Saga', family: 'architecture', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
 }
 
@@ -36,4 +37,5 @@ export const FAMILY_NAMES: Record<PatternFamily, string> = {
   behavioral: 'comportamiento',
   architecture: 'arquitectura',
   resilience: 'resiliencia',
+  principle: 'principio',
 }

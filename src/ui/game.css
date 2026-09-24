@@ -523,6 +523,11 @@
   --fam: #ff5fd2;
 }
 
+.cartridge.principle,
+.note-group.principle {
+  --fam: #f5f1d8;
+}
+
 .cartridge .stripe {
   position: absolute;
   top: 0;
@@ -1099,6 +1104,10 @@
   .brief .problem,
   .stage-card p {
     font-size: 13px;
+  }
+
+  .inventory-open .legend {
+    display: none;
   }
 }
 

@@ -13,6 +13,7 @@ const METRIC_TEXT: Record<MetricName, string> = {
   cancelled: 'pedidos cancelados a tiempo',
   maxLoad: 'carga máxima de un nodo',
   nodesTouched: 'nodos existentes modificados',
+  nodes: 'piezas en el circuito',
 }
 
 const OP_TEXT = { '==': 'debía ser', '<=': 'máximo', '>=': 'mínimo' } as const

@@ -37,6 +37,7 @@ export default function GameApp() {
   const [reviewOpen, setReviewOpen] = useState(false)
   const dialogOpen = notebookOpen || reviewOpen
   const progress = useSession(session, (s) => s.progress)
+  const inventoryOpen = useSession(session, (s) => s.inventoryOpen)
   const closeNotebook = useCallback(() => setNotebookOpen(false), [])
   const closeReview = useCallback(() => setReviewOpen(false), [])
   const reviewable = useSession(session, (s) => reviewItems(LEVELS, s.progress.completed).length)
@@ -101,7 +102,7 @@ export default function GameApp() {
       </header>
 
       <main>
-        <section className="stage-wrap">
+        <section className={`stage-wrap${inventoryOpen ? ' inventory-open' : ''}`}>
           <div className="stage" ref={host} role="img" aria-label={`Circuito del nivel ${session.level.order}: ${session.level.title}`} />
           <BriefCard key={session.level.id} session={session} />
           <StageCard key={`card-${session.level.id}`} session={session} onNext={next ? () => setLevelId(next.id) : undefined} />

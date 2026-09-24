@@ -33,5 +33,6 @@ export function createSkins(): Record<PatternId, Skin> {
     'null-object': nullObject(),
     'circuit-breaker': circuitBreaker(),
     saga: saga(),
+    'keep-simple': {}, // lo simple no lleva firma: el circuito queda como está
   }
 }

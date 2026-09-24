@@ -298,7 +298,7 @@ export class GameSession {
 
   // La corrida ya terminó en la reproducción: basta con calificar su estado final.
   private runFinished() {
-    this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched)
+    this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched, this.playback.circuit.nodes.size)
     if (!this.result.won) this.failedRuns++
     if (this.flow.stage === 'choose') this.saveProgress(withNotes(this.progress, this.level.id, this.pluggedPatterns))
     this.dispatch({ type: 'run-finished', won: this.result.won })

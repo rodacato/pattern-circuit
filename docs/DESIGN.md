@@ -19,7 +19,7 @@ Juego educativo para entender patrones de diseño viéndolos, no leyéndolos. Un
 - **Nodo** = objeto/componente. Se abre con zoom para ver sus ramas internas.
 - **Cable** = dependencia. **Continuo = concreta; discontinuo = abstracta.**
 - **Socket** = punto de variación (puerto hexagonal que late cuando hay un problema).
-- **Cartucho** = patrón, con franja por familia: ámbar creacional, cian estructural, violeta comportamiento, verde arquitectura, magenta resiliencia.
+- **Cartucho** = patrón, con franja por familia: ámbar creacional, cian estructural, violeta comportamiento, verde arquitectura, magenta resiliencia, blanco principio.
 - **Síntomas fijos**: ramas que crecen, nodo caliente con cola, chispas en conexiones que no encajan, cables rojos + contador "Nodos modificados".
 - **Ticket de cambio**: llega un requisito nuevo; se compara cuántos nodos existentes hay que abrir sin patrón y con él (el motor lo calcula por diff).
 - **Resultados**: `solves` / `partial` / `misfit`. Probar un patrón incorrecto da una nota de campo para el *Cuaderno de patrones*.
@@ -100,7 +100,9 @@ El esquema completo está en [`src/engine/schema.ts`](../src/engine/schema.ts).
 | 21 | Resiliencia | Null Object | El cliente sin tarjeta |
 | 22 | | Circuit Breaker | El proveedor se cayó |
 | 23 | | Saga | Cobrado y sin avena |
-| 24 | La cafetería completa | — | Recorrido final con todo funcionando junto |
+| 24 | Criterio: cuándo no | Mantenerlo simple (vs Strategy, Factory Method) | Un solo método de pago, sin otro a la vista |
+| 25 | | Mantenerlo simple (vs Event Bus, Command) | Un solo interesado en saber que se cobró |
+| 26 | La cafetería completa | — | Recorrido final con todo funcionando junto |
 
 Patrones evaluados y descartados:
 
@@ -113,6 +115,8 @@ Patrones evaluados y descartados:
 ## Familias
 
 Las familias de los 14 patrones GoF son las del libro (creacional, estructural, comportamiento). Null Object es *object structural* según Woolf. Ports & Adapters, Event Bus, CQRS y Saga van como **arquitectura**; Circuit Breaker, como **resiliencia** (los *stability patterns* de Nygard). El capítulo "Resiliencia" agrupa tres patrones sobre qué hacer cuando algo falla, aunque sus familias sean distintas.
+
+**Mantenerlo simple** no es un patrón: es el principio YAGNI (Fowler, 2015) aplicado a los patrones. GoF advierte que un patrón no debe aplicarse indiscriminadamente, porque suma indirección, y que conviene solo cuando la flexibilidad que da hace falta (cap. 1); Kerievsky propone refactorizar hacia un patrón cuando la necesidad aparece, no antes. En el capítulo "Criterio" gana quien resuelve el problema sin agregar piezas (métrica `nodes`).
 
 Dos variantes conviene nombrar: el Builder del nivel 3 es el de Bloch (*Effective Java*, ítem 2: muchos parámetros y `build()` que valida), no el Director de GoF; el Proxy del nivel 9 es un *cache proxy* (POSA 1).
 
@@ -136,6 +140,9 @@ El contenido de cada nivel se verificó contra estas fuentes y contra las guías
 - Garcia-Molina, H.; Salem, K. "Sagas". *Proc. ACM SIGMOD*, 1987.
 - Richardson, C. "Pattern: Saga". <https://microservices.io/patterns/data/saga.html>
 - Hohpe, G.; Woolf, B. *Enterprise Integration Patterns* (Message Bus, Publish-Subscribe Channel). Addison-Wesley, 2003.
+- Fowler, M. "Yagni", 2015. <https://martinfowler.com/bliki/Yagni.html>
+- Fowler, M. "Is Design Dead?", 2000, rev. 2004 (sección "Patterns and XP"). <https://martinfowler.com/articles/designDead.html>
+- Kerievsky, J. *Refactoring to Patterns*. Addison-Wesley, 2004 (cap. 1: over-engineering y under-engineering).
 - Castillo, A. *Patrones de diseño 1001* y *Arquitecturas 1001*. <https://notdefined.dev/guias/>
 
 ### Ejemplo de diseño de niveles: 0–3
