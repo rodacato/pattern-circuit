@@ -19,6 +19,7 @@ import {
   type Variant,
 } from '../../engine'
 import { Emitter } from '../events/Emitter'
+import { hintLadder } from '../learning/hints'
 import { recordAnswer } from '../learning/review'
 import { guessed, isRight, outcomePrediction, touchedPrediction, type Prediction } from '../learning/prediction'
 import {
@@ -54,6 +55,7 @@ export class GameSession {
   failedRuns = 0
   progress: Progress
   prediction?: Prediction // la pregunta abierta (sin `guess`) o la última respondida
+  hintsShown = 0
 
   private readonly emitter = new Emitter()
   private readonly store: ProgressStore
@@ -142,6 +144,17 @@ export class GameSession {
   // Hay una pregunta esperando respuesta: la corrida no arranca hasta responderla u omitirla.
   get awaitingPrediction(): boolean {
     return !!this.prediction && this.prediction.guess === undefined
+  }
+
+  // Pistas escalonadas para el socket pendiente: se revelan de a una, a pedido del jugador.
+  get hintLadder(): string[] {
+    return this.flow.stage === 'choose' ? hintLadder(this.level, this.flow, this.result) : []
+  }
+
+  nextHint() {
+    if (this.hintsShown >= this.hintLadder.length) return
+    this.hintsShown++
+    this.emitter.emit()
   }
 
   get inventoryOpen() {

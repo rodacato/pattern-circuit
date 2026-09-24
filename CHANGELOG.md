@@ -13,6 +13,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - **Repaso espaciado**: el botón "Repasar" plantea problemas de niveles ya completados, sin circuito, para elegir el patrón. Cada respuesta se explica con su nota de campo; los aciertos vuelven cada vez más espaciados (1, 3, 7, 14 y 30 días) y los errores, en la próxima ronda.
 - **Capítulo "Criterio: cuándo no"** (niveles 24 y 25): problemas donde gana arreglar lo justo, sin agregar un patrón que nada pide todavía (YAGNI). Nueva métrica: piezas en el circuito.
 - **Dónde lo has visto**: cada patrón muestra un ejemplo real en Ruby o Rails (Rack middleware, SimpleDelegator, `Post.none`, ActiveJob…) con enlace a su documentación, en el Cuaderno y al superar el nivel.
+- **Pistas escalonadas**: en vez de la respuesta, primero una pregunta guía según el síntoma, luego la familia del patrón (con las definiciones de GoF), después un descarte y, al final, el patrón.
 
 ### Changed
 
