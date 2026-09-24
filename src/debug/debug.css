@@ -1,0 +1,175 @@
+.debug {
+  --bg: #0e1116;
+  --panel: #151a21;
+  --line: #2a323d;
+  --text: #d6dde6;
+  --muted: #7d8896;
+  --pulse: #f5f1d8;
+  --accent: #4fd1c5;
+  --bad: #ff6b6b;
+  --good: #7bd88f;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
+}
+
+.debug header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.debug select,
+.debug button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.debug button.on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.debug main {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  min-height: calc(100vh - 50px);
+}
+
+.debug .stage {
+  padding: 16px 20px;
+  overflow: auto;
+}
+
+.debug .brief {
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.debug svg {
+  background: var(--panel);
+  border-radius: 10px;
+}
+
+.debug .wire {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+
+.debug .wire.abstract {
+  stroke-dasharray: 6 5;
+  stroke: var(--accent);
+}
+
+.debug .node rect {
+  fill: #1c232d;
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.debug .node.actor rect {
+  stroke: var(--muted);
+}
+
+.debug .node.touched rect {
+  stroke: var(--bad);
+}
+
+.debug .node text {
+  fill: var(--text);
+  text-anchor: middle;
+  font-size: 12px;
+}
+
+.debug .node .sub,
+.debug .pulse-label {
+  fill: var(--muted);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.debug .pulse {
+  fill: var(--pulse);
+  filter: drop-shadow(0 0 6px var(--pulse));
+}
+
+.debug .transport {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.debug .transport span {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--muted);
+}
+
+.debug .tick {
+  font-variant-numeric: tabular-nums;
+}
+
+.debug .metrics td {
+  padding: 2px 16px 2px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.debug .assertions {
+  padding-left: 18px;
+}
+
+.debug .pass {
+  color: var(--good);
+}
+
+.debug .fail {
+  color: var(--bad);
+}
+
+.debug .code {
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  overflow: auto;
+}
+
+.debug .code-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.debug pre {
+  margin: 0;
+  padding: 10px 0;
+  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.debug pre div {
+  padding: 0 14px;
+  white-space: pre;
+}
+
+.debug pre div.hl {
+  background: rgba(79, 209, 197, 0.14);
+  box-shadow: inset 3px 0 var(--accent);
+}
+
+.debug .ln {
+  display: inline-block;
+  width: 28px;
+  color: #4a5461;
+  user-select: none;
+}
