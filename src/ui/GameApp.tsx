@@ -1,30 +1,43 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LEVELS } from '../levels'
-import { NeonStage } from '../render/NeonStage'
 import { KeyValueProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
+import { LEVELS } from '../levels'
+import { NeonStage } from '../render/NeonStage'
 import { BriefCard } from './BriefCard'
+import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
-import { ResultCard } from './ResultCard'
+import { Inventory } from './Inventory'
+import { Notebook } from './Notebook'
 import { Transport } from './Transport'
+import { useSession } from './useSession'
 import './game.css'
 
 const progressStore = new KeyValueProgressStore(window.localStorage)
 
 export default function GameApp() {
-  const [levelId, setLevelId] = useState(LEVELS[0].id)
+  const [levelId, setLevelId] = useState(() => {
+    const done = progressStore.load().completed
+    return (LEVELS.find((l) => !done.includes(l.id)) ?? LEVELS[0]).id
+  })
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = LEVELS[index + 1]
   const session = useMemo(() => new GameSession(LEVELS[index], progressStore), [index])
   const host = useRef<HTMLDivElement>(null)
+  const [stage, setStage] = useState<NeonStage>()
+  const [notebookOpen, setNotebookOpen] = useState(false)
+  const progress = useSession(session, (s) => s.progress)
 
   useEffect(() => {
-    let stage: NeonStage | undefined
+    let created: NeonStage | undefined
     let cancelled = false
-    NeonStage.create(host.current!, session).then((s) => (cancelled ? s.destroy() : (stage = s)))
+    NeonStage.create(host.current!, session).then((s) => {
+      if (cancelled) return s.destroy()
+      created = s
+      setStage(s)
+    })
     return () => {
       cancelled = true
-      stage?.destroy()
+      created?.destroy()
     }
   }, [session])
 
@@ -53,25 +66,34 @@ export default function GameApp() {
           <span className="dot" />
           Pattern Circuit
         </div>
-        <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label="Nivel">
-          {LEVELS.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.order}. {l.title}
-            </option>
-          ))}
-        </select>
+        <div className="topbar-actions">
+          <button className="notebook-button" onClick={() => setNotebookOpen(true)}>
+            📓 Cuaderno <span>{progress.notes.length}</span>
+          </button>
+          <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label="Nivel">
+            {LEVELS.map((l) => (
+              <option key={l.id} value={l.id}>
+                {progress.completed.includes(l.id) ? '✓ ' : ''}
+                {l.order}. {l.title}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
 
       <main>
         <section className="stage-wrap">
           <div className="stage" ref={host} />
           <BriefCard key={session.level.id} session={session} />
-          <ResultCard session={session} onNext={next ? () => setLevelId(next.id) : undefined} />
+          <StageCard key={`card-${session.level.id}`} session={session} onNext={next ? () => setLevelId(next.id) : undefined} />
+          <Inventory session={session} stage={stage} />
           <Legend />
           <Transport session={session} />
         </section>
         <CodePanel key={session.level.id} session={session} />
       </main>
+
+      {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} onClose={() => setNotebookOpen(false)} />}
     </div>
   )
 }

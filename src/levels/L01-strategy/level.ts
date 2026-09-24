@@ -1,4 +1,4 @@
-import { defineLevel, type NodeDef, type WireDef } from '../../engine'
+import { defineLevel, type NodeDef, type PatternId, type WireDef } from '../../engine'
 import baseCashier from './base.rb?raw'
 import baseAppCashier from './base_app.rb?raw'
 import common from './common.rb?raw'
@@ -15,7 +15,7 @@ const PAYMENTS = [
   { key: 'voucher', id: 'pagoVale', label: 'Vale', className: 'VoucherPayment', row: 4 },
 ] as const
 
-const paymentNode = (p: { id: string; label: string; className: string; row: number }): NodeDef => ({
+const paymentNode = (p: { id: string; label: string; className: string; row: number }, skin?: PatternId): NodeDef => ({
   id: p.id,
   label: p.label,
   className: p.className,
@@ -23,6 +23,7 @@ const paymentNode = (p: { id: string; label: string; className: string; row: num
   at: [10, p.row],
   behavior: { type: 'pass' },
   codeRef: `${p.className}#charge`,
+  skin,
 })
 
 const toBarista = (id: string): WireDef => ({ from: id, to: 'preparar', port: 'out', dep: 'concrete' })
@@ -85,7 +86,7 @@ export default defineLevel({
             update: [{ id: 'cobrar', behavior: { type: 'slot' }, skin: 'strategy' }],
             removeWires: ['cobrar->preparar'],
             add: {
-              nodes: PAYMENTS.map(paymentNode),
+              nodes: PAYMENTS.map((p) => paymentNode(p, 'strategy')),
               wires: PAYMENTS.flatMap((p) => [
                 { from: 'cobrar', to: p.id, key: p.key, dep: 'abstract' as const },
                 toBarista(p.id),
@@ -104,7 +105,7 @@ export default defineLevel({
             update: [{ id: 'cobrar', behavior: { type: 'broadcast' }, skin: 'observer' }],
             removeWires: ['cobrar->preparar'],
             add: {
-              nodes: PAYMENTS.map(paymentNode),
+              nodes: PAYMENTS.map((p) => paymentNode(p, 'observer')),
               wires: PAYMENTS.flatMap((p) => [{ from: 'cobrar', to: p.id, dep: 'abstract' as const }, toBarista(p.id)]),
             },
           },
@@ -158,7 +159,7 @@ export default defineLevel({
       },
       with: {
         add: {
-          nodes: [paymentNode({ id: 'pagoApp', label: 'App', className: 'AppPayment', row: 6 })],
+          nodes: [paymentNode({ id: 'pagoApp', label: 'App', className: 'AppPayment', row: 6 }, 'strategy')],
           wires: [{ from: 'cobrar', to: 'pagoApp', key: 'app', dep: 'abstract' }, toBarista('pagoApp')],
         },
       },
