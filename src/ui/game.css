@@ -472,6 +472,15 @@
   font-size: 12px;
 }
 
+.inventory-head .hint.warning {
+  color: var(--red);
+}
+
+.cartridges {
+  flex-wrap: wrap;
+  max-width: 560px;
+}
+
 .cartridges {
   display: flex;
   gap: 8px;
@@ -797,6 +806,12 @@
   border-radius: 50%;
   background: #f5f1d8;
   box-shadow: 0 0 8px #f5f1d8;
+}
+
+.legend .camera {
+  margin-top: 4px;
+  color: var(--faint);
+  font-size: 11px;
 }
 
 .legend .solid {

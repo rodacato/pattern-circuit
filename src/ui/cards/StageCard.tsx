@@ -25,7 +25,7 @@ const OUTCOME = {
 export function StageCard({ session, onNext }: { session: GameSession; onNext?: () => void }) {
   const stage = useSession(session, (s) => s.flow.stage)
   const result = useSession(session, (s) => s.result)
-  const plugged = useSession(session, (s) => s.flow.plugged)
+  const plugged = useSession(session, (s) => s.flow.last)
   const [dismissed, setDismissed] = useState<Evaluation>()
 
   if (stage === 'complete') return <WinCard session={session} onNext={onNext} />
@@ -93,6 +93,7 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
   const option = session.pluggedOption!
   const solved = session.flow.solved
   const outcome = OUTCOME[option.outcome]
+  const pending = session.sockets.filter((s) => session.flow.plugs[s.id]?.outcome !== 'solves')
   return (
     <div className={`stage-card card ${outcome.tone}`}>
       <Close onClose={solved ? undefined : onClose} />
@@ -105,6 +106,8 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
           <button className="primary" onClick={() => session.continue()}>
             {session.ticket ? 'Siguiente: llega un cambio →' : 'Comparar sin/con patrón →'}
           </button>
+        ) : option.outcome === 'solves' && pending.length ? (
+          <span className="muted">Este socket quedó resuelto. Falta: {pending.map((s) => s.label).join(', ')}.</span>
         ) : (
           <span className="muted">Prueba otro patrón del inventario.</span>
         )}
@@ -153,7 +156,7 @@ function TicketCard({ session }: { session: GameSession }) {
 function CompareCard({ session }: { session: GameSession }) {
   const side = useSession(session, (s) => s.flow.side)
   const cmp = session.comparison!
-  const name = PATTERNS[session.flow.plugged!.pattern].name
+  const name = session.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
   // Se comparan justo las métricas que el nivel usa como objetivo.
   const rows = [...new Set(session.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
   return (
@@ -195,12 +198,16 @@ function CompareCard({ session }: { session: GameSession }) {
 }
 
 function WinCard({ session, onNext }: { session: GameSession; onNext?: () => void }) {
-  const plugged = session.flow.plugged
+  const patterns = session.pluggedPatterns
   return (
     <div className="stage-card card won">
       <span className="eyebrow">Nivel superado</span>
-      <h2>{plugged ? `Aprendiste ${PATTERNS[plugged.pattern].name}` : '¡La cafetería funciona!'}</h2>
-      {plugged && <p className="muted">{PATTERNS[plugged.pattern].gist}</p>}
+      <h2>{patterns.length ? `Aprendiste ${patterns.map((p) => PATTERNS[p].name).join(' + ')}` : '¡La cafetería funciona!'}</h2>
+      {patterns.map((p) => (
+        <p key={p} className="muted">
+          {PATTERNS[p].gist}
+        </p>
+      ))}
       <div className="actions">
         <button onClick={() => session.play()}>Ver de nuevo</button>
         {onNext && (

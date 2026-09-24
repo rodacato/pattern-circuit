@@ -27,6 +27,28 @@ export function fitWorld(screen: { width: number; height: number }, bounds: { w:
   }
 }
 
+export type View = { zoom: number; x: number; y: number }
+export const ZOOM_LIMITS = [0.5, 3] as const
+
+// Vista final = encuadre automático × zoom del jugador, desplazada por su paneo.
+export function worldTransform(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View) {
+  const scale = fitWorld(screen, bounds).zoom * view.zoom
+  return {
+    scale,
+    x: Math.round((screen.width - bounds.w * scale) / 2 + view.x),
+    y: Math.round((screen.height - bounds.h * scale) / 2 + view.y),
+  }
+}
+
+// Zoom alrededor del puntero: el punto del mundo bajo el cursor no se mueve.
+export function zoomAt(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, pointer: Point, factor: number): View {
+  const before = worldTransform(screen, bounds, view)
+  const world = { x: (pointer.x - before.x) / before.scale, y: (pointer.y - before.y) / before.scale }
+  const zoom = Math.min(ZOOM_LIMITS[1], Math.max(ZOOM_LIMITS[0], view.zoom * factor))
+  const centered = worldTransform(screen, bounds, { zoom, x: 0, y: 0 })
+  return { zoom, x: pointer.x - world.x * centered.scale - centered.x, y: pointer.y - world.y * centered.scale - centered.y }
+}
+
 export function nodeAt(nodes: Iterable<NodeDef>, p: Point): NodeDef | undefined {
   for (const n of nodes) {
     const c = nodeCenter(n)

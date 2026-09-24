@@ -9,8 +9,9 @@ export type Plugged = { socketId: string; pattern: PatternId; outcome: SocketOpt
 export type FlowState = {
   stage: Stage
   runs: number
-  plugged?: Plugged
-  solved: boolean // la última corrida con el patrón enchufado cumplió los objetivos
+  plugs: Record<string, Plugged> // socket → patrón enchufado
+  last?: string // socket enchufado más recientemente
+  solved: boolean // la última corrida, con todos los sockets resueltos, cumplió los objetivos
   ticketApplied: boolean
   ticketDone: boolean
   side: Side
@@ -19,7 +20,7 @@ export type FlowState = {
 export type FlowEvent =
   | { type: 'run-finished'; won: boolean }
   | { type: 'plug'; socketId: string; pattern: PatternId; outcome: SocketOption['outcome'] }
-  | { type: 'unplug' }
+  | { type: 'unplug'; socketId: string }
   | { type: 'apply-ticket' }
   | { type: 'continue' }
   | { type: 'compare'; side: Side }
@@ -27,7 +28,9 @@ export type FlowEvent =
 
 type LevelShape = Pick<LevelDef, 'sockets' | 'changeTickets'>
 
-export const initialFlow = (): FlowState => ({ stage: 'observe', runs: 0, solved: false, ticketApplied: false, ticketDone: false, side: 'with' })
+export const initialFlow = (): FlowState => ({ stage: 'observe', runs: 0, plugs: {}, solved: false, ticketApplied: false, ticketDone: false, side: 'with' })
+
+const allSolved = (level: LevelShape, s: FlowState) => level.sockets.every((k) => s.plugs[k.id]?.outcome === 'solves')
 
 export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowState {
   const hasSockets = level.sockets.length > 0
@@ -38,15 +41,19 @@ export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowS
         if (hasSockets) return { ...next, stage: 'choose' }
         return e.won ? { ...next, stage: 'complete' } : next
       }
-      if (s.stage === 'choose') return { ...next, solved: e.won && s.plugged?.outcome === 'solves' }
+      if (s.stage === 'choose') return { ...next, solved: e.won && allSolved(level, s) }
       if (s.stage === 'change' && s.ticketApplied) return { ...next, ticketDone: e.won }
       return next
     }
     case 'plug':
       if (s.stage !== 'choose') return s
-      return { ...s, plugged: { socketId: e.socketId, pattern: e.pattern, outcome: e.outcome }, solved: false }
-    case 'unplug':
-      return s.stage === 'choose' ? { ...s, plugged: undefined, solved: false } : s
+      return { ...s, plugs: { ...s.plugs, [e.socketId]: { socketId: e.socketId, pattern: e.pattern, outcome: e.outcome } }, last: e.socketId, solved: false }
+    case 'unplug': {
+      if (s.stage !== 'choose') return s
+      const plugs = { ...s.plugs }
+      delete plugs[e.socketId]
+      return { ...s, plugs, last: s.last === e.socketId ? undefined : s.last, solved: false }
+    }
     case 'continue':
       if (s.stage === 'choose' && s.solved) return { ...s, stage: level.changeTickets.length ? 'change' : 'compare', side: 'with' }
       if (s.stage === 'change' && s.ticketDone) return { ...s, stage: 'compare', side: 'with' }
@@ -62,20 +69,21 @@ export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowS
 
 // Qué circuito corre en cada momento del flujo.
 export function variantFor(level: LevelShape, s: FlowState, repairs: string[]): Variant {
-  const socket = s.plugged ? { id: s.plugged.socketId, pattern: s.plugged.pattern } : undefined
+  const sockets = level.sockets.flatMap((k) => (s.plugs[k.id] ? [{ id: k.id, pattern: s.plugs[k.id].pattern }] : []))
+  const plugged: Variant = sockets.length ? { sockets } : {}
   const ticket = level.changeTickets[0]?.id
   const base: Variant = repairs.length ? { repairs } : {}
   switch (s.stage) {
     case 'observe':
       return base
     case 'choose':
-      return socket ? { ...base, socket } : base
+      return { ...base, ...plugged }
     case 'change':
-      return { ...base, socket, ...(s.ticketApplied && ticket ? { ticket } : {}) }
+      return { ...base, ...plugged, ...(s.ticketApplied && ticket ? { ticket } : {}) }
     case 'compare':
     case 'complete': {
       const withTicket = ticket ? { ticket } : {}
-      return s.side === 'with' && socket ? { ...base, socket, ...withTicket } : { ...base, ...withTicket }
+      return s.side === 'with' ? { ...base, ...plugged, ...withTicket } : { ...base, ...withTicket }
     }
   }
 }

@@ -114,6 +114,7 @@ function Legend() {
       <span>
         <i className="dashed" /> depende de una interfaz
       </span>
+      <span className="camera">rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar</span>
     </div>
   )
 }

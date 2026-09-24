@@ -54,8 +54,8 @@ export class GameSession {
     return this.level.codeFiles[codeKey(this.level, this.variant)]
   }
 
-  get socket(): SocketDef | undefined {
-    return this.level.sockets[0]
+  get sockets(): SocketDef[] {
+    return this.level.sockets
   }
 
   get ticket(): ChangeTicket | undefined {
@@ -66,9 +66,14 @@ export class GameSession {
     return this.level.repairs.filter((r) => !this.repairs.includes(r.id))
   }
 
+  // La opción enchufada más recientemente: la que comenta la nota de campo.
   get pluggedOption(): SocketOption | undefined {
-    const p = this.flow.plugged
+    const p = this.flow.last ? this.flow.plugs[this.flow.last] : undefined
     return p ? this.level.sockets.find((s) => s.id === p.socketId)?.options[p.pattern] : undefined
+  }
+
+  get pluggedPatterns(): PatternId[] {
+    return this.level.sockets.flatMap((s) => (this.flow.plugs[s.id] ? [this.flow.plugs[s.id].pattern] : []))
   }
 
   get inventoryOpen() {
@@ -144,8 +149,12 @@ export class GameSession {
     return 'repaired'
   }
 
-  plug(pattern: PatternId, socketId = this.socket?.id): SocketOption | undefined {
-    const socket = this.level.sockets.find((s) => s.id === socketId)
+  // Sin socket explícito, va al primero que acepte el patrón (prefiriendo uno aún sin resolver).
+  plug(pattern: PatternId, socketId?: string): SocketOption | undefined {
+    const accepting = this.level.sockets.filter((s) => s.options[pattern])
+    const socket = socketId
+      ? accepting.find((s) => s.id === socketId)
+      : (accepting.find((s) => this.flow.plugs[s.id]?.outcome !== 'solves') ?? accepting[0])
     const option = socket?.options[pattern]
     if (!socket || !option || !this.inventoryOpen) return undefined
     this.dispatch({ type: 'plug', socketId: socket.id, pattern, outcome: option.outcome })
@@ -153,8 +162,8 @@ export class GameSession {
     return option
   }
 
-  unplug() {
-    this.dispatch({ type: 'unplug' })
+  unplug(socketId: string) {
+    this.dispatch({ type: 'unplug', socketId })
     this.rerun(false)
   }
 
@@ -191,8 +200,10 @@ export class GameSession {
     const variant = this.variant
     this.result = evaluate(this.level, variant)
     if (!this.result.won) this.failedRuns++
-    const plugged = this.flow.plugged
-    if (this.flow.stage === 'choose' && plugged) this.saveProgress(withNote(this.progress, noteKey(this.level.id, plugged.pattern)))
+    if (this.flow.stage === 'choose') {
+      const notes = Object.values(this.flow.plugs).reduce((p, plug) => withNote(p, noteKey(this.level.id, plug.pattern)), this.progress)
+      this.saveProgress(notes)
+    }
     this.dispatch({ type: 'run-finished', won: this.result.won })
     this.completeIfDone()
     this.emitter.emit()

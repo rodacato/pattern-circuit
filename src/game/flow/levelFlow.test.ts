@@ -21,7 +21,7 @@ describe('flujo del nivel', () => {
 
   it('con sockets: ver el problema abre el inventario', () => {
     expect(run(L1, finished(false)).stage).toBe('choose')
-    expect(run(L1, plug('misfit')).plugged).toBeUndefined()
+    expect(run(L1, plug('misfit')).plugs).toEqual({})
   })
 
   it('un patrón que no encaja no deja continuar', () => {
@@ -60,10 +60,10 @@ describe('variante según el flujo', () => {
     const repairs: string[] = []
     const choose = run(L1, finished(false), plug('solves'))
     expect(variantFor(L1, initialFlow(), repairs)).toEqual({})
-    expect(variantFor(L1, choose, repairs)).toEqual({ socket: { id: 's', pattern: 'strategy' } })
+    expect(variantFor(L1, choose, repairs)).toEqual({ sockets: [{ id: 's', pattern: 'strategy' }] })
 
     const change = run(L1, finished(false), plug('solves'), finished(true), { type: 'continue' }, { type: 'apply-ticket' })
-    expect(variantFor(L1, change, repairs)).toEqual({ socket: { id: 's', pattern: 'strategy' }, ticket: 't' })
+    expect(variantFor(L1, change, repairs)).toEqual({ sockets: [{ id: 's', pattern: 'strategy' }], ticket: 't' })
 
     const without = reduceFlow(L1, { ...change, stage: 'compare' }, { type: 'compare', side: 'without' })
     expect(variantFor(L1, without, repairs)).toEqual({ ticket: 't' })
@@ -71,5 +71,24 @@ describe('variante según el flujo', () => {
 
   it('las reparaciones se mantienen en todas las etapas', () => {
     expect(variantFor(L0, initialFlow(), ['r'])).toEqual({ repairs: ['r'] })
+  })
+})
+
+describe('flujo con varios sockets', () => {
+  const other = { ...socket, id: 'o' }
+  const L2 = { sockets: [socket, other], changeTickets: [] }
+  const plugAt = (socketId: string, outcome: 'solves' | 'misfit'): FlowEvent => ({ type: 'plug', socketId, pattern: 'strategy', outcome })
+
+  it('solo se resuelve con todos los sockets resueltos', () => {
+    expect(run(L2, finished(false), plugAt('s', 'solves'), finished(true)).solved).toBe(false)
+    const s = run(L2, finished(false), plugAt('s', 'solves'), plugAt('o', 'solves'), finished(true))
+    expect(s.solved).toBe(true)
+    expect(s.last).toBe('o')
+    expect(variantFor(L2, s, []).sockets).toHaveLength(2)
+  })
+
+  it('desenchufar un socket deja el otro', () => {
+    const s = run(L2, finished(false), plugAt('s', 'solves'), plugAt('o', 'misfit'), { type: 'unplug', socketId: 'o' })
+    expect(Object.keys(s.plugs)).toEqual(['s'])
   })
 })

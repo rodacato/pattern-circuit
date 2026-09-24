@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Circuit, compile, type Pulse } from '../engine'
-import { CELL, circuitBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition, socketCenter, withinSocket } from './layout'
+import { CELL, circuitBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition, socketCenter, withinSocket, worldTransform, zoomAt, ZOOM_LIMITS } from './layout'
 
 const circuit = compile(
   Circuit.parse({
@@ -57,5 +57,20 @@ describe('layout', () => {
     expect(withinSocket(at, { x: at.x + 20, y: at.y })).toBe(true)
     expect(withinSocket(at, { x: at.x + 200, y: at.y })).toBe(false)
     expect(socketCenter(base, 'nope')).toBeUndefined()
+  })
+
+  it('el zoom mantiene fijo el punto bajo el puntero y respeta los límites', () => {
+    const screen = { width: 800, height: 600 }
+    const bounds = { w: 600, h: 300 }
+    const view = { zoom: 1, x: 0, y: 0 }
+    const pointer = { x: 300, y: 200 }
+    const t0 = worldTransform(screen, bounds, view)
+    const world = { x: (pointer.x - t0.x) / t0.scale, y: (pointer.y - t0.y) / t0.scale }
+    const zoomed = zoomAt(screen, bounds, view, pointer, 2)
+    const t1 = worldTransform(screen, bounds, zoomed)
+    expect(zoomed.zoom).toBe(2)
+    expect(world.x * t1.scale + t1.x).toBeCloseTo(pointer.x, 0)
+    expect(world.y * t1.scale + t1.y).toBeCloseTo(pointer.y, 0)
+    expect(zoomAt(screen, bounds, view, pointer, 100).zoom).toBe(ZOOM_LIMITS[1])
   })
 })

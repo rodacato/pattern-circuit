@@ -5,7 +5,6 @@ import { Effects } from './fx'
 import {
   CELL,
   circuitBounds,
-  fitWorld,
   nearestPulse,
   NODE_H,
   NODE_W,
@@ -17,6 +16,9 @@ import {
   socketCenter,
   toPx,
   withinSocket,
+  worldTransform,
+  zoomAt,
+  type View,
 } from './layout'
 import { createSkins, stateColor, type DrawContext, type Skin } from './skins'
 import { DROP_TEXT, FAMILY_COLORS, FONT_MONO, FONT_UI, INVALID_TEXT, NEON as C, pulseColor } from './theme'
@@ -36,7 +38,8 @@ export class NeonStage {
   private readonly nodesLayer = new Container()
   private readonly fxLayer = new Container()
   private readonly followLabel = label('', 11, C.white)
-  private readonly socketLabel = label('', 11, C.violet)
+  private readonly socketLabels = new Map<string, Text>()
+  private readonly socketLayer = new Container()
   private readonly fx = new Effects(this.fxLayer)
   private readonly skins: Partial<Record<PatternId, Skin>> = createSkins()
   private session!: GameSession
@@ -53,8 +56,10 @@ export class NeonStage {
   private readonly badgeLayer = new Container()
   private hovered?: string
   private drag?: Drag
-  private dropHover = false
-  private lastPlugged?: string
+  private dropHover?: string
+  private view: View = { zoom: 1, x: 0, y: 0 }
+  private panning?: { x: number; y: number }
+  private lastPlugs: Record<string, string> = {}
 
   static async create(host: HTMLElement, session: GameSession): Promise<NeonStage> {
     const stage = new NeonStage()
@@ -67,8 +72,7 @@ export class NeonStage {
     glowLayer.filters = [new BlurFilter({ strength: 12, quality: 4 })]
     glowLayer.blendMode = 'add'
     stage.followLabel.anchor.set(0.5, 1)
-    stage.socketLabel.anchor.set(0.5, 1)
-    stage.world.addChild(stage.base, glowLayer, stage.dynamic, stage.nodesLayer, stage.badgeLayer, stage.fxLayer, stage.followLabel, stage.socketLabel)
+    stage.world.addChild(stage.base, glowLayer, stage.dynamic, stage.nodesLayer, stage.badgeLayer, stage.fxLayer, stage.followLabel, stage.socketLayer)
     stage.app.stage.addChild(stage.world)
     stage.bindPointer()
     stage.app.ticker.add((t) => stage.tick(t.deltaTime))
@@ -82,13 +86,15 @@ export class NeonStage {
   // --- API para la ui: soltar un cartucho desde el DOM sobre el socket del canvas ---
 
   socketAtClient(clientX: number, clientY: number): string | undefined {
-    const socket = this.session.socket
-    const at = socket && this.socketPoint()
-    return at && withinSocket(at, this.clientToWorld(clientX, clientY)) ? socket.id : undefined
+    const p = this.clientToWorld(clientX, clientY)
+    return this.session.sockets.find((s) => {
+      const at = this.socketPoint(s.id)
+      return at && withinSocket(at, p)
+    })?.id
   }
 
-  setDropHover(active: boolean) {
-    this.dropHover = active
+  setDropHover(socketId: string | undefined) {
+    this.dropHover = socketId
   }
 
   // --- bucle ---
@@ -98,9 +104,9 @@ export class NeonStage {
     if (s.circuitVersion !== this.builtVersion) this.build()
     s.update(delta)
     const time = performance.now()
-    const fit = fitWorld(this.app.screen, this.bounds)
-    this.world.scale.set(fit.zoom)
-    this.world.position.set(fit.x, fit.y)
+    const t = worldTransform(this.app.screen, this.bounds, this.view)
+    this.world.scale.set(t.scale)
+    this.world.position.set(t.x, t.y)
     for (const e of s.playback.drainEvents()) this.onEvent(e)
 
     const d = this.dynamic.clear()
@@ -109,7 +115,7 @@ export class NeonStage {
     this.drawFlow(d, time)
     this.drawHint(d, gl, time)
     this.drawNodes(ctx)
-    this.drawSocket(d, gl, time)
+    this.drawSockets(d, gl, time)
     this.drawDrag(d, gl)
     this.drawPulses(ctx)
     this.drawBadges()
@@ -150,15 +156,16 @@ export class NeonStage {
 
   // Enchufar un patrón: onda y chispas del color de su familia sobre el socket.
   private celebratePlug() {
-    const plugged = this.session.flow.plugged?.pattern
-    if (plugged === this.lastPlugged) return
-    this.lastPlugged = plugged
-    const at = this.socketPoint()
-    if (!plugged || !at) return
-    const color = FAMILY_COLORS[PATTERNS[plugged].family]
-    this.fx.ring(at, color, 110)
-    this.fx.burst(at, color, 34, 3.2)
-    this.fx.float(at, `${PATTERNS[plugged].name} enchufado`, color)
+    for (const [socketId, plug] of Object.entries(this.session.flow.plugs)) {
+      if (this.lastPlugs[socketId] === plug.pattern) continue
+      this.lastPlugs[socketId] = plug.pattern
+      const at = this.socketPoint(socketId)
+      if (!at) continue
+      const color = FAMILY_COLORS[PATTERNS[plug.pattern].family]
+      this.fx.ring(at, color, 110)
+      this.fx.burst(at, color, 34, 3.2)
+      this.fx.float(at, `${PATTERNS[plug.pattern].name} enchufado`, color)
+    }
   }
 
   private nodeView(n: NodeDef): Container {
@@ -206,13 +213,30 @@ export class NeonStage {
     stage.hitArea = this.app.screen
     stage.on('globalpointermove', (e: FederatedPointerEvent) => {
       if (this.drag) this.drag.to = this.world.toLocal(e.global)
+      if (this.panning) {
+        this.view = { ...this.view, x: this.view.x + e.global.x - this.panning.x, y: this.view.y + e.global.y - this.panning.y }
+        this.panning = { x: e.global.x, y: e.global.y }
+      }
     })
-    stage.on('pointerup', () => this.endDrag())
-    stage.on('pointerupoutside', () => this.endDrag())
+    const end = () => {
+      this.endDrag()
+      this.panning = undefined
+    }
+    stage.on('pointerup', end)
+    stage.on('pointerupoutside', end)
     stage.on('pointerdown', (e: FederatedPointerEvent) => {
       const id = nearestPulse(this.positions, this.world.toLocal(e.global))
       if (id !== undefined) this.session.follow(id)
+      else if (e.target === stage) this.panning = { x: e.global.x, y: e.global.y }
     })
+    const canvas = this.app.canvas
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault()
+      const rect = canvas.getBoundingClientRect()
+      const pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+      this.view = zoomAt(this.app.screen, this.bounds, this.view, pointer, Math.exp(-e.deltaY * 0.0015))
+    }, { passive: false })
+    canvas.addEventListener('dblclick', () => (this.view = { zoom: 1, x: 0, y: 0 }))
   }
 
   private endDrag() {
@@ -237,8 +261,8 @@ export class NeonStage {
     return this.world.toLocal({ x: clientX - rect.left, y: clientY - rect.top })
   }
 
-  private socketPoint(): Point | undefined {
-    const socket = this.session.socket
+  private socketPoint(socketId: string): Point | undefined {
+    const socket = this.session.sockets.find((s) => s.id === socketId)
     return socket && socketCenter(this.session.level.circuit.nodes, socket.at)
   }
 
@@ -404,31 +428,38 @@ export class NeonStage {
     for (let i = used; i < this.badges.length; i++) this.badges[i].visible = false
   }
 
-  // El socket late mientras espera un patrón; al enchufar toma el color de la familia del patrón.
-  private drawSocket(d: Graphics, gl: Graphics, time: number) {
+  // Cada socket late mientras espera un patrón; al enchufar toma el color de la familia del patrón.
+  private drawSockets(d: Graphics, gl: Graphics, time: number) {
     const s = this.session
-    const at = this.socketPoint()
-    this.socketLabel.visible = false
-    const plugged = s.variant.socket?.pattern
-    if (!at || !s.socket || (!s.inventoryOpen && !plugged)) return
-    const color = plugged ? FAMILY_COLORS[PATTERNS[plugged].family] : C.violet
-    const waiting = !plugged && s.inventoryOpen
-    const beat = 0.5 + 0.5 * Math.sin(time / (waiting ? 220 : 500))
-    const r = SOCKET_R * (this.dropHover ? 1.35 : 1) + (waiting ? beat * 1.5 : 0)
-    const hex = hexagon(at, r)
+    const plugs = s.variant.sockets ?? (s.variant.socket ? [s.variant.socket] : [])
+    for (const socket of s.sockets) {
+      const text = this.socketLabels.get(socket.id) ?? this.socketLayer.addChild(label('', 11, C.violet))
+      text.anchor.set(0.5, 1)
+      this.socketLabels.set(socket.id, text)
+      text.visible = false
+      const at = this.socketPoint(socket.id)
+      const plugged = plugs.find((p) => p.id === socket.id)?.pattern
+      if (!at || (!s.inventoryOpen && !plugged)) continue
+      const color = plugged ? FAMILY_COLORS[PATTERNS[plugged].family] : C.violet
+      const waiting = !plugged && s.inventoryOpen
+      const hovered = this.dropHover === socket.id
+      const beat = 0.5 + 0.5 * Math.sin(time / (waiting ? 220 : 500))
+      const r = SOCKET_R * (hovered ? 1.35 : 1) + (waiting ? beat * 1.5 : 0)
+      const hex = hexagon(at, r)
 
-    const anchor = nodeCenter(s.level.circuit.nodes.find((n) => n.id === s.socket!.at)!)
-    d.moveTo(at.x, at.y + r).lineTo(anchor.x, anchor.y - NODE_H / 2).stroke({ width: 2, color, alpha: 0.6 })
-    d.poly(hex).fill({ color: plugged ? color : C.bg, alpha: plugged ? 0.9 : 1 }).stroke({ width: 2, color })
-    gl.poly(hex).stroke({ width: 6, color, alpha: 0.35 + beat * 0.5 + (this.dropHover ? 0.4 : 0) })
-    if (waiting) {
-      d.moveTo(at.x - 5, at.y).lineTo(at.x + 5, at.y).moveTo(at.x, at.y - 5).lineTo(at.x, at.y + 5).stroke({ width: 2, color })
-      gl.circle(at.x, at.y, r + 10 + beat * 8).stroke({ width: 2, color, alpha: 0.3 * (1 - beat) })
+      const anchor = nodeCenter(s.level.circuit.nodes.find((n) => n.id === socket.at)!)
+      d.moveTo(at.x, at.y + r).lineTo(anchor.x, anchor.y - NODE_H / 2).stroke({ width: 2, color, alpha: 0.6 })
+      d.poly(hex).fill({ color: plugged ? color : C.bg, alpha: plugged ? 0.9 : 1 }).stroke({ width: 2, color })
+      gl.poly(hex).stroke({ width: 6, color, alpha: 0.35 + beat * 0.5 + (hovered ? 0.4 : 0) })
+      if (waiting) {
+        d.moveTo(at.x - 5, at.y).lineTo(at.x + 5, at.y).moveTo(at.x, at.y - 5).lineTo(at.x, at.y + 5).stroke({ width: 2, color })
+        gl.circle(at.x, at.y, r + 10 + beat * 8).stroke({ width: 2, color, alpha: 0.3 * (1 - beat) })
+      }
+      text.text = plugged ? PATTERNS[plugged].name : hovered ? 'suéltalo aquí' : socket.label
+      text.style.fill = color
+      text.position.set(at.x, at.y - r - 6)
+      text.visible = true
     }
-    this.socketLabel.text = plugged ? PATTERNS[plugged].name : this.dropHover ? 'suéltalo aquí' : s.socket.label
-    this.socketLabel.style.fill = color
-    this.socketLabel.position.set(at.x, at.y - r - 6)
-    this.socketLabel.visible = true
   }
 
   private drawDrag(d: Graphics, gl: Graphics) {
