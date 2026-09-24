@@ -5,6 +5,7 @@ export const CHAPTERS: Record<string, string> = {
   'hora-pico': 'Hora pico',
   'todo-junto': 'Todo junto',
   arquitectura: 'Arquitectura',
+  resiliencia: 'Resiliencia',
   final: 'La cafetería completa',
 }
 
