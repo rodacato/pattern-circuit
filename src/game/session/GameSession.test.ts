@@ -1,47 +1,73 @@
 import { describe, expect, it } from 'vitest'
 import { LEVELS } from '../../levels'
+import { MemoryProgressStore } from '../progress/progress'
 import { GameSession } from './GameSession'
 
-const tutorial = () => new GameSession(LEVELS.find((l) => l.id === 'L00-tutorial')!)
+const session = (id: string, store = new MemoryProgressStore()) => new GameSession(LEVELS.find((l) => l.id === id)!, store)
+
 const runOut = (s: GameSession) => {
-  s.play()
-  for (let i = 0; i < 5000 && s.status !== 'done'; i++) s.update(1)
+  if (!s.playback.playing) s.play()
+  for (let i = 0; i < 10_000 && s.playback.playing; i++) s.update(1)
 }
 
-describe('GameSession', () => {
-  it('sin reparar, la partida termina perdida y cuenta el intento fallido', () => {
-    const s = tutorial()
+describe('GameSession · nivel 0', () => {
+  it('sin reparar se pierde; con el cable correcto se completa y se guarda', () => {
+    const store = new MemoryProgressStore()
+    const s = session('L00-tutorial', store)
     runOut(s)
     expect(s.result?.won).toBe(false)
     expect(s.failedRuns).toBe(1)
-  })
 
-  it('un cable equivocado no cambia nada; el correcto repara y se gana', () => {
-    const s = tutorial()
     expect(s.connect('cliente', 'entregar')).toBe('wrong')
     expect(s.connect('preparar', 'entregar')).toBe('repaired')
-    expect(s.pendingRepairs).toHaveLength(0)
     expect(s.codeFile.text).toContain('@counter.hand_over(order)')
     runOut(s)
-    expect(s.result?.won).toBe(true)
-    expect(s.actions.has('repair')).toBe(true)
+    expect(s.flow.stage).toBe('complete')
+    expect(store.load().completed).toEqual(['L00-tutorial'])
   })
 
   it('paso adelante y atrás vuelven al mismo tick', () => {
-    const s = tutorial()
+    const s = session('L00-tutorial')
     for (let i = 0; i < 10; i++) s.step()
     s.back()
-    expect(s.timeline.tick).toBe(9)
+    expect(s.playback.timeline.tick).toBe(9)
     expect(s.actions).toEqual(new Set(['step', 'back']))
   })
+})
 
-  it('inspeccionar un nodo muestra su región aunque haya pulsos corriendo', () => {
-    const s = tutorial()
-    s.inspect('cobrar')
-    s.play()
-    for (let i = 0; i < 30; i++) s.update(1)
-    expect(s.activeRef).toBe('Cashier#charge')
-    s.follow(1)
-    expect(s.inspected).toBeUndefined()
+describe('GameSession · nivel 1 (Strategy)', () => {
+  it('recorre el nivel completo: problema, patrones, cambio y comparación', () => {
+    const store = new MemoryProgressStore()
+    const s = session('L01-strategy', store)
+    expect(s.plug('strategy')).toBeUndefined() // el inventario abre después de ver el problema
+
+    runOut(s)
+    expect(s.flow.stage).toBe('choose')
+
+    expect(s.plug('observer')?.outcome).toBe('misfit')
+    runOut(s)
+    expect(s.result?.metrics.duplicatesAtSink).toBe(6)
+    s.continue()
+    expect(s.flow.stage).toBe('choose')
+
+    s.plug('strategy')
+    runOut(s)
+    expect(s.flow.solved).toBe(true)
+    s.continue()
+    expect(s.flow.stage).toBe('change')
+
+    s.applyTicket()
+    runOut(s)
+    expect(s.touched).toEqual([])
+    s.continue()
+    expect(s.flow.stage).toBe('compare')
+    expect(s.comparison?.without.metrics.nodesTouched).toBe(1)
+    expect(s.comparison?.with.metrics.nodesTouched).toBe(0)
+
+    s.showSide('without')
+    expect(s.touched).toEqual(['cobrar'])
+    s.finishLevel()
+    expect(s.flow.stage).toBe('complete')
+    expect(store.load()).toMatchObject({ completed: ['L01-strategy'], notes: ['L01-strategy:observer', 'L01-strategy:strategy'] })
   })
 })

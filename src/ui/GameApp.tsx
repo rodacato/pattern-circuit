@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LEVELS } from '../levels'
 import { NeonStage } from '../render/NeonStage'
+import { KeyValueProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { BriefCard } from './BriefCard'
 import { CodePanel } from './CodePanel'
@@ -8,11 +9,13 @@ import { ResultCard } from './ResultCard'
 import { Transport } from './Transport'
 import './game.css'
 
+const progressStore = new KeyValueProgressStore(window.localStorage)
+
 export default function GameApp() {
   const [levelId, setLevelId] = useState(LEVELS[0].id)
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = LEVELS[index + 1]
-  const session = useMemo(() => new GameSession(LEVELS[index]), [index])
+  const session = useMemo(() => new GameSession(LEVELS[index], progressStore), [index])
   const host = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

@@ -5,11 +5,11 @@ import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 export function CodePanel({ session }: { session: GameSession }) {
-  const fileName = useSession(session, (s) => s.codeFileName)
+  const fileName = 'cafeteria.rb'
   const file = useSession(session, (s) => s.codeFile)
-  const activeRef = useSession(session, (s) => s.activeRef)
-  const followed = useSession(session, (s) => s.followed)
-  const inspected = useSession(session, (s) => (s.inspected ? s.circuit.nodes.get(s.inspected)?.label : undefined))
+  const activeRef = useSession(session, (s) => s.playback.activeRef)
+  const followed = useSession(session, (s) => s.playback.followed)
+  const inspected = useSession(session, (s) => (s.playback.inspected ? s.playback.circuit.nodes.get(s.playback.inspected)?.label : undefined))
   const [highlighted, setHighlighted] = useState<{ text: string; tokens: Token[][] }>()
   const tokens = highlighted?.text === file.text ? highlighted.tokens : plainTokens(file.text)
   const body = useRef<HTMLDivElement>(null)

@@ -1,10 +1,11 @@
-import { SPEEDS, type GameSession } from '../game/session/GameSession'
+import { SPEEDS } from '../game/playback/Playback'
+import type { GameSession } from '../game/session/GameSession'
 import { useSession } from './useSession'
 
 export function Transport({ session }: { session: GameSession }) {
-  const playing = useSession(session, (s) => s.playing)
-  const speed = useSession(session, (s) => s.speed)
-  const tick = useSession(session, (s) => s.timeline.tick)
+  const playing = useSession(session, (s) => s.playback.playing)
+  const speed = useSession(session, (s) => s.playback.speed)
+  const tick = useSession(session, (s) => s.playback.timeline.tick)
 
   return (
     <div className="transport">

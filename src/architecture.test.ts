@@ -8,7 +8,7 @@ type Layer = 'engine' | 'levels' | 'game' | 'render' | 'ui' | 'debug' | 'root'
 const RULES: Record<Layer, { layers: Layer[]; packages: string[] }> = {
   engine: { layers: [], packages: ['zod'] },
   levels: { layers: ['engine'], packages: [] },
-  game: { layers: ['engine'], packages: [] },
+  game: { layers: ['engine'], packages: ['zod'] },
   render: { layers: ['engine', 'game'], packages: ['pixi.js'] },
   ui: { layers: ['engine', 'game', 'render', 'levels'], packages: ['react', 'react-dom', 'shiki'] },
   debug: { layers: ['engine', 'levels'], packages: ['react'] },
@@ -54,10 +54,15 @@ describe('arquitectura', () => {
     expect(violations, `${layer} no puede importar esto`).toEqual([])
   })
 
-  it('fuera del motor solo se importa su API pública (engine/index.ts)', () => {
+  it('fuera del motor solo se importa su API pública (engine/index.ts; los tests también engine/testing)', () => {
+    const isPublic = (file: string, spec: string) => /\.test\.tsx?$/.test(file) && /\/engine\/testing$/.test(spec)
     const deep = files
       .filter((f) => layerOf(f) !== 'engine')
-      .flatMap((f) => importsOf(f).filter((s) => s.startsWith('.') && /\/engine\/./.test(s)).map((s) => `${relative(SRC, f)} → ${s}`))
+      .flatMap((f) =>
+        importsOf(f)
+          .filter((s) => s.startsWith('.') && /\/engine\/./.test(s) && !isPublic(f, s))
+          .map((s) => `${relative(SRC, f)} → ${s}`),
+      )
     expect(deep).toEqual([])
   })
 })

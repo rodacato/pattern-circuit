@@ -61,7 +61,7 @@ export class NeonStage {
     s.update(delta)
     const time = performance.now()
     this.fit()
-    for (const e of s.drainEvents()) this.onEvent(e)
+    for (const e of s.playback.drainEvents()) this.onEvent(e)
 
     const d = this.dynamic.clear()
     const gl = this.glow.clear()
@@ -78,14 +78,14 @@ export class NeonStage {
     const s = this.session
     this.builtVersion = s.circuitVersion
     this.trails.clear()
-    const nodes = [...s.circuit.nodes.values()]
+    const nodes = [...s.playback.circuit.nodes.values()]
     this.bounds = circuitBounds(nodes)
 
     const g = this.base.clear()
     for (let x = -4; x <= this.bounds.w / CELL_PX + 4; x++) {
       for (let y = -4; y <= this.bounds.h / CELL_PX + 4; y++) g.circle(x * CELL_PX, y * CELL_PX, 1.3).fill({ color: C.grid })
     }
-    for (const w of s.circuit.wires.values()) {
+    for (const w of s.playback.circuit.wires.values()) {
       const pts = w.path.map(toPx)
       g.moveTo(pts[0].x, pts[0].y)
       for (const p of pts.slice(1)) g.lineTo(p.x, p.y)
@@ -111,7 +111,7 @@ export class NeonStage {
     box.hitArea = new Rectangle(-NODE_W / 2, -NODE_H / 2, NODE_W, NODE_H)
     box.on('pointerover', () => (this.hovered = n.id))
     box.on('pointerout', () => this.hovered === n.id && (this.hovered = undefined))
-    box.on('pointertap', () => this.session.inspect(this.session.inspected === n.id ? undefined : n.id))
+    box.on('pointertap', () => this.session.inspect(this.session.playback.inspected === n.id ? undefined : n.id))
 
     const label = new Text({ text: n.label, style: { fontFamily: FONT_UI, fontSize: 13, fontWeight: '600', fill: C.text } })
     label.anchor.set(0.5, 1)
@@ -154,7 +154,7 @@ export class NeonStage {
     const drag = this.drag
     if (!drag) return
     this.drag = undefined
-    const target = nodeAt(this.session.circuit.nodes.values(), drag.to)
+    const target = nodeAt(this.session.playback.circuit.nodes.values(), drag.to)
     if (!target) return
     const result = this.session.connect(drag.from, target.id)
     const at = nodeCenter(target)
@@ -175,10 +175,10 @@ export class NeonStage {
 
   private onEvent(e: SimEvent) {
     const s = this.session
-    const node = 'nodeId' in e ? s.circuit.nodes.get(e.nodeId) : undefined
+    const node = 'nodeId' in e ? s.playback.circuit.nodes.get(e.nodeId) : undefined
     if (!node) return
     const at = nodeCenter(node)
-    const pulse = 'pulseId' in e ? s.timeline.current.state.pulses.find((p) => p.id === e.pulseId) : undefined
+    const pulse = 'pulseId' in e ? s.playback.timeline.current.state.pulses.find((p) => p.id === e.pulseId) : undefined
     const color = pulse ? pulseColor(pulse.tags) : C.cyan
     switch (e.type) {
       case 'pulse.enter':
@@ -194,7 +194,7 @@ export class NeonStage {
         this.trails.delete(e.pulseId)
         break
       case 'pulse.deliver': {
-        const dup = (s.timeline.current.state.deliveredOrigins[pulse!.originId] ?? 0) > 1
+        const dup = (s.playback.timeline.current.state.deliveredOrigins[pulse!.originId] ?? 0) > 1
         this.burst(at, dup ? C.amber : C.green, 20, 2.4)
         this.float(at, dup ? '¡cobrado otra vez!' : `☕ ${pulse?.label ?? 'pedido'} entregado`, dup ? C.amber : C.green)
         this.trails.delete(e.pulseId)
@@ -207,7 +207,7 @@ export class NeonStage {
   }
 
   private drawFlow(d: Graphics, time: number) {
-    for (const w of this.session.circuit.wires.values()) {
+    for (const w of this.session.playback.circuit.wires.values()) {
       const abstract = w.dep === 'abstract'
       const step = 0.45 / w.length
       const offset = ((time / 1000) * 0.6) / w.length
@@ -226,8 +226,8 @@ export class NeonStage {
     const beat = 0.5 + 0.5 * Math.sin(time / 260)
     for (const r of s.pendingRepairs) {
       for (const w of r.patch.add?.wires ?? []) {
-        const a = s.circuit.nodes.get(w.from)
-        const b = s.circuit.nodes.get(w.to)
+        const a = s.playback.circuit.nodes.get(w.from)
+        const b = s.playback.circuit.nodes.get(w.to)
         if (!a || !b) continue
         const path = wirePath(a.at, b.at).map(toPx)
         const from = { x: path[0].x + NODE_W / 2, y: path[0].y }
@@ -240,16 +240,16 @@ export class NeonStage {
 
   private drawNodes(d: Graphics, gl: Graphics, time: number) {
     const s = this.session
-    const state = s.timeline.current.state
+    const state = s.playback.timeline.current.state
     const connecting = s.pendingRepairs.length > 0
-    for (const n of s.circuit.nodes.values()) {
+    for (const n of s.playback.circuit.nodes.values()) {
       const base = nodeCenter(n)
       const sh = this.shake.get(n.id) ?? 0
       const p = { x: base.x + Math.sin(time / 18) * sh * 5, y: base.y }
       this.views.get(n.id)!.x = p.x
       const f = this.flash.get(n.id)
       const touched = s.touched.includes(n.id)
-      const selected = s.inspected === n.id
+      const selected = s.playback.inspected === n.id
       const hover = this.hovered === n.id || (this.drag && this.overNode(n))
       const beat = touched ? 0.5 + 0.5 * Math.sin(time / 180) : 0
       const color = touched ? C.red : n.behavior.type === 'slot' ? C.violet : n.kind === 'actor' ? C.amber : C.cyan
@@ -302,7 +302,7 @@ export class NeonStage {
 
   private drawDrag(d: Graphics, gl: Graphics) {
     if (!this.drag) return
-    const from = outPort(this.session.circuit.nodes.get(this.drag.from)!)
+    const from = outPort(this.session.playback.circuit.nodes.get(this.drag.from)!)
     d.moveTo(from.x, from.y).lineTo(this.drag.to.x, this.drag.to.y).stroke({ width: 3, color: C.green, cap: 'round' })
     gl.moveTo(from.x, from.y).lineTo(this.drag.to.x, this.drag.to.y).stroke({ width: 8, color: C.green, alpha: 0.6 })
     d.circle(this.drag.to.x, this.drag.to.y, 5).fill({ color: C.green })
@@ -310,15 +310,15 @@ export class NeonStage {
 
   private drawPulses(d: Graphics, gl: Graphics) {
     const s = this.session
-    const prev = new Map(s.prevState.pulses.map((p) => [p.id, p]))
+    const prev = new Map(s.playback.prevState.pulses.map((p) => [p.id, p]))
     const perNode = new Map<string, number>()
     this.positions.clear()
     this.followLabel.visible = false
-    for (const p of s.timeline.current.state.pulses) {
+    for (const p of s.playback.timeline.current.state.pulses) {
       if (p.status !== 'alive') continue
       const slot = p.loc.kind === 'wire' ? 0 : (perNode.get(p.loc.nodeId) ?? 0)
       if (p.loc.kind !== 'wire') perNode.set(p.loc.nodeId, slot + 1)
-      const pos = pulsePosition(s.circuit, p, prev.get(p.id), s.alpha, slot)
+      const pos = pulsePosition(s.playback.circuit, p, prev.get(p.id), s.playback.alpha, slot)
       this.positions.set(p.id, pos)
       const color = pulseColor(p.tags)
       const trail = this.trails.get(p.id) ?? []
@@ -333,7 +333,7 @@ export class NeonStage {
       gl.circle(pos.x, pos.y, 13).fill({ color, alpha: 0.9 })
       d.circle(pos.x, pos.y, 6.5).fill({ color })
       d.circle(pos.x, pos.y, 3).fill({ color: 0xffffff })
-      if (s.followed === p.id) {
+      if (s.playback.followed === p.id) {
         this.followLabel.text = `#${p.id}${p.label ? ` · ${p.label}` : ''}`
         this.followLabel.position.set(pos.x, pos.y - 16)
         this.followLabel.visible = true
