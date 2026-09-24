@@ -32,6 +32,7 @@ npm run coverage # cobertura con umbrales
 - **El motor es determinista**: nada de `Math.random()` ni de tiempo real dentro de `engine/`.
 - Identificadores en inglés; comentarios, textos de UI y documentación en español.
 - Comentarios cortos que explican el *porqué*, no el *qué*.
+- Textos: escríbelos en español donde se muestran, con `t()` / `msg()` / `N()`, y agrega su traducción al catálogo inglés (`src/i18n/en/`); el test de cobertura avisa si falta alguno.
 - Accesibilidad: todo lo nuevo tiene que poder usarse con teclado, y los controles con ícono llevan `aria-label`.
 
 ## Agregar un nivel
@@ -39,7 +40,8 @@ npm run coverage # cobertura con umbrales
 1. Crea `src/levels/LNN-nombre/` con:
    - `level.ts`: los datos, con `defineLevel` y los ayudantes de `levels/kit.ts`;
    - los fragmentos `.rb`, con regiones `# region: Clase#metodo` / `# endregion` para cada `codeRef`;
-   - `level.test.ts`: el comportamiento pedagógico de cada opción ("Observer cobra tres veces", "Strategy + ticket toca 0 nodos").
+   - `level.test.ts`: el comportamiento pedagógico de cada opción ("Observer cobra tres veces", "Strategy + ticket toca 0 nodos");
+   - `en.ts`: la traducción al inglés de cada texto del nivel (el test de cobertura de `i18n` dice cuáles faltan).
 2. El registro lo descubre solo. `defineLevel` valida todas las variantes alcanzables y `levels.test.ts` comprueba las invariantes comunes (sin patrón se falla, con el correcto se gana, ningún incorrecto gana…).
 3. Si el nivel va en un capítulo nuevo, agrégalo en `levels/chapters.ts`, en orden.
 4. Actualiza la tabla de progresión en [docs/DESIGN.md](docs/DESIGN.md).

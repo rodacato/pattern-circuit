@@ -1,5 +1,6 @@
 import { NEON as C, pulseColor } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
+import { N } from '../../i18n'
 import { arc } from '../draw'
 import type { Skin } from './types'
 
@@ -108,7 +109,7 @@ export function chainOfResponsibility(): Skin {
     },
     onEvent({ fx }, node, at, e) {
       if (e.type === 'pulse.enter') scans.set(node.id, 1)
-      if (e.type === 'pulse.exit') fx.float(at, e.wireId.includes('.next') ? 'no me toca → siguiente' : '✓ lo atiendo', e.wireId.includes('.next') ? C.muted : C.green)
+      if (e.type === 'pulse.exit') fx.float(at, e.wireId.includes('.next') ? N('no me toca → siguiente') : N('✓ lo atiendo'), e.wireId.includes('.next') ? C.muted : C.green)
     },
   }
 }

@@ -3,21 +3,24 @@ import { collapse, resolveRegion } from '../engine'
 import { highlightRuby, plainTokens, type Token } from './code/highlight'
 import type { GameSession } from '../game/session/GameSession'
 import { prefersReducedMotion } from '../render/motion'
+import { msg } from '../i18n'
+import { useT } from './i18nContext'
 import { useSession } from './useSession'
 
 export function CodePanel({ session }: { session: GameSession }) {
+  const t = useT()
   const comparing = useSession(session, (s) => s.flow.stage === 'compare' || s.flow.stage === 'complete')
   const [view, setView] = useState<'code' | 'diff'>('code')
   const showDiff = comparing && view === 'diff'
   return (
     <aside className="code-panel">
       {comparing && (
-        <div className="code-tabs" role="tablist" aria-label="Vista del código">
+        <div className="code-tabs" role="tablist" aria-label={t('Vista del código')}>
           <button role="tab" aria-selected={!showDiff} className={showDiff ? '' : 'on'} onClick={() => setView('code')}>
-            Código
+            {t('Código')}
           </button>
           <button role="tab" aria-selected={showDiff} className={showDiff ? 'on' : ''} onClick={() => setView('diff')}>
-            Cambios
+            {t('Cambios')}
           </button>
         </div>
       )}
@@ -28,23 +31,24 @@ export function CodePanel({ session }: { session: GameSession }) {
 
 // Qué líneas de Ruby cambian entre sin y con patrón (o con el ticket), con el resto resumido.
 function CodeDiff({ session }: { session: GameSession }) {
+  const t = useT()
   useSession(session, (s) => s.flow.side) // re-render al cambiar de lado
   const change = session.codeChange
   if (!change) return null
   return (
     <>
       <div className="code-head">
-        <span className="file">{change.title}</span>
+        <span className="file">{t(change.title)}</span>
         <span className="ref">
           <b className="add">+{change.added}</b> <b className="del">−{change.removed}</b>
         </span>
       </div>
-      <div className="code-body diff" tabIndex={0} aria-label={`${change.title}: ${change.added} líneas agregadas, ${change.removed} quitadas`}>
+      <div className="code-body diff" tabIndex={0} aria-label={t(msg('{title}: {added} líneas agregadas, {removed} quitadas', { title: t(change.title), added: change.added, removed: change.removed }))}>
         {collapse(change.lines).map((c, i) =>
           c.kind === 'skip' ? (
             <div key={i} className="line skip">
               <span className="ln">⋯</span>
-              <span>{c.count} líneas sin cambios</span>
+              <span>{t(msg('{count} líneas sin cambios', { count: c.count }))}</span>
             </div>
           ) : (
             <div key={i} className={`line ${c.kind}`}>
@@ -54,12 +58,13 @@ function CodeDiff({ session }: { session: GameSession }) {
           ),
         )}
       </div>
-      <div className="code-foot">Verde: líneas nuevas. Rojo: líneas que hubo que quitar o cambiar. Mira en qué clases caen.</div>
+      <div className="code-foot">{t('Verde: líneas nuevas. Rojo: líneas que hubo que quitar o cambiar. Mira en qué clases caen.')}</div>
     </>
   )
 }
 
 function CodeView({ session }: { session: GameSession }) {
+  const t = useT()
   const fileName = 'cafeteria.rb'
   const file = useSession(session, (s) => s.codeFile)
   const activeRef = useSession(session, (s) => s.playback.activeRef)
@@ -84,7 +89,7 @@ function CodeView({ session }: { session: GameSession }) {
     body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
   }, [region?.start, file.text])
 
-  const source = followed !== undefined && activeRef ? `pulso #${followed}` : inspected ? `nodo · ${inspected}` : undefined
+  const source = followed !== undefined && activeRef ? t(msg('pulso #{id}', { id: followed })) : inspected ? t(msg('nodo · {label}', { label: inspected })) : undefined
 
   return (
     <>
@@ -97,7 +102,7 @@ function CodeView({ session }: { session: GameSession }) {
           </span>
         )}
       </div>
-      <div className="code-body" ref={body} tabIndex={0} aria-label="Código Ruby del circuito">
+      <div className="code-body" ref={body} tabIndex={0} aria-label={t('Código Ruby del circuito')}>
         {tokens.map((line, i) => {
           const on = !!region && i + 1 >= region.start && i + 1 <= region.end
           return (
@@ -116,7 +121,7 @@ function CodeView({ session }: { session: GameSession }) {
           )
         })}
       </div>
-      <div className="code-foot">Haz clic en un nodo o en un pulso para seguir su código.</div>
+      <div className="code-foot">{t('Haz clic en un nodo o en un pulso para seguir su código.')}</div>
     </>
   )
 }

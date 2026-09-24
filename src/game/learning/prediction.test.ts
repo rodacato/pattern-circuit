@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { identity } from '../../i18n'
 import { choiceLabel, guessed, isRight, outcomePrediction, touchedPrediction } from './prediction'
 
 describe('predicciones', () => {
   it('la respuesta de una predicción de resultado es el resultado de la opción', () => {
     const p = outcomePrediction('Strategy', 'partial')
     expect(p.answer).toBe('partial')
-    expect(p.question).toContain('Strategy')
+    expect(identity(p.question)).toContain('Strategy')
     expect(isRight(p)).toBe(false)
     expect(isRight(guessed(p, 'partial'))).toBe(true)
     expect(isRight(guessed(p, 'solves'))).toBe(false)

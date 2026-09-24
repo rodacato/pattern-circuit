@@ -21,7 +21,7 @@ Juego educativo para entender **patrones de diseño viéndolos, no leyéndolos**
 | Reparar un cable (nivel 0) | arrastrar desde el puerto de salida | botón "Conectar… sin arrastrar" |
 | Cámara | rueda: zoom · arrastrar el fondo · doble clic: encuadrar | — |
 
-El progreso se guarda en tu navegador (`localStorage`). Se borra desde el Cuaderno. El juego está pensado para pantallas de escritorio y respeta la preferencia de movimiento reducido del sistema.
+Está en **español e inglés** (botón ES/EN arriba). El progreso se guarda en tu navegador (`localStorage`). Se borra desde el Cuaderno. El juego está pensado para pantallas de escritorio y respeta la preferencia de movimiento reducido del sistema.
 
 | Capítulo | Niveles | Patrones |
 |---|---|---|

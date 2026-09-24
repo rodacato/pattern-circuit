@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
+import { identity } from '../../i18n'
 import { LEVELS } from '../../levels'
 import { emptyProgress, MemoryProgressStore } from '../progress/progress'
 import { GameSession } from './GameSession'
@@ -214,12 +215,12 @@ describe('GameSession · cambios en el código', () => {
     s.showSide('without')
     const added = s.codeChange!.lines.filter((l) => l.kind === 'add').map((l) => l.text.trim())
     expect(added.some((l) => l.startsWith('elsif order.payment == :app'))).toBe(true) // una rama nueva dentro de Cashier
-    expect(s.codeChange?.title).toContain('sin patrón')
+    expect(identity(s.codeChange!.title)).toContain('sin patrón')
   })
 
   it('sin ticket compara el código sin patrón con el código con patrón', () => {
     const s = toCompare('L03-builder')
-    expect(s.codeChange?.title).toContain('Builder')
+    expect(identity(s.codeChange!.title)).toContain('Builder')
     expect(s.codeChange!.added + s.codeChange!.removed).toBeGreaterThan(0)
   })
 
