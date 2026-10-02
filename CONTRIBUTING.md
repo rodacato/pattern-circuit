@@ -1,70 +1,72 @@
-# Contribuir a Pattern Circuit
+# Contributing to Pattern Circuit
 
-¡Gracias por el interés! Este documento explica cómo preparar el entorno, qué se espera de un cambio y cómo agregar niveles o patrones.
+Thanks for your interest! This document explains how to set up the environment, what a change is expected to include and how to add levels or patterns.
 
-## Entorno
+## Environment
 
-- Node 22 o superior.
-- Ruby (opcional): si está instalado, `npm test` corre `ruby -wc` sobre cada archivo Ruby que ve el jugador.
+- Node 22 or later.
+- Ruby (optional): if it is installed, `npm test` runs `ruby -wc` on every Ruby file the player sees.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173 (añade ?debug para la vista del motor)
-npm run check    # tipos + lint + tests: debe pasar antes de cada commit
-npm run coverage # cobertura con umbrales
+npm run dev      # http://localhost:5173 (add ?debug for the engine view)
+npm run check    # types + lint + tests: must pass before every commit
+npm run coverage # coverage with thresholds
 ```
 
-## Flujo de trabajo
+## Workflow
 
-1. Crea una rama desde `main`.
-2. Haz commits pequeños y enfocados. Los mensajes van en español, con el formato `tipo(ámbito): qué cambia`:
-   - tipos: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`;
-   - ámbitos habituales: `engine`, `game`, `render`, `ui`, `levels`, `contenido`.
-3. `npm run check` en verde. Si cambias lógica, agrega o ajusta tests.
-4. Anota el cambio en la sección `[Unreleased]` de [CHANGELOG.md](CHANGELOG.md).
-5. Abre un pull request; CI corre las mismas verificaciones.
+1. Create a branch from `main`.
+2. Make small, focused commits. Commit messages are written in English, in the format `type(scope): what changes`:
+   - types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`;
+   - usual scopes: `engine`, `game`, `render`, `ui`, `levels`, `content`.
+3. `npm run check` must be green. If you change logic, add or adjust tests.
+4. Note the change in the `[Unreleased]` section of [CHANGELOG.md](CHANGELOG.md).
+5. Open a pull request; CI runs the same checks.
 
-## Reglas del código
+## Code rules
 
-- **Capas**: `engine ← levels`, `engine ← game ← render ← ui`. Las reglas están en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) y `src/architecture.test.ts` las hace cumplir. Si ese test falla, la solución casi nunca es relajar la regla.
-- **Fuera de `engine/` solo se importa `engine/index.ts`.**
-- **La lógica no vive en componentes ni en el render**: si hay que decidir algo, va a `game/` (funciones puras cuando se pueda) con su test.
-- **El motor es determinista**: nada de `Math.random()` ni de tiempo real dentro de `engine/`.
-- Identificadores en inglés; comentarios, textos de UI y documentación en español.
-- Comentarios cortos que explican el *porqué*, no el *qué*.
-- Textos: escríbelos en español donde se muestran, con `t()` / `msg()` / `N()`, y agrega su traducción al catálogo inglés (`src/i18n/en/`); el test de cobertura avisa si falta alguno.
-- Accesibilidad: todo lo nuevo tiene que poder usarse con teclado, y los controles con ícono llevan `aria-label`.
+- **Everything that is code is English**: identifiers (including the ids in level data: nodes, sockets, tickets, tags, chapters), file and folder names, comments, test titles, commit messages and documentation. The only Spanish that remains is text the player reads (see "Texts" below).
+- **Layers**: `engine ← levels`, `engine ← game ← render ← ui`. The rules are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and `src/architecture.test.ts` enforces them. If that test fails, the fix is almost never to relax the rule.
+- **Outside `engine/` only `engine/index.ts` is imported.**
+- **Logic does not live in components or in the render**: if something has to be decided, it goes to `game/` (pure functions when possible) with its test.
+- **The engine is deterministic**: no `Math.random()` and no real time inside `engine/`.
+- Short comments that explain the *why*, not the *what*.
+- Texts: write them in Spanish where they are shown, with `t()` / `msg()` / `N()`, and add their translation to the English catalog (`src/i18n/en/`); the coverage test tells you which ones are missing.
+- Accessibility: everything new must be usable with the keyboard, and controls with an icon carry an `aria-label`.
 
-## Agregar un nivel
+## Adding a level
 
-1. Crea `src/levels/LNN-nombre/` con:
-   - `level.ts`: los datos, con `defineLevel` y los ayudantes de `levels/kit.ts`;
-   - los fragmentos `.rb`, con regiones `# region: Clase#metodo` / `# endregion` para cada `codeRef`;
-   - sus equivalentes TypeScript en `ts/`, con las mismas claves, la misma historia línea a línea y regiones `// region:` con los mismos nombres;
-   - `level.test.ts`: el comportamiento pedagógico de cada opción ("Observer cobra tres veces", "Strategy + ticket toca 0 nodos");
-   - `en.ts`: la traducción al inglés de cada texto del nivel (el test de cobertura de `i18n` dice cuáles faltan).
-2. El registro lo descubre solo. `defineLevel` valida todas las variantes alcanzables y `levels.test.ts` comprueba las invariantes comunes (sin patrón se falla, con el correcto se gana, ningún incorrecto gana…).
-3. Si el nivel va en un capítulo nuevo, agrégalo en `levels/chapters.ts`, en orden.
-4. Actualiza la tabla de progresión en [docs/DESIGN.md](docs/DESIGN.md).
+1. Create `src/levels/<id>/` (the folder name is the level id: lowercase English words separated by hyphens, **no ordinal**; the position comes from `order`) with:
+   - `level.ts`: the data, using `defineLevel` and the helpers from `levels/kit.ts`;
+   - the Ruby snippets (`.rb`), with `# region: Class#method` / `# endregion` regions for every `codeRef`;
+   - their TypeScript equivalents in `ts/`, with the same keys, the same story line by line and `// region:` regions with the same names;
+   - `level.test.ts`: the pedagogical behavior of each option ("Observer charges three times", "Strategy + ticket touches 0 nodes");
+   - `en.ts`: the English translation of every text of the level (the `i18n` coverage test says which ones are missing).
+   Everything inside the snippets (identifiers, comments, output strings) is English.
+2. The registry discovers it by itself. `defineLevel` validates every reachable variant and `levels.test.ts` checks the common invariants (without a pattern it fails, with the right one it wins, no wrong one wins…).
+3. Ids are permanent: they are stored in the players' saved progress. If one ever has to change, add the old id to `LEGACY_LEVEL_IDS` / `LEGACY_SOCKET_IDS` in `src/game/progress/progress.ts`.
+4. If the level goes in a new chapter, add it in `levels/tracks.ts`, in order.
+5. Update the progression table in [docs/DESIGN.md](docs/DESIGN.md).
 
-## Agregar un patrón
+## Adding a pattern
 
-1. Súmalo a `PATTERN_IDS` (`engine/schema.ts`) y a `PATTERNS` (`engine/patterns.ts`), con su familia y su idea en una frase.
-2. Dale una skin en `render/skins/` (el tipo exige una por patrón).
-3. Enséñalo en algún nivel (un test lo exige).
-4. Agrega su fuente a la sección "Fuentes" de [docs/DESIGN.md](docs/DESIGN.md).
+1. Add it to `PATTERN_IDS` (`engine/schema.ts`) and to `PATTERNS` (`engine/patterns.ts`), with its family and its idea in one sentence.
+2. Give it a skin in `render/skins/` (the type requires one).
+3. Teach it in some level (a test requires it).
+4. Add its source to the "Sources" section of [docs/DESIGN.md](docs/DESIGN.md).
 
-## Contenido: nada inventado
+## Content: nothing made up
 
-Pattern Circuit enseña, así que el contenido tiene que ser correcto:
+Pattern Circuit teaches, so the content has to be correct:
 
-- Cada idea, nota de campo y veredicto (`solves`, `partial`, `misfit`) tiene que poder respaldarse con una fuente verificable: libro, paper o artículo del autor del patrón. Cita la fuente en el PR.
-- Si el juego simplifica, que la simplificación no contradiga la fuente. Si enseña una variante (por ejemplo, el Builder de Bloch), se nombra en la documentación.
-- Textos simples, cortos y concretos, en el mundo de la cafetería.
+- Every idea, field note and verdict (`solves`, `partial`, `misfit`) must be backed by a verifiable source: a book, a paper or an article by the pattern's author. Cite the source in the PR.
+- If the game simplifies, the simplification must not contradict the source. If it teaches a variant (for example Bloch's Builder), it is named in the documentation.
+- Simple, short, concrete texts, in the cafeteria's world.
 
-## Publicar una versión
+## Publishing a release
 
-1. Mueve lo de `[Unreleased]` a una sección nueva `[X.Y.Z] - AAAA-MM-DD` en [CHANGELOG.md](CHANGELOG.md), según [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
-2. Sube la versión en `package.json` según [Versionado Semántico](https://semver.org/lang/es/). Un cambio que invalide el progreso guardado o el formato de niveles es un cambio mayor.
-3. Commit `chore(release): vX.Y.Z` y tag anotado `vX.Y.Z`.
-4. Push de `main` y del tag: el deploy a GitHub Pages es automático.
+1. Move what is under `[Unreleased]` to a new `[X.Y.Z] - YYYY-MM-DD` section in [CHANGELOG.md](CHANGELOG.md), following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+2. Bump the version in `package.json` following [Semantic Versioning](https://semver.org/). A change that invalidates saved progress or the level format is a major change.
+3. Commit `chore(release): vX.Y.Z` and an annotated tag `vX.Y.Z`.
+4. Push `main` and the tag: the deploy to GitHub Pages is automatic.

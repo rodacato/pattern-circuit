@@ -1,59 +1,69 @@
 # Changelog
 
-Todos los cambios relevantes de Pattern Circuit se documentan en este archivo.
+All notable changes to Pattern Circuit are documented in this file.
 
-El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/). Para un juego, "API pública" significa: el formato de los niveles (`LevelDef`), la API del motor (`engine/index.ts`) y el progreso guardado del jugador; un cambio que rompa el progreso guardado es un cambio mayor.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/). For a game, "public API" means: the level format (`LevelDef`), the engine API (`engine/index.ts`) and the player's saved progress; a change that breaks saved progress is a major change.
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-09-24
+### Changed
 
-Mejoras de aprendizaje: predecir, ver el cambio en el código, repasar, saber cuándo no usar un patrón y reconocerlo en código real. Además, inglés, TypeScript y tablets.
+- **Everything that is code is English.** Level ids and folders no longer carry their position (`strategy`, `branches-and-payments`, `full-cafe`…); the ids of nodes, sockets, repairs, tickets, scenarios, wires, tags, ports and chapters, the snippet files and code keys, the test titles, the comments and the documentation are all English. Commits are in English from now on.
+- The Ruby and TypeScript snippets shown in the code panel are fully English: comments, output strings and identifiers (for example `Charged: …`, `:oat`, `OatMilkLatte`). The texts the player reads in the game (briefs, notes, labels) are unchanged.
+- Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).
 
 ### Added
 
-- **Predecir antes de ver**: al enchufar un patrón el juego pregunta qué hará (resuelve, a medias, no encaja), y antes de un ticket, cuántas piezas habrá que modificar. Después de correr, muestra si acertaste; el Cuaderno lleva la cuenta de predicciones acertadas.
-- **Cambios en el código**: en la comparación, la pestaña "Cambios" del panel muestra qué líneas de Ruby se agregaron o quitaron (con ticket: lo que el ticket obligó a tocar, sin y con patrón).
-- **Repaso espaciado**: el botón "Repasar" plantea problemas de niveles ya completados, sin circuito, para elegir el patrón. Cada respuesta se explica con su nota de campo; los aciertos vuelven cada vez más espaciados (1, 3, 7, 14 y 30 días) y los errores, en la próxima ronda.
-- **Capítulo "Criterio: cuándo no"** (niveles 24 y 25): problemas donde gana arreglar lo justo, sin agregar un patrón que nada pide todavía (YAGNI). Nueva métrica: piezas en el circuito.
-- **Dónde lo has visto**: cada patrón muestra un ejemplo real en Ruby o Rails (Rack middleware, SimpleDelegator, `Post.none`, ActiveJob…) con enlace a su documentación, en el Cuaderno y al superar el nivel.
-- **Pistas escalonadas**: en vez de la respuesta, primero una pregunta guía según el síntoma, luego la familia del patrón (con las definiciones de GoF), después un descarte y, al final, el patrón.
-- **Táctil y tablet**: pellizcar para zoom, doble toque para encuadrar, blancos más grandes con el dedo y layout vertical (circuito arriba, código abajo) hasta 1000 px. En teléfonos (menos de 600 px) sigue el aviso.
-- **Versión en inglés**: botón ES/EN en la barra superior; toda la interfaz, los 27 niveles, las pistas, las notas y los ejemplos traducidos. El idioma se recuerda en el navegador. Los comentarios del código siguen en español.
-- **Código en TypeScript**: el panel de código cambia entre Ruby y TypeScript; los 27 niveles cuentan la misma historia en los dos lenguajes. La elección se recuerda en el navegador.
+- A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.
+
+## [1.1.0] - 2026-09-24
+
+Learning improvements: predict, see the change in the code, review, know when not to use a pattern and recognize it in real code. Also English, TypeScript and tablets.
+
+### Added
+
+- **Predict before seeing**: when a pattern is plugged in, the game asks what it will do (solves, partially, does not fit), and before a ticket, how many pieces will have to be modified. After running, it shows whether you were right; the notebook keeps count of correct predictions.
+- **Changes in the code**: in the comparison, the panel's "Changes" tab shows which Ruby lines were added or removed (with a ticket: what the ticket forced to touch, without and with a pattern).
+- **Spaced review**: the "Review" button poses problems from levels already completed, without a circuit, to choose the pattern. Every answer is explained with its field note; correct answers return at growing intervals (1, 3, 7, 14 and 30 days) and mistakes in the next round.
+- **"Judgment: when not to" chapter** (levels 24 and 25): problems where fixing just what is needed wins, without adding a pattern nothing asks for yet (YAGNI). New metric: pieces in the circuit.
+- **Where you've seen it**: each pattern shows a real example in Ruby or Rails (Rack middleware, SimpleDelegator, `Post.none`, ActiveJob…) with a link to its documentation, in the notebook and when the level is passed.
+- **Tiered hints**: instead of the answer, first a guiding question according to the symptom, then the pattern's family (with GoF's definitions), then an elimination and, at the end, the pattern.
+- **Touch and tablet**: pinch to zoom, double tap to fit, larger finger targets and a vertical layout (circuit on top, code below) up to 1000 px. On phones (under 600 px) the notice remains.
+- **English version**: ES/EN button in the top bar; the whole interface, the 27 levels, the hints, the notes and the examples translated. The language is remembered in the browser. Code comments are still in Spanish.
+- **TypeScript code**: the code panel switches between Ruby and TypeScript; the 27 levels tell the same story in both languages. The choice is remembered in the browser.
 
 ### Changed
 
-- Los capítulos pertenecen a un **tema** (`levels/tracks.ts`): preparación para sumar recorridos nuevos (por ejemplo, sistemas completos con CQRS, eventos o microservicios) sin tocar el motor.
-- La cafetería completa pasa a ser el nivel 26. El progreso guardado con el id anterior se traduce solo.
+- Chapters belong to a **track** (`levels/tracks.ts`): preparation for adding new paths (for example, complete systems with CQRS, events or microservices) without touching the engine.
+- The whole cafeteria becomes level 26. Progress saved with the previous id is translated automatically.
 
 ### Fixed
 
-- En escritorios angostos (1024 px), la tarjeta del nivel ya no tapa la tarjeta de etapa, y la leyenda no tapa el inventario.
-- El título del panel de código ya no queda separado por un espacio enorme cuando aparecen las pestañas.
+- On narrow desktops (1024 px), the level card no longer covers the stage card, and the legend no longer covers the inventory.
+- The code panel's title is no longer separated by a huge gap when the tabs appear.
 
 ## [1.0.0] - 2026-09-24
 
-Primera versión pública.
+First public release.
 
 ### Added
 
-- **25 niveles** (0–24) en ocho capítulos de una cafetería que crece: Apertura, El mostrador, La barra crece, Hora pico, Todo junto, Arquitectura, Resiliencia y La cafetería completa.
-- **20 patrones**: Factory Method, Builder, Singleton, Adapter, Decorator, Composite, Facade, Proxy, Strategy, Observer, State, Command, Chain of Responsibility, Template Method, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker y Saga.
-- Ritmo de cada nivel: observar el problema → elegir un patrón → aplicar un ticket de cambio → comparar sin/con patrón.
-- Niveles de combinación con varios sockets (Factory Method + Strategy, Composite + Decorator, State + Observer + Command).
-- Notas de campo para cada patrón probado, también los que no encajan, reunidas en el **Cuaderno de patrones**.
-- Contenido verificado contra las fuentes originales, con bibliografía en `docs/DESIGN.md`.
-- Panel de código Ruby con resaltado que sigue al pulso o al nodo seleccionado.
-- Render neón con PixiJS: firma visual por patrón, estelas, partículas, cámara con zoom y paneo.
-- Controles de reproducción: play/pausa, paso adelante y atrás, velocidades y atajos de teclado.
-- Juego completo con teclado: cartuchos con Enter/Espacio y reparación de cables sin arrastrar.
-- Accesibilidad: nombres accesibles, tarjetas anunciadas (`role="status"`), cuaderno como diálogo, foco visible y soporte de `prefers-reduced-motion`.
-- Progreso guardado en `localStorage` con esquema versionado, y opción para borrarlo.
-- Motor de simulación determinista con 14 primitivas, parches de circuito y métrica de nodos modificados.
-- Validación exhaustiva de cada nivel: todas las variantes alcanzables compilan, tienen escenario y código.
-- Vista de depuración del motor (`?debug`).
-- Deploy estático a GitHub Pages y CI para pull requests con GitHub Actions.
+- **25 levels** (0–24) in eight chapters of a growing cafeteria: Opening, The counter, The bar grows, Rush hour, All together, Architecture, Resilience and The whole cafeteria.
+- **20 patterns**: Factory Method, Builder, Singleton, Adapter, Decorator, Composite, Facade, Proxy, Strategy, Observer, State, Command, Chain of Responsibility, Template Method, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker and Saga.
+- Rhythm of every level: observe the problem → pick a pattern → apply a change ticket → compare without/with the pattern.
+- Combination levels with several sockets (Factory Method + Strategy, Composite + Decorator, State + Observer + Command).
+- Field notes for every pattern tried, also the ones that do not fit, gathered in the **pattern notebook**.
+- Content verified against the original sources, with the bibliography in `docs/DESIGN.md`.
+- Ruby code panel with highlighting that follows the pulse or the selected node.
+- Neon render with PixiJS: visual signature per pattern, trails, particles, camera with zoom and pan.
+- Playback controls: play/pause, step forward and back, speeds and keyboard shortcuts.
+- Fully playable with the keyboard: cartridges with Enter/Space and wire repair without dragging.
+- Accessibility: accessible names, announced cards (`role="status"`), the notebook as a dialog, visible focus and `prefers-reduced-motion` support.
+- Progress saved in `localStorage` with a versioned schema, and an option to erase it.
+- Deterministic simulation engine with 14 primitives, circuit patches and a modified-nodes metric.
+- Exhaustive validation of every level: all reachable variants compile and have a scenario and code.
+- Engine debug view (`?debug`).
+- Static deploy to GitHub Pages and CI for pull requests with GitHub Actions.
 
 
 [Unreleased]: https://github.com/rodacato/pattern-circuit/compare/v1.1.0...HEAD
