@@ -8,15 +8,15 @@ import type { Pulse } from './types'
 const node = (id: string, x: number, behavior: object, y = 0, extra: object = {}) => ({ id, label: id, at: [x, y], behavior, ...extra })
 const graph = (nodes: object[], wires: object[]) => Circuit.parse({ nodes, wires })
 
-describe('primitivas sin memoria', () => {
-  it('guard: deja pasar lo que cumple y pierde lo demás con motivo `guard`', () => {
+describe('memoryless primitives', () => {
+  it('guard: lets through what holds and drops the rest with reason `guard`', () => {
     const c = line({ src: { type: 'source' }, g: { type: 'guard', require: { hasTag: 'ok' }, onFail: 'drop' }, out: { type: 'sink' } })
     const { sim, events } = runToEnd(createSim(c, scenario({ at: 0, tags: ['ok'] }, { at: 5 })))
     expect(sim.state.metrics).toMatchObject({ delivered: 1, dropped: 1 })
     expect(events.find((e) => e.type === 'pulse.drop')).toMatchObject({ reason: 'guard' })
   })
 
-  it('guard: con `onFail` desvía lo rechazado por ese puerto', () => {
+  it('guard: with `onFail` diverts what is rejected through that port', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('g', 2, { type: 'guard', require: { hasTag: 'ok' }, onFail: 'no' }), node('si', 4, { type: 'sink' }), node('no', 4, { type: 'sink' }, 2)],
       [{ from: 'src', to: 'g' }, { from: 'g', to: 'si' }, { from: 'g', port: 'no', to: 'no' }],
@@ -25,7 +25,7 @@ describe('primitivas sin memoria', () => {
     expect(sim.state.pulses.map((p) => p.trail.at(-1))).toEqual(['si', 'no'])
   })
 
-  it('slot: enruta por la clave del cable y pierde lo que nadie registró', () => {
+  it('slot: routes by the wire key and drops what nobody registered', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('s', 2, { type: 'slot' }), node('a', 4, { type: 'sink' }), node('b', 4, { type: 'sink' }, 2)],
       [{ from: 'src', to: 's' }, { from: 's', to: 'a', key: 'a', dep: 'abstract' }, { from: 's', to: 'b', key: 'b', dep: 'abstract' }],
@@ -35,7 +35,7 @@ describe('primitivas sin memoria', () => {
     expect(events.find((e) => e.type === 'pulse.drop')).toMatchObject({ reason: 'unhandled' })
   })
 
-  it('sink: `expects` cuenta pedidos equivocados y `uniqueBy` los repetidos', () => {
+  it('sink: `expects` counts wrong orders and `uniqueBy` the repeated ones', () => {
     const expects = line({ src: { type: 'source' }, out: { type: 'sink', expects: { hasTag: 'latte' } } })
     expect(runToEnd(createSim(expects, scenario({ at: 0, tags: ['latte'] }, { at: 5, tags: ['te'] }))).sim.state.metrics).toMatchObject({ delivered: 2, invalidAtSink: 1 })
     const unique = graph([node('src', 0, { type: 'source' }), node('out', 2, { type: 'sink', uniqueBy: 'n' })], [{ from: 'src', to: 'out' }])
@@ -44,8 +44,8 @@ describe('primitivas sin memoria', () => {
   })
 })
 
-describe('primitivas con estado', () => {
-  it('breaker: su cuenta de fallos no se mezcla con la de un counter', () => {
+describe('stateful primitives', () => {
+  it('breaker: its failure count is not mixed with that of a counter', () => {
     const c = graph(
       [
         node('src', 0, { type: 'source' }),
@@ -62,7 +62,7 @@ describe('primitivas con estado', () => {
     expect(sim.state.nodeState.b).toBeUndefined()
   })
 
-  it('buffer: una cancelación que esperaba en cola también anula su orden', () => {
+  it('buffer: a cancellation that waited in the queue also cancels its order', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('buf', 2, { type: 'buffer', cancelTag: 'undo', match: 'order' }, 0, { capacity: 2, cost: 30 }), node('out', 4, { type: 'sink' }), node('orphan', 4, { type: 'sink' }, 2)],
       [{ from: 'src', to: 'buf' }, { from: 'buf', to: 'out' }, { from: 'buf', port: 'orphan', to: 'orphan' }],
@@ -70,36 +70,36 @@ describe('primitivas con estado', () => {
     const pulses = [
       { at: 0, tags: [], data: { order: 1 } },
       { at: 5, tags: [], data: { order: 2 } },
-      { at: 6, tags: ['undo'], data: { order: 2 } }, // llega con el buffer lleno: espera en cola
+      { at: 6, tags: ['undo'], data: { order: 2 } }, // arrives with the buffer full: waits in the queue
     ]
     const { sim } = runToEnd(createSim(c, { id: 's', pulses: pulses.map((p) => ({ ...p, from: 'src', shape: 'circle' as const })) }))
     expect(sim.state.metrics).toMatchObject({ cancelled: 1, delivered: 1 })
   })
 
-  it('estado inicial: la máquina arranca en `initial` y el interruptor cerrado', () => {
+  it('initial state: the machine starts at `initial` and the breaker closed', () => {
     expect(initialNodeState({ type: 'machine', initial: 'nuevo', states: {}, else: 'drop' })).toBe('nuevo')
     expect(initialNodeState({ type: 'breaker', threshold: 1, failTag: 'x' })).toBe('cerrado')
     expect(initialNodeState({ type: 'pass' })).toBeUndefined()
   })
 })
 
-describe('límites de la simulación', () => {
-  it('rechaza escenarios que salen de un nodo inexistente', () => {
+describe('simulation limits', () => {
+  it('rejects scenarios that start at a nonexistent node', () => {
     const c = line({ src: { type: 'source' }, out: { type: 'sink' } })
     expect(() => createSim(c, { id: 's', pulses: [{ at: 0, from: 'nadie', tags: [], shape: 'circle', data: {} }] })).toThrow(/nadie/)
   })
 
-  it('runToEnd corta un circuito que no termina', () => {
+  it('runToEnd cuts off a circuit that never ends', () => {
     const c = graph([node('src', 0, { type: 'source' }), node('a', 2, { type: 'pass' }), node('b', 4, { type: 'pass' }, 2)], [{ from: 'src', to: 'a' }, { from: 'a', to: 'b' }, { from: 'b', to: 'a' }])
     expect(() => runToEnd(createSim(c, scenario({ at: 0 })), 500)).toThrow(/500 ticks/)
   })
 
-  it('un escenario vacío ya está terminado', () => {
+  it('an empty scenario is already finished', () => {
     expect(isDone(createSim(line({ src: { type: 'source' } }), scenario()))).toBe(true)
   })
 })
 
-describe('predicados', () => {
+describe('predicates', () => {
   const pulse = { tags: ['a', 'b'], shape: 'square', data: { n: 1 } } as unknown as Pulse
   it.each<[Predicate, boolean]>([
     [{ hasTag: 'a' }, true],

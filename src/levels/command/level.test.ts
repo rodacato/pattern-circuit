@@ -5,15 +5,15 @@ import level from './level'
 const socket = (pattern: 'command' | 'strategy' | 'observer') => ({ sockets: [{ id: 'orders', pattern }] })
 
 describe('L13 · Command', () => {
-  it('sin patrón: el latte se prepara igual y la cancelación se pierde', () => {
+  it('without a pattern: the latte is made anyway and the cancellation is lost', () => {
     expect(evaluate(level, {}).metrics).toMatchObject({ delivered: 3, dropped: 1, cancelled: 0 })
   })
 
-  it('Command: la cancelación saca el latte de la cola antes de prepararlo', () => {
+  it('Command: the cancellation takes the latte out of the queue before it is made', () => {
     expect(evaluate(level, socket('command')).metrics).toMatchObject({ delivered: 2, cancelled: 1, dropped: 0 })
   })
 
-  it('Observer prepara la cancelación como si fuera un pedido', () => {
+  it('Observer prepares the cancellation as if it were an order', () => {
     expect(evaluate(level, socket('observer')).metrics.delivered).toBe(4)
   })
 })

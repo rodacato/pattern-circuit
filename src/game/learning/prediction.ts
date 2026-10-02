@@ -1,8 +1,8 @@
 import type { SocketOption } from '../../engine'
 import { msg, N, type Message } from '../../i18n'
 
-// Predecir antes de ver: el jugador se compromete con una respuesta y el circuito la confirma o la contradice.
-// Las preguntas salen de los datos del nivel (resultado de la opción, nodos tocados): no hay contenido extra que inventar.
+// Predict before seeing: the player commits to an answer and the circuit confirms or contradicts it.
+// The questions come from the level data (option result, touched nodes): there is no extra content to invent.
 export type PredictionKind = 'outcome' | 'touched'
 export type Choice = { id: string; label: string }
 

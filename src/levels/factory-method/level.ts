@@ -18,7 +18,7 @@ import tsSingleton from './ts/singleton.ts?raw'
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 
-// Cada sucursal tiene su bebida; entregar otra es un pedido equivocado.
+// Each branch has its own drink; delivering another one is a wrong order.
 const MENU: Record<string, string> = { downtown: 'latte', beach: 'frappe', mountain: 'chocolate', harbor: 'tea' }
 const rightDrink: Predicate = { any: Object.entries(MENU).map(([branch, drink]) => ({ all: [{ hasTag: branch }, { hasTag: `made:${drink}` }] })) }
 

@@ -1,7 +1,7 @@
 import { isDone, step, type Sim } from './sim'
 import type { SimEvent } from './types'
 
-// Como `step` es puro, un snapshot es solo una referencia: retroceder = restaurar y re-simular.
+// Since `step` is pure, a snapshot is just a reference: going back = restore and re-simulate.
 export class Timeline {
   private readonly snapshots = new Map<number, Sim>()
   private readonly snapshotEvery: number
@@ -26,7 +26,7 @@ export class Timeline {
     return isDone(this.sim)
   }
 
-  // Eventos del último paso hacia adelante (vacío tras retroceder).
+  // Events of the last forward step (empty after going back).
   get events(): SimEvent[] {
     return this.lastEvents
   }

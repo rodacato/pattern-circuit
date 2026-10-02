@@ -5,18 +5,18 @@ import level from './level'
 const socket = (pattern: 'state' | 'strategy' | 'command') => ({ sockets: [{ id: 'states', pattern }] })
 
 describe('L11 · State', () => {
-  it('sin patrón: tres eventos fuera de orden llegan al historial', () => {
+  it('without a pattern: three out-of-order events reach the history', () => {
     expect(evaluate(level, {}).metrics.invalidAtSink).toBe(3)
   })
 
-  it('State rechaza lo que no aplica y el pedido termina entregado', () => {
+  it('State rejects what does not apply and the order ends up delivered', () => {
     const variant = socket('state')
     expect(evaluate(level, variant).metrics).toMatchObject({ invalidAtSink: 0, dropped: 0 })
     const { sim } = runToEnd(createSim(buildCircuit(level, variant).circuit, scenarioFor(level, variant)))
     expect(sim.state.nodeState.order).toBe('entregado')
   })
 
-  it.each(['strategy', 'command'] as const)('%s deja pasar los eventos fuera de orden', (p) => {
+  it.each(['strategy', 'command'] as const)('%s lets out-of-order events through', (p) => {
     expect(evaluate(level, socket(p)).metrics.invalidAtSink).toBe(3)
   })
 })

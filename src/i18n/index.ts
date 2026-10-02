@@ -1,15 +1,15 @@
-// Idiomas. El español es el idioma fuente: cada texto se escribe en español en su lugar (niveles,
-// catálogo, tarjetas) y los catálogos de otros idiomas lo traducen usando ese texto como clave.
-// Lo que no tiene traducción se muestra en español: nunca queda un hueco.
+// Languages. Spanish is the source language: each text is written in Spanish in place (levels,
+// catalog, cards) and the catalogs of other languages translate it using that text as the key.
+// What has no translation is shown in Spanish: there is never a gap.
 export const LOCALES = ['es', 'en'] as const
 export type Locale = (typeof LOCALES)[number]
 
-// Un texto con huecos `{nombre}`; los valores también se traducen (p. ej. el nombre de un socket),
-// y un valor puede ser otro mensaje con sus propios huecos.
+// A text with `{name}` placeholders; the values are translated too (e.g. a socket name),
+// and a value can be another message with its own placeholders.
 export type Message = string | { text: string; params: Record<string, Param> }
 type Param = string | number | Message
 
-// Marca un texto para traducir sin cambiarlo (como N_ en gettext): así los tests lo encuentran.
+// Marks a text for translation without changing it (like N_ in gettext): that way the tests find it.
 export const N = (text: string) => text
 
 export const msg = (text: string, params: Record<string, Param>): Message => ({ text, params })

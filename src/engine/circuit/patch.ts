@@ -7,7 +7,7 @@ export function wireId(w: WireDef): string {
   return `${w.from}${port}${key}->${w.to}`
 }
 
-// Orden fijo: quitar, actualizar, añadir.
+// Fixed order: remove, update, add.
 export function applyPatch(circuit: Circuit, patch: GraphPatch): Circuit {
   const removed = new Set(patch.remove ?? [])
   const removedWires = new Set(patch.removeWires ?? [])
@@ -26,7 +26,7 @@ export function applyPatch(circuit: Circuit, patch: GraphPatch): Circuit {
   }
 }
 
-// Registrar un cable abstracto en un slot no cuenta: es justo lo que el patrón hace barato.
+// Registering an abstract wire in a slot does not count: that is exactly what the pattern makes cheap.
 export function nodesTouched(before: Circuit, after: Circuit): string[] {
   const afterNodes = new Map(after.nodes.map((n) => [n.id, n]))
   const concreteOut = (c: Circuit, id: string) =>

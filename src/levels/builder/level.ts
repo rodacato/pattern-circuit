@@ -27,7 +27,7 @@ const station = (id: string, label: string, codeRef: string, x: number, behavior
   skin: 'builder',
 })
 
-// Los argumentos cruzados se arreglan en cuanto cada dato tiene nombre propio.
+// Crossed arguments get fixed as soon as each piece of data has its own name.
 const fixCrossedArgs: NodeDef['behavior'] = { type: 'transform', when: { hasTag: 'crossed-args' }, removeTags: ['crossed-args'] }
 
 export default defineLevel({

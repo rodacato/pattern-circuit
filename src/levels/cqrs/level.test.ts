@@ -3,11 +3,11 @@ import { evaluate } from '../../engine'
 import level from './level'
 
 describe('L20 · CQRS', () => {
-  it('sin patrón: lecturas y escrituras hacen una fila larga', () => {
+  it('without a pattern: reads and writes form a long queue', () => {
     expect(evaluate(level, {}).metrics.maxLoad).toBeGreaterThan(3)
   })
 
-  it('CQRS: cada camino con su ritmo, sin filas largas', () => {
+  it('CQRS: each path at its own pace, no long queues', () => {
     const r = evaluate(level, { sockets: [{ id: 'model', pattern: 'cqrs' }] })
     expect(r.metrics.maxLoad).toBe(3)
     expect(r.metrics.dropped).toBe(0)

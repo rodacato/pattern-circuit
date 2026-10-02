@@ -3,7 +3,7 @@ import type { Point, PulseShape } from '../engine'
 import { NODE_W } from './layout'
 import { FONT_UI, NEON as C } from './theme'
 
-// Pixi continúa el trazo anterior al dibujar un arco: hay que moverse a su inicio primero.
+// Pixi continues the previous stroke when drawing an arc: you must move to its start first.
 export function arc(d: Graphics, x: number, y: number, r: number, from: number, to: number) {
   return d.moveTo(x + Math.cos(from) * r, y + Math.sin(from) * r).arc(x, y, r, from, to)
 }
@@ -12,7 +12,7 @@ export function label(text: string, size: number, fill: number, fontFamily = FON
   return new Text({ text, style: { fontFamily, fontSize: size, fontWeight, fill } })
 }
 
-// El árbol de if/elsif: una rama por caso más el `else` que pierde pedidos.
+// The if/elsif tree: one branch per case plus the `else` that loses orders.
 export function drawBranchGlyph(d: Graphics, p: Point, cases: number) {
   const x0 = p.x - NODE_W / 2 + 12
   for (let i = 0; i <= cases; i++) {
@@ -21,7 +21,7 @@ export function drawBranchGlyph(d: Graphics, p: Point, cases: number) {
   }
 }
 
-// La forma del pulso dice qué tipo de dato es: ● pedido, ■ pago, ▲ evento, ◆ producto.
+// The pulse shape says what kind of data it is: ● order, ■ payment, ▲ event, ◆ product.
 export function drawShape(d: Graphics, shape: PulseShape, p: Point, r: number, color: number) {
   if (shape === 'square') d.roundRect(p.x - r, p.y - r, r * 2, r * 2, 2).fill({ color })
   else if (shape === 'triangle') d.poly([p.x, p.y - r * 1.15, p.x + r, p.y + r * 0.8, p.x - r, p.y + r * 0.8]).fill({ color })

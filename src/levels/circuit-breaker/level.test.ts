@@ -5,17 +5,17 @@ import level from './level'
 const socket = (pattern: 'circuit-breaker' | 'chain-of-responsibility') => ({ sockets: [{ id: 'provider', pattern }] })
 
 describe('L22 · Circuit Breaker', () => {
-  it('sin patrón: todos los pedidos se pierden en el timeout', () => {
+  it('without a pattern: every order is lost in the timeout', () => {
     expect(evaluate(level, {}).metrics.dropped).toBe(8)
   })
 
-  it('un respaldo sin memoria salva los pedidos, pero todos esperan el timeout', () => {
+  it('a memoryless fallback saves the orders, but all wait for the timeout', () => {
     expect(evaluate(level, socket('chain-of-responsibility')).metrics).toMatchObject({ dropped: 0, invalidAtSink: 8 })
   })
 
-  it('Circuit Breaker: tras los primeros fallos, el resto va directo al respaldo', () => {
+  it('Circuit Breaker: after the first failures, the rest go straight to the fallback', () => {
     const r = evaluate(level, socket('circuit-breaker')).metrics
     expect(r.dropped).toBe(0)
-    expect(r.invalidAtSink).toBe(3) // solo las llamadas que fallaron antes de abrir el interruptor
+    expect(r.invalidAtSink).toBe(3) // only the calls that failed before the breaker opened
   })
 })

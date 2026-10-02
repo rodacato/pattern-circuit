@@ -1,7 +1,7 @@
 import type { LevelDef, PatternId, SocketDef, SocketOption, Variant } from '../../engine'
 
-// observar el problema → elegir patrón → aplicar un cambio → comparar → completado.
-// Las etapas que el nivel no necesita se saltan: sin sockets no hay "elegir", sin tickets no hay "cambio".
+// observe the problem → choose a pattern → apply a change → compare → completed.
+// Stages the level does not need are skipped: no sockets, no "choose"; no tickets, no "change".
 export type Stage = 'observe' | 'choose' | 'change' | 'compare' | 'complete'
 export type Side = 'without' | 'with'
 type Plugged = { socketId: string; pattern: PatternId; outcome: SocketOption['outcome'] }
@@ -9,9 +9,9 @@ type Plugged = { socketId: string; pattern: PatternId; outcome: SocketOption['ou
 export type FlowState = {
   stage: Stage
   runs: number
-  plugs: Record<string, Plugged> // socket → patrón enchufado
-  last?: string // socket enchufado más recientemente
-  solved: boolean // la última corrida, con todos los sockets resueltos, cumplió los objetivos
+  plugs: Record<string, Plugged> // socket → plugged pattern
+  last?: string // most recently plugged socket
+  solved: boolean // the last run, with every socket resolved, met the goals
   ticketApplied: boolean
   ticketDone: boolean
   side: Side
@@ -67,31 +67,31 @@ export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowS
   }
 }
 
-// Etapas que el jugador verá en este nivel, en orden (las mismas reglas que salta el reducer).
+// Stages the player will see in this level, in order (the same rules the reducer skips by).
 export function stagesFor(level: LevelShape): Exclude<Stage, 'complete'>[] {
   const hasSockets = level.sockets.length > 0
   return ['observe', ...(hasSockets ? (['choose'] as const) : []), ...(level.changeTickets.length ? (['change'] as const) : []), ...(hasSockets ? (['compare'] as const) : [])]
 }
 
-// Sin socket explícito, un patrón va al primero que lo acepte, prefiriendo uno aún sin resolver.
+// Without an explicit socket, a pattern goes to the first one that accepts it, preferring one still unresolved.
 export function targetSocket(level: LevelShape, s: FlowState, pattern: PatternId, socketId?: string): SocketDef | undefined {
   const accepting = level.sockets.filter((k) => k.options[pattern])
   if (socketId) return accepting.find((k) => k.id === socketId)
   return accepting.find((k) => s.plugs[k.id]?.outcome !== 'solves') ?? accepting[0]
 }
 
-// Patrones enchufados en el orden en que el nivel declara sus sockets.
+// Plugged patterns in the order in which the level declares its sockets.
 export const pluggedPatterns = (level: LevelShape, s: FlowState): PatternId[] => level.sockets.flatMap((k) => (s.plugs[k.id] ? [s.plugs[k.id].pattern] : []))
 
 export const pendingSockets = (level: LevelShape, s: FlowState): SocketDef[] => level.sockets.filter((k) => s.plugs[k.id]?.outcome !== 'solves')
 
-// La opción enchufada más recientemente: la que comenta la nota de campo.
+// The most recently plugged option: the one the field note comments on.
 export function lastPluggedOption(level: LevelShape, s: FlowState): SocketOption | undefined {
   const p = s.last ? s.plugs[s.last] : undefined
   return p ? level.sockets.find((k) => k.id === p.socketId)?.options[p.pattern] : undefined
 }
 
-// Qué circuito corre en cada momento del flujo.
+// Which circuit runs at each moment of the flow.
 export function variantFor(level: LevelShape, s: FlowState, repairs: string[]): Variant {
   const sockets = level.sockets.flatMap((k) => (s.plugs[k.id] ? [{ id: k.id, pattern: s.plugs[k.id].pattern }] : []))
   const plugged: Variant = sockets.length ? { sockets } : {}

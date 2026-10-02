@@ -2,14 +2,14 @@ import { spawnSync } from 'node:child_process'
 import { describe, expect, it } from 'vitest'
 import { LEVELS } from '.'
 
-// Todo el Ruby que ve el jugador tiene que ser Ruby válido. Si no hay ruby instalado, se omite.
+// All the Ruby the player sees has to be valid Ruby. If ruby is not installed, it is skipped.
 const hasRuby = spawnSync('ruby', ['-v']).status === 0
 
-describe.skipIf(!hasRuby)('el código Ruby de cada nivel es sintácticamente válido', () => {
+describe.skipIf(!hasRuby)('the Ruby code of each level is syntactically valid', () => {
   it.each(LEVELS.flatMap((l) => Object.entries(l.codeFiles.rb).map(([key, file]) => [`${l.id} · ${key}`, file.text] as const)))('%s', (_name, text) => {
-    // El comentario mágico fija UTF-8 aunque el entorno no tenga locale.
+    // The magic comment pins UTF-8 even if the environment has no locale.
     const result = spawnSync('ruby', ['-wc'], { input: `# encoding: utf-8\n${text}`, encoding: 'utf8' })
-    // Los bloques de wiring muestran cómo se arma el objeto; que la variable no se use después es intencional.
+    // Wiring blocks show how the object is assembled; the variable going unused afterwards is intentional.
     const warnings = result.stderr.split('\n').filter((l) => l.trim() && !l.includes('assigned but unused variable'))
     expect(warnings).toEqual([])
     expect(result.status).toBe(0)

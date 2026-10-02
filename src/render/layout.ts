@@ -1,4 +1,4 @@
-// Geometría de pantalla sin Pixi: todo lo que el render calcula y se puede probar aislado.
+// Screen geometry without Pixi: everything the render computes that can be tested in isolation.
 import { pointAt, type CompiledCircuit, type NodeDef, type Point, type Pulse } from '../engine'
 
 export const CELL = 62
@@ -19,11 +19,11 @@ export function circuitBounds(nodes: Iterable<NodeDef>): { w: number; h: number 
 
 export type Insets = { top: number; bottom: number }
 
-// Franjas reservadas para las tarjetas (arriba) y los controles (abajo), si la pantalla da para ello.
+// Bands reserved for the cards (top) and the controls (bottom), if the screen has room for them.
 export const insetsFor = (screen: { height: number }): Insets =>
   screen.height > 560 ? { top: Math.min(210, screen.height * 0.26), bottom: 90 } : { top: 0, bottom: 0 }
 
-// Escala y centra el circuito en el área libre; nunca amplía de más.
+// Scales and centers the circuit in the free area; never enlarges too much.
 export function fitWorld(screen: { width: number; height: number }, bounds: { w: number; h: number }, insets: Insets = { top: 0, bottom: 0 }) {
   const free = screen.height - insets.top - insets.bottom
   const zoom = Math.min(screen.width / (bounds.w + CELL * 3.6), free / (bounds.h + CELL * 3.4), 1.7)
@@ -37,7 +37,7 @@ export function fitWorld(screen: { width: number; height: number }, bounds: { w:
 export type View = { zoom: number; x: number; y: number }
 export const ZOOM_LIMITS = [0.5, 3] as const
 
-// Vista final = encuadre automático × zoom del jugador, desplazada por su paneo.
+// Final view = automatic framing × player zoom, shifted by their pan.
 export function worldTransform(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, extraBottom = 0) {
   const base = insetsFor(screen)
   const insets = { ...base, bottom: base.bottom + (screen.height > 560 ? extraBottom : 0) }
@@ -50,7 +50,7 @@ export function worldTransform(screen: { width: number; height: number }, bounds
   }
 }
 
-// Zoom alrededor del puntero: el punto del mundo bajo el cursor no se mueve.
+// Zoom around the pointer: the world point under the cursor does not move.
 export function zoomAt(screen: { width: number; height: number }, bounds: { w: number; h: number }, view: View, pointer: Point, factor: number, extraBottom = 0): View {
   const before = worldTransform(screen, bounds, view, extraBottom)
   const world = { x: (pointer.x - before.x) / before.scale, y: (pointer.y - before.y) / before.scale }
@@ -76,7 +76,7 @@ export function nearestPulse(positions: Map<number, Point>, p: Point, radius = 1
   return best?.id
 }
 
-// En un cable interpola entre el tick anterior y el actual; dentro de un nodo, los pulsos se alinean arriba.
+// On a wire it interpolates between the previous and current tick; inside a node, pulses line up at the top.
 export function pulsePosition(circuit: CompiledCircuit, pulse: Pulse, before: Pulse | undefined, alpha: number, slot: number): Point {
   if (pulse.loc.kind === 'wire') {
     const wire = circuit.wires.get(pulse.loc.wireId)!
@@ -89,7 +89,7 @@ export function pulsePosition(circuit: CompiledCircuit, pulse: Pulse, before: Pu
 
 export const SOCKET_R = 13
 
-// El socket vive sobre el nodo del circuito base: no se mueve aunque el patrón reemplace ese nodo.
+// The socket lives on the base circuit node: it does not move even if the pattern replaces that node.
 export function socketCenter(baseNodes: NodeDef[], nodeId: string): Point | undefined {
   const n = baseNodes.find((b) => b.id === nodeId)
   if (!n) return undefined

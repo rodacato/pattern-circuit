@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-// Diálogo modal accesible: el foco entra al abrir, Escape cierra y el foco vuelve a quien lo abrió.
+// Accessible modal dialog: focus enters on open, Escape closes and focus returns to whoever opened it.
 export function useDialog<T extends HTMLElement>(onClose: () => void) {
   const first = useRef<T>(null)
   useEffect(() => {

@@ -7,8 +7,8 @@ type Particle = { x: number; y: number; vx: number; vy: number; life: number; co
 type Ring = { x: number; y: number; r: number; max: number; life: number; color: number }
 type Floater = { text: Text; life: number }
 
-// Efectos efímeros: partículas, ondas y textos que suben. Viven en coordenadas del mundo.
-// Con movimiento reducido solo quedan los textos, quietos: la información se mantiene, el movimiento no.
+// Ephemeral effects: particles, waves and rising texts. They live in world coordinates.
+// With reduced motion only the texts remain, still: the information stays, the movement does not.
 export class Effects {
   private particles: Particle[] = []
   private rings: Ring[] = []
@@ -17,7 +17,7 @@ export class Effects {
   private readonly reduced: boolean
   private readonly t: Translate
 
-  // Los textos flotantes se traducen aquí: los skins escriben en español, como todo el contenido.
+  // Floating texts are translated here: the skins write in Spanish, like all the content.
   constructor(layer: Container, reduced = false, t: Translate = identity) {
     this.layer = layer
     this.reduced = reduced

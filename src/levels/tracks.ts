@@ -1,6 +1,6 @@
-// Un tema (track) es un recorrido propio: sus capítulos, en orden, y sus niveles numerados desde 0.
-// Hoy hay uno. Un tema nuevo que se pueda contar como circuito (p. ej. sistemas completos con CQRS,
-// eventos o microservicios) es solo contenido: sus capítulos aquí y sus niveles en `levels/`.
+// A track is its own path: its chapters, in order, and its levels numbered from 0.
+// Today there is one. A new track that can be told as a circuit (e.g. whole systems with CQRS,
+// events or microservices) is just content: its chapters here and its levels in `levels/`.
 export type Track = { id: string; name: string; chapters: Record<string, string> }
 
 export const TRACKS: Track[] = [

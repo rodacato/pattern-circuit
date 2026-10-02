@@ -40,26 +40,26 @@ const level = defineLevel({
 
 const both = { sockets: [{ id: 'sa', pattern: 'strategy' as const }, { id: 'sb', pattern: 'builder' as const }] }
 
-describe('niveles con varios sockets', () => {
-  it('aplica el parche de cada socket enchufado', () => {
+describe('levels with several sockets', () => {
+  it('applies the patch of each plugged socket', () => {
     const nodes = buildCircuit(level, both).circuit.nodes
     expect(nodes.find((n) => n.id === 'a')?.behavior).toMatchObject({ addTags: ['a'] })
     expect(nodes.find((n) => n.id === 'b')?.behavior).toMatchObject({ addTags: ['b'] })
   })
 
-  it('solo gana con todos los sockets resueltos', () => {
+  it('only wins with every socket resolved', () => {
     expect(evaluate(level, { sockets: [both.sockets[0]] }).won).toBe(false)
     expect(evaluate(level, both).won).toBe(true)
     expect(solvesAll(level, both)).toBe(true)
   })
 
-  it('compone el código con la base y un fragmento por socket', () => {
+  it('composes the code from the base and one fragment per socket', () => {
     expect(codeKey(level, {})).toBe('base+a_vacio+b_vacio')
     expect(codeKey(level, both)).toBe('base+a_ok+b_ok')
     expect(level.codeFiles.rb['base+a_mal+b_vacio'].text).toBe('# base\n# a×\n# b?')
   })
 
-  it('las variantes cubren todas las combinaciones y el ticket solo sobre base o solución completa', () => {
+  it('variants cover every combination and the ticket only runs on base or the full solution', () => {
     const variants = reachableVariants(level)
     expect(variants.filter((v) => !v.ticket)).toHaveLength(3 * 2)
     expect(variants.filter((v) => v.ticket).map((v) => v.sockets?.length ?? 0)).toEqual([0, 2])

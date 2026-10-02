@@ -6,21 +6,21 @@ describe('L03 · Builder', () => {
   const l = level
   const socket = (pattern: 'builder' | 'factory-method' | 'decorator') => ({ id: 'create-order', pattern })
 
-  it('sin patrón: argumentos cruzados y un pedido imposible que explota en cocina', () => {
+  it('without a pattern: crossed arguments and an impossible order that blows up in the kitchen', () => {
     expect(evaluate(l, {}).metrics).toMatchObject({ invalidAtSink: 1, dropped: 1 })
   })
 
-  it('Builder corrige el orden y rechaza lo imposible antes de cobrar', () => {
+  it('Builder fixes the order and rejects the impossible before charging', () => {
     const r = evaluate(l, { sockets: [socket('builder')] })
     expect(r.metrics).toMatchObject({ delivered: 3, invalidAtSink: 0, dropped: 0 })
     expect(r.won).toBe(true)
   })
 
-  it('Factory Method pierde los pedidos que no tienen molde', () => {
+  it('Factory Method drops the orders that have no mold', () => {
     expect(evaluate(l, { sockets: [socket('factory-method')] }).metrics).toMatchObject({ delivered: 1, dropped: 2 })
   })
 
-  it('Decorator arregla los extras pero lo imposible sigue llegando a cocina', () => {
+  it('Decorator fixes the extras but the impossible still reaches the kitchen', () => {
     const r = evaluate(l, { sockets: [socket('decorator')] })
     expect(r.metrics).toMatchObject({ invalidAtSink: 0, dropped: 1 })
     expect(r.won).toBe(false)

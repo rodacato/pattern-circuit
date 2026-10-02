@@ -5,15 +5,15 @@ import level from './level'
 const socket = { id: 'recipe', pattern: 'template-method' as const }
 
 describe('L14 · Template Method', () => {
-  it('sin patrón: el té sale sin tapa', () => {
+  it('without a pattern: the tea comes out without a lid', () => {
     expect(evaluate(level, {}).metrics).toMatchObject({ delivered: 4, invalidAtSink: 2 })
   })
 
-  it('sin patrón + manga: la misma edición en las dos copias', () => {
+  it('without a pattern + sleeve: the same edit in both copies', () => {
     expect(evaluate(level, { ticket: 'sleeve' }).touched.sort()).toEqual(['lidC', 'serveT'])
   })
 
-  it('Template Method: pasos comunes una sola vez', () => {
+  it('Template Method: common steps only once', () => {
     expect(evaluate(level, { sockets: [socket] }).metrics.invalidAtSink).toBe(0)
     expect(evaluate(level, { sockets: [socket], ticket: 'sleeve' }).touched).toEqual(['lid'])
   })

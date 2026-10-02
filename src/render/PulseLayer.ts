@@ -9,7 +9,7 @@ import { FONT_MONO, NEON as C, pulseColor } from './theme'
 
 const TRAIL_LENGTH = 16
 
-// Pulsos vivos: posición interpolada, estela, firma de los patrones que visitó, turno y etiqueta del seguido.
+// Live pulses: interpolated position, trail, signature of the patterns visited, turn and label of the followed one.
 export class PulseLayer {
   readonly container = new Container()
   readonly positions = new Map<number, Point>()
@@ -66,7 +66,7 @@ export class PulseLayer {
         gl.circle(pos.x, pos.y, 14).stroke({ width: 3, color: C.white, alpha: 0.5 })
       }
     }
-    // Tras reiniciar o retroceder los ids se reutilizan: una estela sin pulso vivo se descarta.
+    // After a restart or going back the ids are reused: a trail with no live pulse is discarded.
     for (const id of this.trails.keys()) if (!this.positions.has(id)) this.trails.delete(id)
     this.drawBadges(pb)
   }
@@ -83,7 +83,7 @@ export class PulseLayer {
     })
   }
 
-  // Número de turno u otros datos visibles del pulso, en una etiqueta pequeña.
+  // Turn number or other visible data of the pulse, in a small label.
   private drawBadges(pb: Playback) {
     let used = 0
     for (const p of pb.timeline.current.state.pulses) {

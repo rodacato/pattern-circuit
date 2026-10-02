@@ -44,7 +44,7 @@ export type ConnectResult = 'repaired' | 'wrong' | 'none'
 export type CodeChange = { title: Message; lines: DiffLine[]; added: number; removed: number }
 export type Comparison = Record<Side, Evaluation>
 
-// Fachada de una partida: render y ui solo hablan con esto. Coordina flujo, reproducción y progreso.
+// Facade of a game: render and ui only talk to this. It coordinates flow, playback and progress.
 export class GameSession {
   readonly level: Level
   readonly actions = new Set<PlayerAction>()
@@ -57,7 +57,7 @@ export class GameSession {
   comparison?: Comparison
   failedRuns = 0
   progress: Progress
-  prediction?: Prediction // la pregunta abierta (sin `guess`) o la última respondida
+  prediction?: Prediction // the open question (without `guess`) or the last answered one
   hintsShown = 0
 
   private readonly emitter = new Emitter()
@@ -76,7 +76,7 @@ export class GameSession {
     return variantFor(this.level, this.flow, this.repairs)
   }
 
-  // Lenguaje del panel de código; si el nivel no lo trae, se muestra Ruby.
+  // Language of the code panel; if the level does not provide it, Ruby is shown.
   codeLang: CodeLang = 'rb'
 
   setCodeLang(lang: CodeLang) {
@@ -88,7 +88,7 @@ export class GameSession {
     return CODE_LANGS.filter((lang) => Object.keys(this.level.codeFiles[lang]).length > 0)
   }
 
-  // El lenguaje que de verdad se muestra (Ruby si el nivel no trae el elegido).
+  // The language actually shown (Ruby if the level does not provide the chosen one).
   get shownCodeLang(): CodeLang {
     return this.availableCodeLangs.includes(this.codeLang) ? this.codeLang : 'rb'
   }
@@ -113,7 +113,7 @@ export class GameSession {
     return this.level.repairs.filter((r) => !this.repairs.includes(r.id))
   }
 
-  // La opción enchufada más recientemente: la que comenta la nota de campo.
+  // The most recently plugged option: the one the field note comments on.
   get pluggedOption(): SocketOption | undefined {
     return lastPluggedOption(this.level, this.flow)
   }
@@ -126,26 +126,26 @@ export class GameSession {
     return pendingSockets(this.level, this.flow)
   }
 
-  // Patrón que corre ahora en cada socket (en la comparación "sin patrón", ninguno).
+  // Pattern running now in each socket (in the "without pattern" comparison, none).
   pluggedAt(socketId: string): PatternId | undefined {
     return this.variant.sockets?.find((p) => p.id === socketId)?.pattern
   }
 
-  // Métricas objetivo del nivel que cambian entre sin y con patrón: las filas de la comparación.
+  // Level goal metrics that change between without and with pattern: the comparison rows.
   get comparisonRows(): MetricName[] {
     const cmp = this.comparison
     if (!cmp) return []
     return [...new Set(this.level.winWhen.map((a) => a.metric))].filter((m) => cmp.with.metrics[m] !== cmp.without.metrics[m])
   }
 
-  // En la comparación: qué líneas de Ruby cambian. Con ticket, lo que el ticket obligó a tocar en el lado
-  // que se está mirando (sin o con patrón); sin ticket, del código sin patrón al código con patrón.
+  // In the comparison: which Ruby lines change. With a ticket, what the ticket forced to touch on the side
+  // being viewed (without or with pattern); without a ticket, from the code without pattern to the code with pattern.
   get codeChange(): CodeChange | undefined {
     if (this.flow.stage !== 'compare' && this.flow.stage !== 'complete') return undefined
     const code = (stage: FlowState['stage'], side: Side) => this.files[codeKey(this.level, variantFor(this.level, { ...this.flow, stage, side }, this.repairs))]
     const side = this.flow.side
     const names = this.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
-    // 'observe' = circuito base y 'choose' = con patrón, ambos sin ticket; 'compare' = el lado elegido, con ticket.
+    // 'observe' = base circuit and 'choose' = with pattern, both without ticket; 'compare' = the chosen side, with ticket.
     const [before, after, title] = this.ticket
       ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), side === 'with' ? msg('Lo que cambió con el ticket, con {names}', { names }) : N('Lo que cambió con el ticket, sin patrón')]
       : [code('compare', 'without'), code('compare', 'with'), msg('Del código sin patrón al código con {names}', { names })]
@@ -154,7 +154,7 @@ export class GameSession {
     return { title, lines, ...diffStats(lines) }
   }
 
-  // Resultado del patrón en un socket concreto, o en el primero que lo ofrece.
+  // Result of the pattern in a given socket, or in the first one that offers it.
   outcomeOf(pattern: PatternId): SocketOption['outcome'] | undefined {
     const socketId = Object.values(this.flow.plugs).find((p) => p.pattern === pattern)?.socketId
     const socket = this.level.sockets.find((s) => s.id === socketId) ?? this.level.sockets.find((s) => s.options[pattern])
@@ -165,12 +165,12 @@ export class GameSession {
     return !!this.level.sockets.find((s) => s.id === socketId)?.options[pattern]
   }
 
-  // Hay una pregunta esperando respuesta: la corrida no arranca hasta responderla u omitirla.
+  // A question is waiting for an answer: the run does not start until it is answered or skipped.
   get awaitingPrediction(): boolean {
     return !!this.prediction && this.prediction.guess === undefined
   }
 
-  // Pistas escalonadas para el socket pendiente: se revelan de a una, a pedido del jugador.
+  // Staged hints for the pending socket: revealed one at a time, on the player's request.
   get hintLadder(): Message[] {
     return this.flow.stage === 'choose' ? hintLadder(this.level, this.flow, this.result) : []
   }
@@ -185,7 +185,7 @@ export class GameSession {
     return this.flow.stage === 'choose'
   }
 
-  // Llamado por el render en cada frame.
+  // Called by the render every frame.
   update(deltaFrames: number) {
     const wasPlaying = this.playback.playing
     const advanced = this.playback.update(deltaFrames)
@@ -194,7 +194,7 @@ export class GameSession {
   }
 
   play() {
-    if (this.awaitingPrediction && this.prediction?.kind === 'outcome') this.prediction = undefined // correr sin responder = omitir
+    if (this.awaitingPrediction && this.prediction?.kind === 'outcome') this.prediction = undefined // running without answering = skipping
     if (this.playback.done) this.result = undefined
     this.playback.play()
     this.did('play')
@@ -244,7 +244,7 @@ export class GameSession {
     this.did('follow-pulse')
   }
 
-  // Arrastrar un cable: si coincide con una reparación pendiente, se aplica y se vuelve a correr.
+  // Dragging a wire: if it matches a pending repair, it is applied and the run restarts.
   connect(from: string, to: string): ConnectResult {
     if (from === to) return 'none'
     const repair = this.pendingRepairs.find((r) => r.patch.add?.wires?.some((w) => w.from === from && w.to === to))
@@ -271,7 +271,7 @@ export class GameSession {
     this.rerun(false)
   }
 
-  // Responder la pregunta abierta: se anota el acierto y sigue lo que estaba esperando.
+  // Answering the open question: the result is recorded and whatever was waiting continues.
   predict(guess: string) {
     if (!this.prediction || !this.awaitingPrediction) return
     this.prediction = guessed(this.prediction, guess)
@@ -312,7 +312,7 @@ export class GameSession {
     this.emitter.emit()
   }
 
-  // El repaso escribe a través de la sesión: así hay un solo dueño del progreso y nada se pisa.
+  // Review writes through the session: that way there is a single owner of progress and nothing gets overwritten.
   recordReview(itemId: string, correct: boolean, now = Date.now()) {
     this.saveProgress({ ...this.progress, review: recordAnswer(this.progress.review, itemId, correct, now) })
     this.emitter.emit()
@@ -323,7 +323,7 @@ export class GameSession {
     this.emitter.emit()
   }
 
-  // Nodos que tocaría el ticket con lo enchufado ahora: la respuesta de la predicción del cambio.
+  // Nodes the ticket would touch with what is plugged now: the answer to the change prediction.
   private ticketTouched(): number {
     return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticketApplied: true }, this.repairs)).touched.length
   }
@@ -333,7 +333,7 @@ export class GameSession {
     return { without: at('without'), with: at('with') }
   }
 
-  // La corrida ya terminó en la reproducción: basta con calificar su estado final.
+  // The run already finished in playback: scoring its final state is enough.
   private runFinished() {
     this.result = score(this.level, this.playback.timeline.current.state.metrics, this.touched, this.playback.circuit.nodes.size)
     if (!this.result.won) this.failedRuns++
@@ -357,7 +357,7 @@ export class GameSession {
     this.flow = reduceFlow(this.level, this.flow, event)
   }
 
-  // Reconstruye el circuito para el estado actual del flujo; por defecto arranca a correr solo.
+  // Rebuilds the circuit for the current flow state; by default it starts running on its own.
   private rerun(autoplay = true) {
     this.rebuild()
     if (autoplay) this.play()

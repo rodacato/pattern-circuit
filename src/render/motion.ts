@@ -1,4 +1,4 @@
-// Animaciones de nodos por frame (destello, sacudida, aparición). Sin Pixi: se prueban solas.
+// Per-frame node animations (flash, shake, appearance). No Pixi: they are tested on their own.
 export const APPEAR_FRAMES = 28
 
 export type NodeMotion = { flash?: { t: number; color: number }; shake: number; grow: number }
@@ -9,7 +9,7 @@ export class NodeAnimations {
   private readonly appearing = new Map<string, number>()
   private readonly reduced: boolean
 
-  // Con movimiento reducido no hay sacudidas ni rebotes; el destello de color sí queda (no se mueve).
+  // With reduced motion there are no shakes or bounces; the color flash stays (it does not move).
   constructor(reduced = false) {
     this.reduced = reduced
   }
@@ -31,7 +31,7 @@ export class NodeAnimations {
     return { flash: this.flashes.get(id), shake: this.shakes.get(id) ?? 0, grow: frame === undefined ? 1 : easeOutBack(frame / APPEAR_FRAMES) }
   }
 
-  // Avanza un frame de cada animación de este nodo y olvida las terminadas.
+  // Advances one frame of each animation of this node and forgets the finished ones.
   advance(id: string) {
     const f = this.flashes.get(id)
     if (f && (f.t -= 0.05) <= 0) this.flashes.delete(id)

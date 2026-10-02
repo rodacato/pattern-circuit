@@ -1,4 +1,4 @@
-// Vista de depuración de la fase 1: muestra el motor tal cual, sin el lenguaje visual final.
+// Phase 1 debug view: shows the engine as is, without the final visual language.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   buildCircuit,
@@ -188,7 +188,7 @@ export default function DebugApp() {
 
 function VariantControls({ level, variant, onChange }: { level: Level; variant: Variant; onChange: (v: Variant) => void }) {
   const plugs = variant.sockets ?? []
-  // Un ticket solo corre sobre el circuito base o con todos los sockets resueltos.
+  // A ticket only runs on the base circuit or with every socket resolved.
   const ticketAllowed = plugs.length === 0 || solvesAll(level, variant)
   const setPlug = (socketId: string, pattern: PatternId | '') => {
     const others = plugs.filter((p) => p.id !== socketId)

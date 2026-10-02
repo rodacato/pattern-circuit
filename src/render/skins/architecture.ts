@@ -2,7 +2,7 @@ import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'
 
-// Ports & Adapters: el núcleo es un hexágono; los puertos, muescas; los adaptadores, enchufes por fuera.
+// Ports & Adapters: the core is a hexagon; ports are notches; adapters are plugs on the outside.
 export function portsAndAdapters(): Skin {
   return {
     drawNode({ d, gl, circuit }, node, at) {
@@ -24,7 +24,7 @@ export function portsAndAdapters(): Skin {
   }
 }
 
-// Event Bus: el bus es una vía luminosa por la que corren los eventos.
+// Event Bus: the bus is a luminous track the events run along.
 export function eventBus(): Skin {
   return {
     drawNode({ d, gl, time }, node, at) {
@@ -44,7 +44,7 @@ export function eventBus(): Skin {
   }
 }
 
-// CQRS: el lado de escritura en ámbar, el de lectura en cian; la proyección los une.
+// CQRS: the write side in amber, the read side in cyan; the projection joins them.
 export function cqrs(): Skin {
   return {
     drawNode({ d, gl }, node, at) {

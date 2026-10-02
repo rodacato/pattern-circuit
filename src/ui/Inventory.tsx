@@ -18,8 +18,8 @@ const OUTCOME_TEXT = {
 } as const
 const DRAG_THRESHOLD = 6
 
-// Cartuchos de patrones: se arrastran al socket del canvas, o se enchufan con clic o teclado (Enter/Espacio).
-// Un cartucho ya enchufado se desenchufa con otro clic.
+// Pattern cartridges: dragged to the canvas socket, or plugged with click or keyboard (Enter/Space).
+// An already plugged cartridge is unplugged with another click.
 export function Inventory({ session, stage }: { session: GameSession; stage?: NeonStage }) {
   const t = useT()
   const open = useSession(session, (s) => s.inventoryOpen)
@@ -28,7 +28,7 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
   const [ghost, setGhost] = useState<Ghost>()
   const [warning, setWarning] = useState<string>()
   const warningTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const dragged = useRef(false) // el click que sigue a soltar un arrastre no debe volver a enchufar
+  const dragged = useRef(false) // the click that follows releasing a drag must not plug again
   useEffect(() => () => clearTimeout(warningTimer.current), [])
 
   const sockets = session.sockets
@@ -71,7 +71,7 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
     setGhost({ ...ghost, x: e.clientX, y: e.clientY, moved, over: !!target })
   }
 
-  // Un clic sin arrastre lo resuelve onClick (así también funciona con teclado).
+  // A click without a drag is handled by onClick (so it also works with the keyboard).
   const onUp = (e: ReactPointerEvent) => {
     if (!ghost) return
     dragged.current = ghost.moved

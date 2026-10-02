@@ -7,13 +7,13 @@ import { I18nContext } from './i18nContext'
 const KEY = 'pattern-circuit:locale'
 const CATALOGS: Record<Locale, Catalog> = { es: {}, en: { ...EN, ...LEVEL_CATALOGS.en } }
 
-// El idioma es una preferencia de este navegador: se guarda aparte del progreso.
+// The language is a preference of this browser: it is stored apart from progress.
 function initialLocale(): Locale {
   let stored: string | null = null
   try {
     stored = window.localStorage.getItem(KEY)
   } catch {
-    // almacenamiento bloqueado: se usa el idioma del navegador
+    // storage blocked: the browser language is used
   }
   return detectLocale(stored, navigator.languages ?? [])
 }
@@ -26,7 +26,7 @@ export function I18nProvider({ children, locale: fixed }: { children: ReactNode;
       try {
         window.localStorage.setItem(KEY, l)
       } catch {
-        // sin almacenamiento, el cambio dura esta sesión
+        // without storage, the change lasts this session
       }
     }
     return { locale, t: createTranslator(CATALOGS[locale]), setLocale }

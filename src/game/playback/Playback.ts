@@ -2,12 +2,12 @@ import { compile, createSim, Timeline, type Circuit, type CompiledCircuit, type 
 
 export const SPEEDS = [0.5, 1, 2, 4] as const
 
-// Reproduce una simulación en tiempo real: velocidad, pasos, interpolación y qué código mirar.
+// Plays a simulation in real time: speed, steps, interpolation and which code to look at.
 export class Playback {
   readonly circuit: CompiledCircuit
   readonly timeline: Timeline
   prevState: SimState
-  alpha = 1 // fracción entre prevState y el estado actual, para interpolar
+  alpha = 1 // fraction between prevState and the current state, to interpolate
   playing = false
   speed: number
   followed?: number
@@ -15,7 +15,7 @@ export class Playback {
 
   private carry = 0
   private pending: SimEvent[] = []
-  private pulseRefs = new Map<number, { tick: number; ref: string }[]>() // regiones que visitó cada pulso
+  private pulseRefs = new Map<number, { tick: number; ref: string }[]>() // regions each pulse visited
 
   constructor(circuit: Circuit, scenario: Scenario, speed = 1) {
     this.circuit = compile(circuit)
@@ -28,16 +28,16 @@ export class Playback {
     return this.timeline.done
   }
 
-  // Región activa: la del pulso seguido; si no hay, la del nodo inspeccionado.
+  // Active region: the followed pulse's; if none, the inspected node's.
   get activeRef(): string | undefined {
     const visited = this.followed !== undefined ? this.pulseRefs.get(this.followed) : undefined
-    // Tras retroceder, solo cuentan las regiones visitadas hasta el tick actual.
+    // After going back, only regions visited up to the current tick count.
     const ref = visited?.findLast((v) => v.tick < this.timeline.tick)?.ref
     if (ref) return ref
     return this.inspected ? this.circuit.nodes.get(this.inspected)?.codeRef : undefined
   }
 
-  // `deltaFrames` viene del ticker del render (1 ≈ 1/60 s). Devuelve cuántos ticks avanzó.
+  // `deltaFrames` comes from the render ticker (1 ≈ 1/60 s). Returns how many ticks it advanced.
   update(deltaFrames: number): number {
     if (!this.playing) return 0
     this.carry += deltaFrames * this.speed
@@ -105,7 +105,7 @@ export class Playback {
     const events = this.timeline.forward()
     for (const e of events) {
       if ((e.type === 'pulse.enter' || e.type === 'pulse.branch') && e.codeRef) {
-        const visited = (this.pulseRefs.get(e.pulseId) ?? []).filter((v) => v.tick < e.tick) // al re-simular tras retroceder
+        const visited = (this.pulseRefs.get(e.pulseId) ?? []).filter((v) => v.tick < e.tick) // when re-simulating after going back
         visited.push({ tick: e.tick, ref: e.codeRef })
         this.pulseRefs.set(e.pulseId, visited)
       }
@@ -114,7 +114,7 @@ export class Playback {
     this.autoFollow()
   }
 
-  // Si el pulso seguido terminó, el foco pasa al siguiente vivo; si el jugador eligió un nodo, se respeta.
+  // If the followed pulse finished, focus moves to the next live one; if the player chose a node, that is respected.
   private autoFollow() {
     if (this.inspected) return
     const alive = this.timeline.current.state.pulses.filter((p) => p.status === 'alive')

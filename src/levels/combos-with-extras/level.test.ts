@@ -6,15 +6,15 @@ const composite = { id: 'combo', pattern: 'composite' as const }
 const decorator = { id: 'extras', pattern: 'decorator' as const }
 
 describe('L16 · Composite + Decorator', () => {
-  it('sin patrones: ningún desayuno llega', () => {
+  it('without patterns: no breakfast arrives', () => {
     expect(evaluate(level, {}).metrics.delivered).toBe(1)
   })
 
-  it('solo Composite: llegan los desayunos, pero el de dos extras sale incompleto', () => {
+  it('Composite only: the breakfasts arrive, but the two-extras one comes out incomplete', () => {
     expect(evaluate(level, { sockets: [composite] }).metrics).toMatchObject({ delivered: 3, invalidAtSink: 1 })
   })
 
-  it('juntos: todos los extras aplicados dentro del combo', () => {
+  it('together: all the extras applied inside the combo', () => {
     expect(evaluate(level, { sockets: [composite, decorator] }).metrics).toMatchObject({ delivered: 3, invalidAtSink: 0, dropped: 0 })
   })
 })

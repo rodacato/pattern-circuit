@@ -1,6 +1,6 @@
 import { BREAKER_OPEN, buildCircuit, initialNodeState, reachableVariants, type Level } from '../engine'
 
-// Todos los textos de un nivel que ve el jugador, incluidos los nodos que solo aparecen en algunas variantes.
+// All the texts of a level the player sees, including nodes that only appear in some variants.
 export function levelTexts(level: Level): string[] {
   const nodes = reachableVariants(level).flatMap((v) => buildCircuit(level, v).circuit.nodes)
   const states = nodes.flatMap((n) => (n.behavior.type === 'machine' ? [n.behavior.initial, ...Object.keys(n.behavior.states), ...Object.values(n.behavior.states).flatMap((s) => Object.values(s).flatMap((t) => (t.to ? [t.to] : [])))] : []))

@@ -14,7 +14,7 @@ const OUTCOME_LABEL = {
   misfit: 'No encaja',
 } as const
 
-// Una nota por cada socket del nivel donde se probó ese patrón (un patrón puede ofrecerse en varios).
+// One note per level socket where that pattern was tried (a pattern can be offered in several).
 function entriesFor(levels: Level[], notes: string[]): Map<PatternId, Entry[]> {
   const byPattern = new Map<PatternId, Entry[]>()
   for (const key of notes) {
@@ -27,7 +27,7 @@ function entriesFor(levels: Level[], notes: string[]): Map<PatternId, Entry[]> {
   return byPattern
 }
 
-// Cuaderno de patrones: cada patrón probado deja una nota, también los que no encajaban.
+// Pattern notebook: each pattern tried leaves a note, also the ones that did not fit.
 type Props = { levels: Level[]; notes: string[]; predictions?: { right: number; total: number }; onClose: () => void; onReset: () => void }
 
 export function Notebook({ levels, notes, predictions, onClose, onReset }: Props) {

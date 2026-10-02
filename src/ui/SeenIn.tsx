@@ -2,7 +2,7 @@ import type { SeenIn as SeenInInfo } from '../engine'
 import { msg } from '../i18n'
 import { useT } from './i18nContext'
 
-// "Dónde lo has visto": el patrón en código Ruby real, con enlace a la fuente.
+// "Where you have seen it": the pattern in real Ruby code, with a link to the source.
 export function SeenIn({ info }: { info?: SeenInInfo }) {
   const t = useT()
   if (!info) return null

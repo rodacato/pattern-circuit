@@ -12,8 +12,8 @@ const runOut = (s: GameSession) => {
   for (let i = 0; i < 10_000 && s.playback.playing; i++) s.update(1)
 }
 
-describe('GameSession · nivel 0', () => {
-  it('sin reparar se pierde; con el cable correcto se completa y se guarda', () => {
+describe('GameSession · level 0', () => {
+  it('without repairing it is lost; with the right wire it completes and is saved', () => {
     const store = new MemoryProgressStore()
     const s = session('tutorial', store)
     runOut(s)
@@ -28,7 +28,7 @@ describe('GameSession · nivel 0', () => {
     expect(store.load().completed).toEqual(['tutorial'])
   })
 
-  it('paso adelante y atrás vuelven al mismo tick', () => {
+  it('stepping forward and back returns to the same tick', () => {
     const s = session('tutorial')
     for (let i = 0; i < 10; i++) s.step()
     s.back()
@@ -37,11 +37,11 @@ describe('GameSession · nivel 0', () => {
   })
 })
 
-describe('GameSession · nivel 1 (Strategy)', () => {
-  it('recorre el nivel completo: problema, patrones, cambio y comparación', () => {
+describe('GameSession · level 1 (Strategy)', () => {
+  it('goes through the whole level: problem, patterns, change and comparison', () => {
     const store = new MemoryProgressStore()
     const s = session('strategy', store)
-    expect(s.plug('strategy')).toBeUndefined() // el inventario abre después de ver el problema
+    expect(s.plug('strategy')).toBeUndefined() // the inventory opens after seeing the problem
 
     runOut(s)
     expect(s.flow.stage).toBe('choose')
@@ -74,14 +74,14 @@ describe('GameSession · nivel 1 (Strategy)', () => {
   })
 })
 
-describe('GameSession · detalles', () => {
+describe('GameSession · details', () => {
   const inChoose = (id: string) => {
     const s = session(id)
     runOut(s)
     return s
   }
 
-  it('con varios sockets, un patrón sin socket va al primero sin resolver que lo acepte', () => {
+  it('with several sockets, a pattern without a socket goes to the first unresolved one that accepts it', () => {
     const s = inChoose('branches-and-payments')
     const [first] = s.sockets
     const pattern = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
@@ -91,13 +91,13 @@ describe('GameSession · detalles', () => {
     expect(s.accepts(pattern, first.id)).toBe(true)
   })
 
-  it('un patrón en un socket que no lo acepta no hace nada', () => {
+  it('a pattern in a socket that does not accept it does nothing', () => {
     const s = inChoose('strategy')
     expect(s.plug('strategy', 'no-existe')).toBeUndefined()
     expect(s.flow.plugs).toEqual({})
   })
 
-  it('desenchufar vuelve al circuito sin patrón y no lo corre solo', () => {
+  it('unplugging goes back to the circuit without a pattern and does not run it on its own', () => {
     const s = inChoose('strategy')
     s.plug('strategy')
     const [socket] = s.sockets
@@ -106,11 +106,11 @@ describe('GameSession · detalles', () => {
     expect(s.playback.playing).toBe(false)
   })
 
-  it('conectar un nodo consigo mismo no cuenta como intento', () => {
+  it('connecting a node to itself does not count as an attempt', () => {
     expect(session('tutorial').connect('charge', 'charge')).toBe('none')
   })
 
-  it('reiniciar borra el resultado; reconstruir conserva velocidad y nodo inspeccionado', () => {
+  it('restarting clears the result; rebuilding keeps speed and inspected node', () => {
     const s = inChoose('strategy')
     expect(s.result).toBeDefined()
     s.setSpeed(2)
@@ -122,14 +122,14 @@ describe('GameSession · detalles', () => {
     expect(s.playback.inspected).toBe('charge')
   })
 
-  it('la calificación de la corrida coincide con evaluar la variante desde cero', () => {
+  it('the run score matches evaluating the variant from scratch', () => {
     const s = inChoose('observer')
     s.plug('observer')
     runOut(s)
     expect(s.result).toEqual(evaluate(s.level, s.variant))
   })
 
-  it('la comparación lista solo las métricas objetivo que cambian', () => {
+  it('the comparison lists only the goal metrics that change', () => {
     const s = session('strategy')
     runOut(s)
     s.plug('strategy')
@@ -142,7 +142,7 @@ describe('GameSession · detalles', () => {
     for (const m of s.comparisonRows) expect(s.comparison!.with.metrics[m]).not.toBe(s.comparison!.without.metrics[m])
   })
 
-  it('borrar el progreso lo vacía en el almacén', () => {
+  it('clearing progress empties it in the store', () => {
     const store = new MemoryProgressStore({ version: 1, completed: ['tutorial'], notes: ['strategy:observer'], predictions: { right: 1, total: 2 }, review: {} })
     const s = session('strategy', store)
     s.resetProgress()
@@ -150,14 +150,14 @@ describe('GameSession · detalles', () => {
   })
 })
 
-describe('GameSession · predicciones', () => {
+describe('GameSession · predictions', () => {
   const inChoose = (id: string, store = new MemoryProgressStore()) => {
     const s = session(id, store)
     runOut(s)
     return s
   }
 
-  it('enchufar abre una pregunta y no corre hasta responderla', () => {
+  it('plugging opens a question and does not run until it is answered', () => {
     const store = new MemoryProgressStore()
     const s = inChoose('strategy', store)
     s.plug('observer')
@@ -169,7 +169,7 @@ describe('GameSession · predicciones', () => {
     expect(store.load().predictions).toEqual({ right: 0, total: 1 })
   })
 
-  it('darle play sin responder omite la pregunta y no cuenta', () => {
+  it('pressing play without answering skips the question and does not count', () => {
     const store = new MemoryProgressStore()
     const s = inChoose('strategy', store)
     s.plug('strategy')
@@ -178,7 +178,7 @@ describe('GameSession · predicciones', () => {
     expect(store.load().predictions.total).toBe(0)
   })
 
-  it('el ticket pregunta cuántas piezas se tocarán y responder lo aplica', () => {
+  it('the ticket asks how many pieces will be touched and answering applies it', () => {
     const s = inChoose('strategy')
     s.plug('strategy')
     s.predict('solves')
@@ -192,7 +192,7 @@ describe('GameSession · predicciones', () => {
   })
 })
 
-describe('GameSession · cambios en el código', () => {
+describe('GameSession · code changes', () => {
   const toCompare = (id: string) => {
     const s = session(id)
     runOut(s)
@@ -208,29 +208,29 @@ describe('GameSession · cambios en el código', () => {
     return s
   }
 
-  it('Strategy + ticket: con el patrón solo cambia el registro; sin patrón se abre Cashier', () => {
+  it('Strategy + ticket: with the pattern only the registration changes; without it Cashier is opened', () => {
     const s = toCompare('strategy')
     const removed = () => s.codeChange!.lines.filter((l) => l.kind === 'del').map((l) => l.text.trim())
     expect(removed()).toEqual(['{ cash: CashPayment.new, card: CardPayment.new, voucher: VoucherPayment.new },'])
     s.showSide('without')
     const added = s.codeChange!.lines.filter((l) => l.kind === 'add').map((l) => l.text.trim())
-    expect(added.some((l) => l.startsWith('elsif order.payment == :app'))).toBe(true) // una rama nueva dentro de Cashier
+    expect(added.some((l) => l.startsWith('elsif order.payment == :app'))).toBe(true) // a new branch inside Cashier
     expect(identity(s.codeChange!.title)).toContain('sin patrón')
   })
 
-  it('sin ticket compara el código sin patrón con el código con patrón', () => {
+  it('without a ticket it compares the code without pattern against the code with pattern', () => {
     const s = toCompare('builder')
     expect(identity(s.codeChange!.title)).toContain('Builder')
     expect(s.codeChange!.added + s.codeChange!.removed).toBeGreaterThan(0)
   })
 
-  it('antes de comparar no hay cambios que mostrar', () => {
+  it('before comparing there are no changes to show', () => {
     expect(session('strategy').codeChange).toBeUndefined()
   })
 })
 
-describe('GameSession · repaso', () => {
-  it('anota la respuesta en el progreso guardado', () => {
+describe('GameSession · review', () => {
+  it('records the answer in the saved progress', () => {
     const store = new MemoryProgressStore()
     const s = session('tutorial', store)
     s.recordReview('strategy/metodo-de-pago', true, 1000)

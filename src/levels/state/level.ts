@@ -20,7 +20,7 @@ export const EVENT_LABELS: Record<string, string> = { pay: 'pagar', prepare: 'pr
 const TARGET: Record<string, string> = { pay: 'pagado', prepare: 'preparando', deliver: 'entregado', cancel: 'cancelado' }
 const VALID: Record<string, string[]> = { pendiente: ['pay', 'cancel'], pagado: ['prepare', 'cancel'], preparando: ['deliver'], entregado: [], cancelado: [] }
 
-// Sin patrón: todo evento cambia el status; los que no tenían sentido quedan marcados.
+// Without a pattern: every event changes the status; the ones that made no sense are left marked.
 export const permissive = Object.fromEntries(
   STATES.map((s) => [
     s,
@@ -28,7 +28,7 @@ export const permissive = Object.fromEntries(
   ]),
 )
 
-// Con State: cada estado solo conoce sus transiciones válidas.
+// With State: each state only knows its valid transitions.
 export const strict = Object.fromEntries(STATES.map((s) => [s, Object.fromEntries(VALID[s].map((event) => [event, { to: TARGET[event] }]))]))
 
 const events = ['pay', 'deliver', 'prepare', 'deliver', 'cancel'].map((e, i) => pulse(i * 40, EVENT_LABELS[e], [e], {}, 'events'))

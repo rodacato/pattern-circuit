@@ -14,7 +14,7 @@ import { isShortcut } from './shortcuts'
 import { Transport } from './Transport'
 
 afterEach(cleanup)
-Element.prototype.scrollIntoView = () => {} // jsdom no implementa scroll
+Element.prototype.scrollIntoView = () => {} // jsdom does not implement scroll
 
 const session = (id: string, store = new MemoryProgressStore()) => new GameSession(LEVELS.find((l) => l.id === id)!, store)
 const runOut = (s: GameSession) =>
@@ -25,7 +25,7 @@ const runOut = (s: GameSession) =>
 const keyboardClick = (el: HTMLElement) => fireEvent.click(el, { detail: 0 })
 
 describe('Transport', () => {
-  it('cada control tiene nombre accesible y la velocidad activa se marca', () => {
+  it('every control has an accessible name and the active speed is marked', () => {
     const s = session('tutorial')
     render(<Transport session={s} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paso adelante' }))
@@ -37,7 +37,7 @@ describe('Transport', () => {
 })
 
 describe('BriefCard', () => {
-  it('muestra las etapas del nivel y marca la actual', () => {
+  it('shows the level stages and marks the current one', () => {
     const s = session('strategy')
     render(<BriefCard session={s} />)
     const steps = [...document.querySelectorAll('.stages li')].map((li) => li.textContent)
@@ -49,7 +49,7 @@ describe('BriefCard', () => {
 })
 
 describe('Inventory', () => {
-  it('aparece al ver el problema; con teclado enchufa y un segundo clic desenchufa', () => {
+  it('appears when seeing the problem; with the keyboard it plugs and a second click unplugs', () => {
     const s = session('strategy')
     const { container } = render(<Inventory session={s} />)
     expect(container.innerHTML).toBe('')
@@ -62,7 +62,7 @@ describe('Inventory', () => {
     expect(s.pluggedPatterns).toEqual([])
   })
 
-  it('tras probar un patrón muestra su resultado', () => {
+  it('after trying a pattern it shows its result', () => {
     const s = session('strategy')
     render(<Inventory session={s} />)
     runOut(s)
@@ -73,7 +73,7 @@ describe('Inventory', () => {
 })
 
 describe('StageCard', () => {
-  it('tras fallar el nivel 0 ofrece conectar el cable sin arrastrar', () => {
+  it('after failing level 0 it offers to connect the wire without dragging', () => {
     const s = session('tutorial')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
@@ -84,12 +84,12 @@ describe('StageCard', () => {
     expect(screen.getByRole('status').textContent).toContain('Nivel superado')
   })
 
-  it('la comparación marca el lado activo y lista las métricas que cambian', () => {
+  it('the comparison marks the active side and lists the metrics that change', () => {
     const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     act(() => void s.plug('strategy'))
-    runOut(s) // correr sin responder omite la predicción
+    runOut(s) // running without answering skips the prediction
     fireEvent.click(screen.getByRole('button', { name: /Siguiente: llega un cambio/ }))
     fireEvent.click(screen.getByRole('button', { name: /Ninguna/ }))
     expect(s.flow.ticketApplied).toBe(true)
@@ -101,8 +101,8 @@ describe('StageCard', () => {
   })
 })
 
-describe('pistas', () => {
-  it('se revelan de a una hasta nombrar el patrón', () => {
+describe('hints', () => {
+  it('they are revealed one at a time until the pattern is named', () => {
     const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
@@ -112,8 +112,8 @@ describe('pistas', () => {
   })
 })
 
-describe('predicciones', () => {
-  it('al enchufar pregunta primero y, tras la corrida, dice si acertó', () => {
+describe('predictions', () => {
+  it('when plugging it asks first and, after the run, says whether it was right', () => {
     const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
@@ -126,7 +126,7 @@ describe('predicciones', () => {
 })
 
 describe('CodePanel', () => {
-  it('en la comparación ofrece ver los cambios del código', () => {
+  it('in the comparison it offers to view the code changes', () => {
     const s = session('strategy')
     render(<CodePanel session={s} />)
     expect(screen.queryByRole('tab', { name: 'Cambios' })).toBeNull()
@@ -144,7 +144,7 @@ describe('CodePanel', () => {
 })
 
 describe('Notebook', () => {
-  it('vacío invita a probar patrones; Escape cierra', () => {
+  it('when empty it invites trying patterns; Escape closes', () => {
     const onClose = vi.fn()
     render(<Notebook levels={LEVELS} notes={[]} onClose={onClose} onReset={() => {}} />)
     expect(screen.getByRole('dialog').textContent).toContain('Todavía vacío')
@@ -152,7 +152,7 @@ describe('Notebook', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('agrupa las notas por patrón y borra el progreso solo si se confirma', () => {
+  it('groups notes by pattern and clears progress only if confirmed', () => {
     const onReset = vi.fn()
     render(<Notebook levels={LEVELS} notes={['strategy:observer', 'observer:observer']} onClose={() => {}} onReset={onReset} />)
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('2 notas de campo')
@@ -167,7 +167,7 @@ describe('Notebook', () => {
 })
 
 describe('Review', () => {
-  it('pregunta por un nivel completado, explica la respuesta y la anota en el progreso', () => {
+  it('asks about a completed level, explains the answer and records it in the progress', () => {
     const store = new MemoryProgressStore({ ...emptyProgress(), completed: ['strategy'] })
     const s = session('tutorial', store)
     render(<Review session={s} levels={LEVELS} onClose={() => {}} />)
@@ -179,14 +179,14 @@ describe('Review', () => {
     expect(screen.getByRole('dialog').textContent).toContain('Acertaste 0 de 1')
   })
 
-  it('sin niveles completados no hay nada pendiente', () => {
+  it('without completed levels nothing is pending', () => {
     render(<Review session={session('tutorial')} levels={LEVELS} onClose={() => {}} />)
     expect(screen.getByRole('dialog').textContent).toContain('Nada pendiente')
   })
 })
 
-describe('atajos de teclado', () => {
-  it('no se activan con modificadores ni sobre controles', () => {
+describe('keyboard shortcuts', () => {
+  it('they do not fire with modifiers or over controls', () => {
     const plain = { metaKey: false, ctrlKey: false, altKey: false, target: document.body }
     expect(isShortcut(plain)).toBe(true)
     expect(isShortcut({ ...plain, metaKey: true })).toBe(false)

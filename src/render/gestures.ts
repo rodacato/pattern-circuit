@@ -1,6 +1,6 @@
 import type { Point } from '../engine'
 
-// Gestos táctiles sin Pixi ni DOM: pellizcar para zoom y doble toque. Se prueban solos.
+// Touch gestures without Pixi or DOM: pinch to zoom and double tap. They are tested on their own.
 export class Pinch {
   private readonly pointers = new Map<number, Point>()
 
@@ -16,7 +16,7 @@ export class Pinch {
     return this.pointers.size >= 2
   }
 
-  // Mueve un dedo; con dos dedos devuelve cuánto escalar y alrededor de qué punto (el medio).
+  // Moves a finger; with two fingers it returns how much to scale and around which point (the midpoint).
   move(id: number, p: Point): { factor: number; center: Point } | undefined {
     if (!this.pointers.has(id)) return undefined
     const before = this.span()
@@ -33,7 +33,7 @@ export class Pinch {
   }
 }
 
-// Dos toques cerca en el tiempo y en el espacio = doble toque (los navegadores táctiles no siempre emiten dblclick).
+// Two taps close in time and space = double tap (touch browsers do not always emit dblclick).
 export class DoubleTap {
   private last?: { at: number; p: Point }
   private readonly ms: number

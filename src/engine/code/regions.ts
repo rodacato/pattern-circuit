@@ -1,6 +1,6 @@
-// Fragmentos de código con marcadores `# region: Clase#metodo` / `# endregion` (anidables).
-// El marcador es un comentario del lenguaje: `#` en Ruby, `//` en TypeScript.
-export type CodeRegion = { start: number; end: number } // líneas 1-based, inclusivas
+// Code fragments with `# region: Class#method` / `# endregion` markers (nestable).
+// The marker is a comment of the language: `#` in Ruby, `//` in TypeScript.
+export type CodeRegion = { start: number; end: number } // 1-based lines, inclusive
 export type CodeFile = { text: string; regions: Record<string, CodeRegion> }
 
 const OPEN = /^\s*(?:#|\/\/)\s*region:\s*(\S+)\s*$/
@@ -29,7 +29,7 @@ export function parseCode(source: string): CodeFile {
   return { text: lines.join('\n'), regions }
 }
 
-// `Cashier#charge:cash` cae a `Cashier#charge` si la rama no tiene región propia.
+// `Cashier#charge:cash` falls back to `Cashier#charge` if the branch has no region of its own.
 export function resolveRegion(file: CodeFile, ref: string | undefined): CodeRegion | undefined {
   if (!ref) return undefined
   return file.regions[ref] ?? file.regions[ref.split(':')[0]]

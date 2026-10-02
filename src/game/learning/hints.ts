@@ -2,10 +2,10 @@ import { FAMILY_NAMES, PATTERNS, type Evaluation, type LevelDef, type MetricName
 import { msg, N, type Message } from '../../i18n'
 import { pendingSockets, type FlowState } from '../flow/levelFlow'
 
-// Pistas de menos a más: una pregunta guía, la familia del patrón, un descarte y, al final, la respuesta.
-// Todo sale de los datos del nivel; las definiciones de familia GoF son las del libro (Gamma et al., 1994, cap. 1).
+// Hints from least to most: a guiding question, the pattern family, a ruling out and, at the end, the answer.
+// Everything comes from the level data; the GoF family definitions are the book's (Gamma et al., 1994, ch. 1).
 
-// Preguntas guía por síntoma: orientan la mirada sin nombrar ningún patrón.
+// Guiding questions per symptom: they direct the eye without naming any pattern.
 // i18n
 const QUESTIONS: Partial<Record<MetricName, string>> = {
   dropped: '¿Por qué se pierden pedidos? Busca el caso que no tiene a dónde ir.',
@@ -35,11 +35,11 @@ export function hintLadder(level: HintLevel, flow: FlowState, result?: Evaluatio
   if (!socket) return []
   const answer = socket.inventory.find((p) => socket.options[p]?.outcome === 'solves')
   if (!answer) return []
-  // "Entregados" es el síntoma más general: si falla otra métrica, esa orienta mejor.
+  // "Delivered" is the most general symptom: if another metric fails, that one guides better.
   const failing = result?.results.filter((r) => !r.pass).map((r) => r.assertion.metric).sort((a, b) => Number(a === 'delivered') - Number(b === 'delivered'))[0]
   const decoy = socket.inventory.find((p) => socket.options[p]?.outcome === 'misfit' && flow.plugs[socket.id]?.pattern !== p)
   const family = PATTERNS[answer].family
-  // Con varios sockets, cada pista dice de cuál habla.
+  // With several sockets, each hint says which one it is about.
   const where = level.sockets.length > 1 ? msg(' (socket "{socket}")', { socket: socket.label }) : ''
   return [
     (failing && QUESTIONS[failing]) ?? N('Corre el circuito y sigue un pulso: ¿dónde se tuerce el recorrido?'),

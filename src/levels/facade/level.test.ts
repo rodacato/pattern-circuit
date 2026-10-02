@@ -5,15 +5,15 @@ import level from './level'
 const socket = { id: 'kitchen', pattern: 'facade' as const }
 
 describe('L08 · Facade', () => {
-  it('sin patrón: los lattes de la app salen sin espuma', () => {
+  it('without a pattern: the app lattes come out without foam', () => {
     expect(evaluate(level, {}).metrics).toMatchObject({ delivered: 4, invalidAtSink: 2 })
   })
 
-  it('sin patrón + precalentar: el mismo cambio en dos lugares', () => {
+  it('without a pattern + preheat: the same change in two places', () => {
     expect(evaluate(level, { ticket: 'preheat' }).touched.sort()).toEqual(['grinder', 'grinderApp'])
   })
 
-  it('Facade: una sola orquestación, un solo lugar que cambiar', () => {
+  it('Facade: a single orchestration, a single place to change', () => {
     expect(evaluate(level, { sockets: [socket] }).metrics.invalidAtSink).toBe(0)
     expect(evaluate(level, { sockets: [socket], ticket: 'preheat' }).touched).toEqual(['grinder'])
   })

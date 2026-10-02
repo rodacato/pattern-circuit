@@ -36,7 +36,7 @@ const OUTCOME = {
 
 const names = (session: GameSession, t: Translate) => session.pluggedPatterns.map((p) => t(PATTERNS[p].name)).join(' + ')
 
-// La tarjeta que acompaña cada etapa del flujo del nivel.
+// The card that accompanies each stage of the level flow.
 export function StageCard({ session, onNext }: { session: GameSession; onNext?: () => void }) {
   const stage = useSession(session, (s) => s.flow.stage)
   const result = useSession(session, (s) => s.result)
@@ -82,7 +82,7 @@ function Close({ onClose }: { onClose?: () => void }) {
   ) : null
 }
 
-// Sin mouse no se puede arrastrar un cable: el botón "Conectar" hace la misma reparación.
+// Without a mouse a wire cannot be dragged: the "Conectar" button makes the same repair.
 function FailCard({ session, result, onClose }: { session: GameSession; result: Evaluation; onClose?: () => void }) {
   const t = useT()
   const repair = session.pendingRepairs[0]
@@ -106,7 +106,7 @@ function FailCard({ session, result, onClose }: { session: GameSession; result: 
   )
 }
 
-// Pistas de menos a más; la última dice qué patrón probar.
+// Hints from least to most; the last one says which pattern to try.
 function Hints({ session }: { session: GameSession }) {
   const t = useT()
   const shown = useSession(session, (s) => s.hintsShown)
@@ -143,7 +143,7 @@ function ProblemCard({ session, result, onClose }: { session: GameSession; resul
   )
 }
 
-// Antes de correr: el jugador se compromete con una respuesta.
+// Before running: the player commits to an answer.
 function PredictionCard({ session }: { session: GameSession }) {
   const t = useT()
   const p = session.prediction!
@@ -174,7 +174,7 @@ function Choices({ prediction, onPick }: { prediction: Prediction; onPick: (id: 
   )
 }
 
-// Tras la corrida: la predicción contrastada con lo que pasó.
+// After the run: the prediction compared with what happened.
 function PredictionResult({ prediction }: { prediction?: Prediction }) {
   const t = useT()
   if (!prediction?.guess) return null

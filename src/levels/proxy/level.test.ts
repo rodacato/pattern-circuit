@@ -3,11 +3,11 @@ import { evaluate } from '../../engine'
 import level from './level'
 
 describe('L09 · Proxy', () => {
-  it('sin patrón: se forma fila frente al almacén', () => {
+  it('without a pattern: a queue forms in front of the warehouse', () => {
     expect(evaluate(level, {}).metrics.maxLoad).toBeGreaterThan(3)
   })
 
-  it('Proxy: solo lo nuevo viaja al almacén', () => {
+  it('Proxy: only the new goes to the warehouse', () => {
     const r = evaluate(level, { sockets: [{ id: 'inventory', pattern: 'proxy' }] })
     expect(r.metrics).toMatchObject({ delivered: 6 })
     expect(r.metrics.maxLoad).toBe(2)

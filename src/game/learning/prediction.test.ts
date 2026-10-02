@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { identity } from '../../i18n'
 import { choiceLabel, guessed, isRight, outcomePrediction, touchedPrediction } from './prediction'
 
-describe('predicciones', () => {
-  it('la respuesta de una predicción de resultado es el resultado de la opción', () => {
+describe('predictions', () => {
+  it('the answer of an outcome prediction is the outcome of the option', () => {
     const p = outcomePrediction('Strategy', 'partial')
     expect(p.answer).toBe('partial')
     expect(identity(p.question)).toContain('Strategy')
@@ -12,11 +12,11 @@ describe('predicciones', () => {
     expect(isRight(guessed(p, 'solves'))).toBe(false)
   })
 
-  it('los nodos tocados se agrupan en ninguna, una o más de una', () => {
+  it('touched nodes are grouped as none, one or more than one', () => {
     expect([0, 1, 2, 5].map((n) => touchedPrediction(n).answer)).toEqual(['0', '1', 'many', 'many'])
   })
 
-  it('choiceLabel traduce el id a su texto', () => {
+  it('choiceLabel translates the id into its text', () => {
     expect(choiceLabel(touchedPrediction(0), '0')).toContain('Ninguna')
   })
 })

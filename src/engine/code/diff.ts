@@ -1,11 +1,11 @@
-// Diferencias línea a línea entre dos versiones del código (LCS clásico: los archivos son de ~100 líneas).
+// Line-by-line differences between two versions of the code (classic LCS: the files are ~100 lines).
 export type DiffLine = { kind: 'same' | 'add' | 'del'; text: string }
 export type DiffChunk = DiffLine | { kind: 'skip'; count: number }
 
 export function diffLines(before: string, after: string): DiffLine[] {
   const a = before.split('\n')
   const b = after.split('\n')
-  // lcs[i][j] = largo de la subsecuencia común más larga entre a[i..] y b[j..]
+  // lcs[i][j] = length of the longest common subsequence between a[i..] and b[j..]
   const lcs = Array.from({ length: a.length + 1 }, () => new Array<number>(b.length + 1).fill(0))
   for (let i = a.length - 1; i >= 0; i--) {
     for (let j = b.length - 1; j >= 0; j--) lcs[i][j] = a[i] === b[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1])
@@ -26,7 +26,7 @@ export function diffLines(before: string, after: string): DiffLine[] {
   return out
 }
 
-// Deja `context` líneas iguales alrededor de cada cambio y resume el resto.
+// Keeps `context` equal lines around each change and summarizes the rest.
 export function collapse(lines: DiffLine[], context = 3): DiffChunk[] {
   const near = lines.map((_, i) => lines.slice(Math.max(0, i - context), i + context + 1).some((l) => l.kind !== 'same'))
   const out: DiffChunk[] = []

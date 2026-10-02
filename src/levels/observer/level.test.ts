@@ -5,20 +5,20 @@ import level from './level'
 const socket = (pattern: 'observer' | 'strategy' | 'chain-of-responsibility') => ({ id: 'notices', pattern })
 
 describe('L10 · Observer', () => {
-  it('sin patrón: Lealtad nunca se entera', () => {
+  it('without a pattern: Loyalty never finds out', () => {
     expect(evaluate(level, {}).metrics.delivered).toBe(6)
   })
 
-  it('sin patrón + cocina: hay que abrir el pedido', () => {
+  it('without a pattern + kitchen: the order has to be opened', () => {
     expect(evaluate(level, { ticket: 'kitchen' }).touched).toEqual(['ready'])
   })
 
-  it('Observer: todos se enteran y la cocina se suscribe sin tocar nada', () => {
+  it('Observer: everyone finds out and the kitchen subscribes without touching anything', () => {
     expect(evaluate(level, { sockets: [socket('observer')] }).metrics.delivered).toBe(9)
     expect(evaluate(level, { sockets: [socket('observer')], ticket: 'kitchen' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
   })
 
-  it.each(['strategy', 'chain-of-responsibility'] as const)('%s: solo uno se entera', (p) => {
+  it.each(['strategy', 'chain-of-responsibility'] as const)('%s: only one finds out', (p) => {
     expect(evaluate(level, { sockets: [socket(p)] }).metrics.delivered).toBe(3)
   })
 })

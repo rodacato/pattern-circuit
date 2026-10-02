@@ -13,7 +13,7 @@ import tsSimple from './ts/simple.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const PIECES = 5 // avisar a la cocina no necesita piezas nuevas: basta un cable
+const PIECES = 5 // notifying the kitchen needs no new pieces: one wire is enough
 
 export default defineLevel({
   id: 'single-listener',

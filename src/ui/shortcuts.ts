@@ -1,6 +1,6 @@
 import type { GameSession } from '../game/session/GameSession'
 
-// Atajos de reproducción. Se ignoran con un modificador (⌘R recarga) o si el foco está en un control que ya usa la tecla.
+// Playback shortcuts. Ignored with a modifier (⌘R reloads) or if focus is in a control that already uses the key.
 export const SHORTCUTS: Record<string, (s: GameSession) => void> = {
   ' ': (s) => s.toggle(),
   ArrowRight: (s) => s.step(),

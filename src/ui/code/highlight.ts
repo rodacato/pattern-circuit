@@ -7,7 +7,7 @@ const SHIKI_LANG: Record<CodeLang, string> = { rb: 'ruby', ts: 'typescript' }
 
 let highlighter: Promise<HighlighterCore> | undefined
 
-// Shiki se carga bajo demanda: el juego arranca sin esperar las gramáticas.
+// Shiki is loaded on demand: the game starts without waiting for the grammars.
 function load() {
   highlighter ??= Promise.all([
     import('shiki/core'),
@@ -18,7 +18,7 @@ function load() {
   ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }, ruby, typescript, theme]) =>
     createHighlighterCore({ themes: [theme.default], langs: [ruby.default, typescript.default], engine: createJavaScriptRegexEngine() }),
   )
-  highlighter.catch(() => (highlighter = undefined)) // un fallo de red no deja el panel sin color para siempre
+  highlighter.catch(() => (highlighter = undefined)) // a network failure does not leave the panel colorless forever
   return highlighter
 }
 

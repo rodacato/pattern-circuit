@@ -1,11 +1,11 @@
-// Skins del capítulo Resiliencia (Null Object, Circuit Breaker, Saga), con su color propio.
+// Skins of the Resilience chapter (Null Object, Circuit Breaker, Saga), with their own color.
 import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'
 
 const PINK = 0xff5fd2
 
-// Null Object: el objeto que "no hace nada" se dibuja hueco, y los pulsos que lo llevan, con anillo punteado.
+// Null Object: the object that "does nothing" is drawn hollow, and the pulses carrying it, with a dotted ring.
 export function nullObject(): Skin {
   return {
     drawNode({ d }, _node, at) {
@@ -22,7 +22,7 @@ export function nullObject(): Skin {
   }
 }
 
-// Circuit Breaker: un interruptor que se ve cerrado (pasa) o abierto (desvía).
+// Circuit Breaker: a switch that looks closed (passes) or open (diverts).
 export function circuitBreaker(): Skin {
   return {
     drawNode({ d, gl, state }, node, at) {
@@ -43,7 +43,7 @@ export function circuitBreaker(): Skin {
   }
 }
 
-// Saga: los pasos llevan su compensación; la compensación corre hacia atrás.
+// Saga: the steps carry their compensation; the compensation runs backwards.
 export function saga(): Skin {
   return {
     drawNode({ d }, node, at) {

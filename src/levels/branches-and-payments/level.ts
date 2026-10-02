@@ -1,6 +1,6 @@
 import { defineLevel, type NodeInput, type Predicate } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire } from '../kit'
-// Un nivel de combinación reutiliza el código de los niveles donde se aprendió cada patrón.
+// A combination level reuses the code from the levels where each pattern was learned.
 import chargeBase from '../strategy/base.rb?raw'
 import chargeDecorator from '../strategy/decorator.rb?raw'
 import chargeObserver from '../strategy/observer.rb?raw'

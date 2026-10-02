@@ -21,7 +21,7 @@ const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 const EXTRAS = ['oat', 'shot', 'cinnamon', 'caramel']
 
-// Cada extra pedido tiene que estar aplicado (+extra) en la bebida entregada.
+// Each requested extra must be applied (+extra) to the delivered drink.
 const allExtrasApplied: Predicate = { all: EXTRAS.map((e) => ({ any: [{ not: { hasTag: e } }, { hasTag: `+${e}` }] })) }
 
 const subclass = (id: string, label: string, className: string, y: number, extras: string[]) =>

@@ -7,7 +7,7 @@ import type { Effects } from './fx'
 import { NODE_H, nodeCenter, SOCKET_R, socketCenter, withinSocket } from './layout'
 import { FAMILY_COLORS, NEON as C } from './theme'
 
-// Sockets hexagonales: laten mientras esperan un patrón y toman el color de la familia del enchufado.
+// Hexagonal sockets: they pulse while waiting for a pattern and take the color of the plugged one's family.
 export class SocketLayer {
   readonly container = new Container()
   dropHover?: string
@@ -35,7 +35,7 @@ export class SocketLayer {
     })?.id
   }
 
-  // Enchufar un patrón: onda y chispas del color de su familia sobre el socket.
+  // Plugging a pattern: wave and sparks of its family color over the socket.
   celebrate() {
     for (const [socketId, plug] of Object.entries(this.session.flow.plugs)) {
       if (this.lastPlugs[socketId] === plug.pattern) continue

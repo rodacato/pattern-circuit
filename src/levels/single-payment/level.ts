@@ -13,7 +13,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const PIECES = 5 // las piezas que ya tiene el circuito: arreglar el cobro no necesita más
+const PIECES = 5 // the pieces the circuit already has: fixing the charge needs no more
 
 export default defineLevel({
   id: 'single-payment',

@@ -7,19 +7,19 @@ const state = { id: 'states', pattern: 'state' as const }
 const observer = { id: 'notices', pattern: 'observer' as const }
 
 describe('L17 · State + Observer + Command', () => {
-  it('los tres juntos resuelven el nivel', () => {
+  it('all three together solve the level', () => {
     expect(evaluate(level, { sockets: [command, state, observer] }).metrics).toMatchObject({ delivered: 7, cancelled: 1, invalidAtSink: 0, dropped: 0 })
   })
 
-  it('sin Command, el deshacer se pierde', () => {
+  it('without Command, the undo is lost', () => {
     expect(evaluate(level, { sockets: [state, observer] }).metrics.dropped).toBe(1)
   })
 
-  it('sin State, cancelar lo entregado llega como válido', () => {
+  it('without State, cancelling the delivered arrives as valid', () => {
     expect(evaluate(level, { sockets: [command, observer] }).metrics.invalidAtSink).toBe(2)
   })
 
-  it('sin Observer, Lealtad no se entera', () => {
+  it('without Observer, Loyalty does not find out', () => {
     expect(evaluate(level, { sockets: [command, state] }).metrics.delivered).toBe(4)
   })
 })

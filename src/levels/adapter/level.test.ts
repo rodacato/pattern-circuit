@@ -5,15 +5,15 @@ import level from './level'
 const socket = (pattern: 'adapter' | 'decorator' | 'facade') => ({ sockets: [{ id: 'gateway', pattern }] })
 
 describe('L05 · Adapter', () => {
-  it('sin patrón: la terminal rechaza todos los pagos', () => {
+  it('without a pattern: the terminal rejects every payment', () => {
     expect(evaluate(level, {}).metrics).toMatchObject({ delivered: 0, dropped: 3 })
   })
 
-  it('Adapter traduce el formato y todo pasa', () => {
+  it('Adapter translates the format and everything goes through', () => {
     expect(evaluate(level, socket('adapter')).metrics).toMatchObject({ delivered: 3, dropped: 0 })
   })
 
-  it.each(['decorator', 'facade'] as const)('%s no cambia el formato: se sigue rechazando', (p) => {
+  it.each(['decorator', 'facade'] as const)('%s does not change the format: still rejected', (p) => {
     expect(evaluate(level, socket(p)).metrics.dropped).toBe(3)
   })
 })
