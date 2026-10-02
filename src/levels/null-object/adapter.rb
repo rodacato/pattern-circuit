@@ -3,6 +3,6 @@
 # region: CardAdapter
 class CardAdapter
   def initialize(card) = @card = card
-  def add_points(amount) = @card.add_points(amount)
+  def add_points(amount) = @card.credit_points(amount)
 end
 # endregion

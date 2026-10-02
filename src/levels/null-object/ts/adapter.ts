@@ -3,6 +3,6 @@
 // region: CardAdapter
 class CardAdapter {
   constructor(private card: ExternalCard) {}
-  addPoints(amount: number) { this.card.addPoints(amount) }
+  addPoints(amount: number) { this.card.creditPoints(amount) }
 }
 // endregion
