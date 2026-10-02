@@ -20,7 +20,7 @@ export default defineConfig({
       // Fuera: contenido de niveles (lo cubren sus propios tests), el dibujo Pixi (humble object: lo que
       // se puede calcular vive en layout.ts y motion.ts, que sí se miden) y los puntos de entrada.
       exclude: [
-        'src/levels/L*/**',
+        'src/levels/*/**',
         'src/render/{NeonStage,PulseLayer,SocketLayer,draw,fx,theme}.ts',
         'src/render/skins/**',
         'src/debug/**',

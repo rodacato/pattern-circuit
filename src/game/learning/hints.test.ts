@@ -11,7 +11,7 @@ const level = (id: string) => LEVELS.find((l) => l.id === id)!
 
 describe('pistas', () => {
   it('van de una pregunta guía a la respuesta, pasando por la familia y un descarte', () => {
-    const l = level('L01-strategy')
+    const l = level('strategy')
     const hints = hintLadder(l, { ...initialFlow(), stage: 'choose' }, evaluate(l, {}))
     expect(hints).toHaveLength(4)
     expect(hints[0]).toContain('se pierden pedidos')
@@ -21,7 +21,7 @@ describe('pistas', () => {
   })
 
   it('con varios sockets apuntan al primero sin resolver y lo nombran', () => {
-    const l = level('L15-sucursales-y-pagos')
+    const l = level('branches-and-payments')
     const [first, second] = l.sockets
     const solved = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
     const flow = { ...initialFlow(), stage: 'choose' as const, plugs: { [first.id]: { socketId: first.id, pattern: solved, outcome: 'solves' as const } } }

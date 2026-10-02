@@ -26,7 +26,7 @@ const keyboardClick = (el: HTMLElement) => fireEvent.click(el, { detail: 0 })
 
 describe('Transport', () => {
   it('cada control tiene nombre accesible y la velocidad activa se marca', () => {
-    const s = session('L00-tutorial')
+    const s = session('tutorial')
     render(<Transport session={s} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paso adelante' }))
     expect(s.playback.timeline.tick).toBe(1)
@@ -38,7 +38,7 @@ describe('Transport', () => {
 
 describe('BriefCard', () => {
   it('muestra las etapas del nivel y marca la actual', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<BriefCard session={s} />)
     const steps = [...document.querySelectorAll('.stages li')].map((li) => li.textContent)
     expect(steps).toEqual(['Observar', 'Elegir patrón', 'Cambio', 'Comparar'])
@@ -50,7 +50,7 @@ describe('BriefCard', () => {
 
 describe('Inventory', () => {
   it('aparece al ver el problema; con teclado enchufa y un segundo clic desenchufa', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     const { container } = render(<Inventory session={s} />)
     expect(container.innerHTML).toBe('')
     runOut(s)
@@ -63,7 +63,7 @@ describe('Inventory', () => {
   })
 
   it('tras probar un patrón muestra su resultado', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<Inventory session={s} />)
     runOut(s)
     keyboardClick(screen.getByRole('button', { name: /^Observer/ }))
@@ -74,7 +74,7 @@ describe('Inventory', () => {
 
 describe('StageCard', () => {
   it('tras fallar el nivel 0 ofrece conectar el cable sin arrastrar', () => {
-    const s = session('L00-tutorial')
+    const s = session('tutorial')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     expect(screen.getByRole('status').textContent).toContain('Algo salió mal')
@@ -85,7 +85,7 @@ describe('StageCard', () => {
   })
 
   it('la comparación marca el lado activo y lista las métricas que cambian', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     act(() => void s.plug('strategy'))
@@ -103,7 +103,7 @@ describe('StageCard', () => {
 
 describe('pistas', () => {
   it('se revelan de a una hasta nombrar el patrón', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: /pista/ }))
@@ -114,7 +114,7 @@ describe('pistas', () => {
 
 describe('predicciones', () => {
   it('al enchufar pregunta primero y, tras la corrida, dice si acertó', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<StageCard session={s} onNext={() => {}} />)
     runOut(s)
     act(() => void s.plug('observer'))
@@ -127,7 +127,7 @@ describe('predicciones', () => {
 
 describe('CodePanel', () => {
   it('en la comparación ofrece ver los cambios del código', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     render(<CodePanel session={s} />)
     expect(screen.queryByRole('tab', { name: 'Cambios' })).toBeNull()
     runOut(s)
@@ -154,7 +154,7 @@ describe('Notebook', () => {
 
   it('agrupa las notas por patrón y borra el progreso solo si se confirma', () => {
     const onReset = vi.fn()
-    render(<Notebook levels={LEVELS} notes={['L01-strategy:observer', 'L10-observer:observer']} onClose={() => {}} onReset={onReset} />)
+    render(<Notebook levels={LEVELS} notes={['strategy:observer', 'observer:observer']} onClose={() => {}} onReset={onReset} />)
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('2 notas de campo')
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1)
     expect(screen.getByRole('link', { name: /Ver fuente/ }).getAttribute('href')).toContain('Observable')
@@ -168,19 +168,19 @@ describe('Notebook', () => {
 
 describe('Review', () => {
   it('pregunta por un nivel completado, explica la respuesta y la anota en el progreso', () => {
-    const store = new MemoryProgressStore({ ...emptyProgress(), completed: ['L01-strategy'] })
-    const s = session('L00-tutorial', store)
+    const store = new MemoryProgressStore({ ...emptyProgress(), completed: ['strategy'] })
+    const s = session('tutorial', store)
     render(<Review session={s} levels={LEVELS} onClose={() => {}} />)
     expect(screen.getByRole('dialog').textContent).toContain('¿Efectivo o tarjeta?')
     fireEvent.click(screen.getByRole('button', { name: /^Observer/ }))
     expect(screen.getByText(/La respuesta era Strategy/)).toBeTruthy()
-    expect(store.load().review['L01-strategy/metodo-de-pago']).toMatchObject({ box: 1 })
+    expect(store.load().review['strategy/metodo-de-pago']).toMatchObject({ box: 1 })
     fireEvent.click(screen.getByRole('button', { name: 'Ver resultado' }))
     expect(screen.getByRole('dialog').textContent).toContain('Acertaste 0 de 1')
   })
 
   it('sin niveles completados no hay nada pendiente', () => {
-    render(<Review session={session('L00-tutorial')} levels={LEVELS} onClose={() => {}} />)
+    render(<Review session={session('tutorial')} levels={LEVELS} onClose={() => {}} />)
     expect(screen.getByRole('dialog').textContent).toContain('Nada pendiente')
   })
 })

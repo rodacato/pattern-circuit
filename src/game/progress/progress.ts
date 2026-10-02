@@ -59,12 +59,42 @@ export class MemoryProgressStore implements ProgressStore {
 
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>
 
-// Ids de nivel que cambiaron entre versiones: el progreso guardado se traduce al cargar.
-const RENAMED_LEVELS: Record<string, string> = { 'L24-cafeteria-completa': 'L26-cafeteria-completa' } // 1.1: entró el capítulo Criterio
+// Level ids from earlier versions (1.0 and 1.1 numbered them: `L24-…`), mapped to the current ones.
+// Saved progress is translated on load, so renaming a level never loses what a player completed.
+export const LEGACY_LEVEL_IDS: Record<string, string> = {
+  'L00-tutorial': 'tutorial',
+  'L01-strategy': 'strategy',
+  'L02-factory-method': 'factory-method',
+  'L03-builder': 'builder',
+  'L04-singleton': 'singleton',
+  'L05-adapter': 'adapter',
+  'L06-decorator': 'decorator',
+  'L07-composite': 'composite',
+  'L08-facade': 'facade',
+  'L09-proxy': 'proxy',
+  'L10-observer': 'observer',
+  'L11-state': 'state',
+  'L12-chain': 'chain',
+  'L13-command': 'command',
+  'L14-template-method': 'template-method',
+  'L15-sucursales-y-pagos': 'branches-and-payments',
+  'L16-combos-con-extras': 'combos-with-extras',
+  'L17-pedidos-en-vivo': 'live-orders',
+  'L18-ports-and-adapters': 'ports-and-adapters',
+  'L19-event-bus': 'event-bus',
+  'L20-cqrs': 'cqrs',
+  'L21-null-object': 'null-object',
+  'L22-circuit-breaker': 'circuit-breaker',
+  'L23-saga': 'saga',
+  'L24-un-solo-pago': 'single-payment',
+  'L25-un-solo-oyente': 'single-listener',
+  'L26-cafeteria-completa': 'full-cafe',
+  'L24-cafeteria-completa': 'full-cafe',
+}
 
 export function migrateLevelIds(p: Progress): Progress {
-  const id = (levelId: string) => RENAMED_LEVELS[levelId] ?? levelId
-  const key = (k: string) => k.replace(/^[^:/]+/, (levelId) => id(levelId)) // `nivel:patrón` y `nivel/socket`
+  const id = (levelId: string) => LEGACY_LEVEL_IDS[levelId] ?? levelId
+  const key = (k: string) => k.replace(/^[^:/]+/, (levelId) => id(levelId)) // `level:pattern` and `level/socket`
   return {
     ...p,
     completed: p.completed.map(id),

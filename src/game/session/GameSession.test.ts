@@ -15,7 +15,7 @@ const runOut = (s: GameSession) => {
 describe('GameSession · nivel 0', () => {
   it('sin reparar se pierde; con el cable correcto se completa y se guarda', () => {
     const store = new MemoryProgressStore()
-    const s = session('L00-tutorial', store)
+    const s = session('tutorial', store)
     runOut(s)
     expect(s.result?.won).toBe(false)
     expect(s.failedRuns).toBe(1)
@@ -25,11 +25,11 @@ describe('GameSession · nivel 0', () => {
     expect(s.codeFile.text).toContain('@counter.hand_over(order)')
     runOut(s)
     expect(s.flow.stage).toBe('complete')
-    expect(store.load().completed).toEqual(['L00-tutorial'])
+    expect(store.load().completed).toEqual(['tutorial'])
   })
 
   it('paso adelante y atrás vuelven al mismo tick', () => {
-    const s = session('L00-tutorial')
+    const s = session('tutorial')
     for (let i = 0; i < 10; i++) s.step()
     s.back()
     expect(s.playback.timeline.tick).toBe(9)
@@ -40,7 +40,7 @@ describe('GameSession · nivel 0', () => {
 describe('GameSession · nivel 1 (Strategy)', () => {
   it('recorre el nivel completo: problema, patrones, cambio y comparación', () => {
     const store = new MemoryProgressStore()
-    const s = session('L01-strategy', store)
+    const s = session('strategy', store)
     expect(s.plug('strategy')).toBeUndefined() // el inventario abre después de ver el problema
 
     runOut(s)
@@ -70,7 +70,7 @@ describe('GameSession · nivel 1 (Strategy)', () => {
     expect(s.touched).toEqual(['cobrar'])
     s.finishLevel()
     expect(s.flow.stage).toBe('complete')
-    expect(store.load()).toMatchObject({ completed: ['L01-strategy'], notes: ['L01-strategy:observer', 'L01-strategy:strategy'] })
+    expect(store.load()).toMatchObject({ completed: ['strategy'], notes: ['strategy:observer', 'strategy:strategy'] })
   })
 })
 
@@ -82,7 +82,7 @@ describe('GameSession · detalles', () => {
   }
 
   it('con varios sockets, un patrón sin socket va al primero sin resolver que lo acepte', () => {
-    const s = inChoose('L15-sucursales-y-pagos')
+    const s = inChoose('branches-and-payments')
     const [first] = s.sockets
     const pattern = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
     s.plug(pattern)
@@ -92,13 +92,13 @@ describe('GameSession · detalles', () => {
   })
 
   it('un patrón en un socket que no lo acepta no hace nada', () => {
-    const s = inChoose('L01-strategy')
+    const s = inChoose('strategy')
     expect(s.plug('strategy', 'no-existe')).toBeUndefined()
     expect(s.flow.plugs).toEqual({})
   })
 
   it('desenchufar vuelve al circuito sin patrón y no lo corre solo', () => {
-    const s = inChoose('L01-strategy')
+    const s = inChoose('strategy')
     s.plug('strategy')
     const [socket] = s.sockets
     s.unplug(socket.id)
@@ -107,11 +107,11 @@ describe('GameSession · detalles', () => {
   })
 
   it('conectar un nodo consigo mismo no cuenta como intento', () => {
-    expect(session('L00-tutorial').connect('cobrar', 'cobrar')).toBe('none')
+    expect(session('tutorial').connect('cobrar', 'cobrar')).toBe('none')
   })
 
   it('reiniciar borra el resultado; reconstruir conserva velocidad y nodo inspeccionado', () => {
-    const s = inChoose('L01-strategy')
+    const s = inChoose('strategy')
     expect(s.result).toBeDefined()
     s.setSpeed(2)
     s.inspect('cobrar')
@@ -123,14 +123,14 @@ describe('GameSession · detalles', () => {
   })
 
   it('la calificación de la corrida coincide con evaluar la variante desde cero', () => {
-    const s = inChoose('L10-observer')
+    const s = inChoose('observer')
     s.plug('observer')
     runOut(s)
     expect(s.result).toEqual(evaluate(s.level, s.variant))
   })
 
   it('la comparación lista solo las métricas objetivo que cambian', () => {
-    const s = session('L01-strategy')
+    const s = session('strategy')
     runOut(s)
     s.plug('strategy')
     runOut(s)
@@ -143,8 +143,8 @@ describe('GameSession · detalles', () => {
   })
 
   it('borrar el progreso lo vacía en el almacén', () => {
-    const store = new MemoryProgressStore({ version: 1, completed: ['L00-tutorial'], notes: ['L01-strategy:observer'], predictions: { right: 1, total: 2 }, review: {} })
-    const s = session('L01-strategy', store)
+    const store = new MemoryProgressStore({ version: 1, completed: ['tutorial'], notes: ['strategy:observer'], predictions: { right: 1, total: 2 }, review: {} })
+    const s = session('strategy', store)
     s.resetProgress()
     expect(store.load()).toEqual(emptyProgress())
   })
@@ -159,7 +159,7 @@ describe('GameSession · predicciones', () => {
 
   it('enchufar abre una pregunta y no corre hasta responderla', () => {
     const store = new MemoryProgressStore()
-    const s = inChoose('L01-strategy', store)
+    const s = inChoose('strategy', store)
     s.plug('observer')
     expect(s.awaitingPrediction).toBe(true)
     expect(s.playback.playing).toBe(false)
@@ -171,7 +171,7 @@ describe('GameSession · predicciones', () => {
 
   it('darle play sin responder omite la pregunta y no cuenta', () => {
     const store = new MemoryProgressStore()
-    const s = inChoose('L01-strategy', store)
+    const s = inChoose('strategy', store)
     s.plug('strategy')
     s.play()
     expect(s.prediction).toBeUndefined()
@@ -179,7 +179,7 @@ describe('GameSession · predicciones', () => {
   })
 
   it('el ticket pregunta cuántas piezas se tocarán y responder lo aplica', () => {
-    const s = inChoose('L01-strategy')
+    const s = inChoose('strategy')
     s.plug('strategy')
     s.predict('solves')
     runOut(s)
@@ -209,7 +209,7 @@ describe('GameSession · cambios en el código', () => {
   }
 
   it('Strategy + ticket: con el patrón solo cambia el registro; sin patrón se abre Cashier', () => {
-    const s = toCompare('L01-strategy')
+    const s = toCompare('strategy')
     const removed = () => s.codeChange!.lines.filter((l) => l.kind === 'del').map((l) => l.text.trim())
     expect(removed()).toEqual(['{ cash: CashPayment.new, card: CardPayment.new, voucher: VoucherPayment.new },'])
     s.showSide('without')
@@ -219,21 +219,21 @@ describe('GameSession · cambios en el código', () => {
   })
 
   it('sin ticket compara el código sin patrón con el código con patrón', () => {
-    const s = toCompare('L03-builder')
+    const s = toCompare('builder')
     expect(identity(s.codeChange!.title)).toContain('Builder')
     expect(s.codeChange!.added + s.codeChange!.removed).toBeGreaterThan(0)
   })
 
   it('antes de comparar no hay cambios que mostrar', () => {
-    expect(session('L01-strategy').codeChange).toBeUndefined()
+    expect(session('strategy').codeChange).toBeUndefined()
   })
 })
 
 describe('GameSession · repaso', () => {
   it('anota la respuesta en el progreso guardado', () => {
     const store = new MemoryProgressStore()
-    const s = session('L00-tutorial', store)
-    s.recordReview('L01-strategy/metodo-de-pago', true, 1000)
-    expect(store.load().review['L01-strategy/metodo-de-pago']).toMatchObject({ box: 1 })
+    const s = session('tutorial', store)
+    s.recordReview('strategy/metodo-de-pago', true, 1000)
+    expect(store.load().review['strategy/metodo-de-pago']).toMatchObject({ box: 1 })
   })
 })

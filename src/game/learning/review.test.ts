@@ -7,21 +7,21 @@ const now = Date.UTC(2026, 8, 24)
 
 describe('repaso espaciado', () => {
   it('solo entran los sockets de niveles completados, con el patrón que resuelve', () => {
-    const items = reviewItems(LEVELS, ['L00-tutorial', 'L01-strategy', 'L15-sucursales-y-pagos'])
-    expect(items.map((i) => i.id)).toEqual(['L01-strategy/metodo-de-pago', ...LEVELS.find((l) => l.id === 'L15-sucursales-y-pagos')!.sockets.map((s) => `L15-sucursales-y-pagos/${s.id}`)])
+    const items = reviewItems(LEVELS, ['tutorial', 'strategy', 'branches-and-payments'])
+    expect(items.map((i) => i.id)).toEqual(['strategy/metodo-de-pago', ...LEVELS.find((l) => l.id === 'branches-and-payments')!.sockets.map((s) => `branches-and-payments/${s.id}`)])
     expect(items[0].answer).toBe('strategy')
   })
 
   it('lo nunca repasado está pendiente; lo acertado se aleja cada vez más', () => {
-    const items = reviewItems(LEVELS, ['L01-strategy'])
+    const items = reviewItems(LEVELS, ['strategy'])
     let state: ReviewState = {}
     expect(dueItems(items, state, now)).toHaveLength(1)
-    state = recordAnswer(state, 'L01-strategy/metodo-de-pago', true, now)
-    expect(state['L01-strategy/metodo-de-pago']).toEqual({ box: 1, due: now + DAY })
+    state = recordAnswer(state, 'strategy/metodo-de-pago', true, now)
+    expect(state['strategy/metodo-de-pago']).toEqual({ box: 1, due: now + DAY })
     expect(dueItems(items, state, now)).toHaveLength(0)
     expect(dueItems(items, state, now + DAY)).toHaveLength(1)
-    state = recordAnswer(state, 'L01-strategy/metodo-de-pago', true, now + DAY)
-    expect(state['L01-strategy/metodo-de-pago']).toEqual({ box: 2, due: now + DAY + 3 * DAY })
+    state = recordAnswer(state, 'strategy/metodo-de-pago', true, now + DAY)
+    expect(state['strategy/metodo-de-pago']).toEqual({ box: 2, due: now + DAY + 3 * DAY })
   })
 
   it('un error devuelve la tarjeta a la primera caja y vuelve enseguida', () => {
