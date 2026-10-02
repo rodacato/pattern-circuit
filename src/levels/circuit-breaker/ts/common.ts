@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 interface Gateway {
   charge(order: Order): unknown
 }
@@ -14,7 +14,7 @@ class Cashier {
 class OfflinePayments implements Gateway {
   private pending: Order[] = []
 
-  // Respaldo: anota el cobro y lo procesa cuando el proveedor vuelva.
+  // Fallback: records the charge and processes it when the provider is back.
   // region: OfflinePayments#charge
   charge(order: Order) { this.pending.push(order) }
   // endregion
@@ -30,6 +30,6 @@ class Barista {
 
 class Counter {
   // region: Counter#hand_over
-  handOver(order: Order) { console.log('¡Listo!') }
+  handOver(order: Order) { console.log('Ready!') }
   // endregion
 }

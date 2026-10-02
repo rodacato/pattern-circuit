@@ -4,7 +4,7 @@ class Order {
   // endregion
 }
 
-// Los extras se apilan como envolturas con nombre: ya no se cruzan.
+// Extras stack as named wrappers: they no longer get swapped.
 // region: WithMilk
 class WithMilk {
   constructor(private inner: Order, private milk: string) {}
@@ -25,10 +25,10 @@ class WithIce {
 class OrderTaker {
   constructor(private cashier: Cashier) {}
 
-  // …pero nadie revisa el pedido completo: caliente + hielo pasa y explota en cocina.
+  // …but nobody checks the whole order: hot + ice gets through and blows up in the kitchen.
   // region: OrderTaker#take
   take(request: OrderRequest) {
-    const order = new WithSyrup(new WithMilk(new Order('grande', 'caliente'), 'avena'), 'vainilla')
+    const order = new WithSyrup(new WithMilk(new Order('large', 'hot'), 'oat'), 'vanilla')
     this.cashier.charge(order)
   }
   // endregion

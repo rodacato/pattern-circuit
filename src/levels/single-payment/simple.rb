@@ -1,12 +1,12 @@
-# Un solo método de pago y ninguno más a la vista: el arreglo es una línea.
-IVA = 0.16
+# A single payment method and no other in sight: the fix is one line.
+VAT = 0.16
 
 class Cashier
   def initialize(barista) = @barista = barista
 
   # region: Cashier#charge
   def charge(order)
-    total = order.price * (1 + IVA)
+    total = order.price * (1 + VAT)
     CardTerminal.charge(total)
     @barista.prepare(order)
   end

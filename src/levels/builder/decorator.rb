@@ -6,7 +6,7 @@ class Order
   # endregion
 end
 
-# Los extras se apilan como envolturas con nombre: ya no se cruzan.
+# Extras stack as named wrappers: they no longer get swapped.
 # region: WithMilk
 class WithMilk < SimpleDelegator
   def initialize(order, milk) = (super(order); @milk = milk)
@@ -26,10 +26,10 @@ end
 class OrderTaker
   def initialize(cashier) = @cashier = cashier
 
-  # …pero nadie revisa el pedido completo: caliente + hielo pasa y explota en cocina.
+  # …but nobody checks the whole order: hot + ice gets through and blows up in the kitchen.
   # region: OrderTaker#take
   def take(request)
-    order = WithSyrup.new(WithMilk.new(Order.new(:grande, :caliente), :avena), :vainilla)
+    order = WithSyrup.new(WithMilk.new(Order.new(:large, :hot), :oat), :vanilla)
     @cashier.charge(order)
   end
   # endregion

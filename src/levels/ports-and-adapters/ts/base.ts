@@ -1,9 +1,9 @@
-// El núcleo del negocio habla directo con la base de datos y con Stripe.
+// The business core talks directly to the database and to Stripe.
 class OrderService {
   // region: OrderService#place
   place(params: OrderParams) {
     const order = new Order(params)
-    const db = PG.connect(process.env.DATABASE_URL!) // la base real, siempre
+    const db = PG.connect(process.env.DATABASE_URL!) // always the real database
     db.exec('INSERT INTO orders …', order.toRow())
     Stripe.Charge.create({ amount: order.totalCents, source: params.card })
     new Receipt().confirm(order)
@@ -12,9 +12,9 @@ class OrderService {
 }
 
 // region: Postgres
-// En el entorno de pruebas no hay DATABASE_URL: PG.connect explota.
+// In the test environment there is no DATABASE_URL: PG.connect blows up.
 // endregion
 
 // region: Stripe
-// Y cada prueba intentaría cobrar de verdad.
+// And every test would try to really charge.
 // endregion

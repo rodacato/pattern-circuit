@@ -1,4 +1,4 @@
-// Envuelve el pedido y le añade algo, pero no decide nada.
+// Wraps the order and adds something, but decides nothing.
 // region: TrackedOrder
 class TrackedOrder implements Order {
   constructor(private inner: Order) {}
@@ -14,7 +14,7 @@ class Cashier {
 
   // region: Cashier#charge
   charge(plain: Order) {
-    const order = new TrackedOrder(plain) // el pedido llega envuelto…
+    const order = new TrackedOrder(plain) // the order arrives wrapped…
     // region: Cashier#charge:cash
     if (order.payment === 'cash') {
       CashDrawer.collect(order.total)
@@ -25,7 +25,7 @@ class Cashier {
     // endregion
     // region: Cashier#charge:else
     } else {
-      return // …pero cae en el mismo árbol de if
+      return // …but it falls into the same if tree
     // endregion
     }
     this.barista.prepare(order)

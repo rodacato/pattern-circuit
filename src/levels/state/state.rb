@@ -1,4 +1,4 @@
-# Cada estado es un objeto que sabe qué eventos acepta y a qué estado lleva.
+# Each state is an object that knows which events it accepts and which state it leads to.
 class Order
   attr_accessor :state
 
@@ -18,35 +18,35 @@ end
 
 # region: Order#handle:pendiente
 class Pending
-  def name = :pendiente
-  def on(event) = { pagar: Paid.new, cancelar: Cancelled.new }[event]
+  def name = :pending
+  def on(event) = { pay: Paid.new, cancel: Cancelled.new }[event]
 end
 # endregion
 
 # region: Order#handle:pagado
 class Paid
-  def name = :pagado
-  def on(event) = { preparar: Preparing.new, cancelar: Cancelled.new }[event]
+  def name = :paid
+  def on(event) = { prepare: Preparing.new, cancel: Cancelled.new }[event]
 end
 # endregion
 
 # region: Order#handle:preparando
 class Preparing
-  def name = :preparando
-  def on(event) = { entregar: Delivered.new }[event]
+  def name = :preparing
+  def on(event) = { deliver: Delivered.new }[event]
 end
 # endregion
 
 # region: Order#handle:entregado
 class Delivered
-  def name = :entregado
-  def on(_event) = nil # un pedido entregado ya no cambia
+  def name = :delivered
+  def on(_event) = nil # a delivered order no longer changes
 end
 # endregion
 
 # region: Order#handle:cancelado
 class Cancelled
-  def name = :cancelado
+  def name = :cancelled
   def on(_event) = nil
 end
 # endregion

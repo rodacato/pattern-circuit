@@ -1,7 +1,7 @@
 class TicketCounter {
   private static _instance?: TicketCounter
 
-  // Una sola instancia para toda la cafetería.
+  // One single instance for the whole coffee shop.
   static get instance() { return (this._instance ??= new TicketCounter()) }
   private constructor() {}
 
@@ -15,7 +15,7 @@ class TicketCounter {
 class Register {
   constructor(private display: Display) {}
 
-  // Resuelve el problema… a costa de que cualquier clase pueda llegar al contador global.
+  // Solves the problem… at the cost of any class being able to reach the global counter.
   // region: Register#checkout
   checkout(order: Order) {
     order.ticket = TicketCounter.instance.next()

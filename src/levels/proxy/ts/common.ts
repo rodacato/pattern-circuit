@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type Order = { item: string }
 
 interface Inventory {
@@ -19,11 +19,11 @@ class OrderTaker {
   // endregion
 }
 
-// El almacén está lejos: cada consulta tarda y atiende de a una.
+// The warehouse is far away: each query takes time and serves one at a time.
 class RemoteInventory implements Inventory {
   // region: RemoteInventory#in_stock?
   inStock(item: string) {
-    sleep(2) // viaje de ida y vuelta al almacén
+    sleep(2) // round trip to the warehouse
     return Warehouse.api.stock(item) > 0
   }
   // endregion
@@ -39,6 +39,6 @@ class Barista {
 
 class Counter {
   // region: Counter#hand_over
-  handOver(order: Order) { console.log(`¡${order.item} listo!`) }
+  handOver(order: Order) { console.log(`${order.item} ready!`) }
   // endregion
 }

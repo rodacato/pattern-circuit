@@ -13,7 +13,7 @@ class Cashier
     # endregion
     # region: Cashier#charge:else
     else
-      # ¿vales? Nadie los contempló: el pedido se pierde en silencio.
+      # vouchers? Nobody planned for them: the order is lost silently.
       return
     # endregion
     end

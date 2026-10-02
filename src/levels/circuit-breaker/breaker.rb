@@ -4,7 +4,7 @@ class PaymentGateway
   # endregion
 end
 
-# Después de varios fallos seguidos deja de llamar al proveedor y va directo al respaldo.
+# After several consecutive failures it stops calling the provider and goes straight to the fallback.
 class CircuitBreaker
   def initialize(service, fallback, threshold: 2)
     @service, @fallback, @threshold = service, fallback, threshold
@@ -15,7 +15,7 @@ class CircuitBreaker
   def charge(order)
     return @fallback.charge(order) if open?
     result = @service.charge(order)
-    @failures = 0 # un éxito reinicia la cuenta: lo que abre el circuito son fallos seguidos
+    @failures = 0 # a success resets the count: what opens the circuit is consecutive failures
     result
   rescue Timeout::Error
     @failures += 1
@@ -23,9 +23,9 @@ class CircuitBreaker
   end
   # endregion
 
-  def open? = @failures >= @threshold # (tras un tiempo, un intento de prueba lo cerraría: "half-open")
+  def open? = @failures >= @threshold # (after a while, a trial attempt would close it: "half-open")
 end
 
 # region: Timeout::Error
-# El fallo vuelve al interruptor, que lo cuenta.
+# The failure comes back to the breaker, which counts it.
 # endregion

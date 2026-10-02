@@ -1,7 +1,7 @@
 abstract class Branch {
   constructor(private barista: Barista) {}
 
-  // El flujo es el mismo para todas; solo `createDrink` cambia.
+  // The flow is the same for all of them; only `createDrink` changes.
   // region: Branch#take
   take(order: Order) {
     const drink = this.createDrink()
@@ -31,7 +31,7 @@ class MountainBranch extends Branch {
 }
 
 // region: HarborBranch#create_drink
-class HarborBranch extends Branch { // ← sucursal nueva: una subclase, nada más
+class HarborBranch extends Branch { // ← new branch: one subclass, nothing else
   createDrink() { return new IcedTea() }
 }
 // endregion

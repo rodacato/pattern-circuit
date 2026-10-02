@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type DrinkRequest = { extras: string[] }
 
 interface Drink {

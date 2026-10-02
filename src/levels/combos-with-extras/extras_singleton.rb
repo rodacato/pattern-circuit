@@ -2,8 +2,8 @@
 class CoffeeMenu
   def self.instance = @instance ||= new
 
-  # Un único menú compartido… que sigue eligiendo una sola subclase.
+  # A single shared menu… that still picks only one subclass.
   # region: CoffeeMenu#drink_for
-  def drink_for(extras) = extras.include?(:avena) ? OatMilkLatte.new : ShotLatte.new
+  def drink_for(extras) = extras.include?(:oat) ? OatMilkLatte.new : ShotLatte.new
   # endregion
 end

@@ -15,7 +15,7 @@ class Cashier
 
   # region: Cashier#charge
   def charge(order)
-    puts "Cobrado: #{order.drink}"
+    puts "Charged: #{order.drink}"
     @barista.prepare(order)
   end
   # endregion
@@ -24,8 +24,8 @@ end
 class Barista
   # region: Barista#prepare
   def prepare(order)
-    puts "Preparando #{order.drink}..."
-    # ¿y ahora a quién se la entrego? Falta un cable.
+    puts "Preparing #{order.drink}..."
+    # and now who do I hand it to? A wire is missing.
   end
   # endregion
 end
@@ -33,7 +33,7 @@ end
 class Counter
   # region: Counter#hand_over
   def hand_over(order)
-    puts "¡#{order.drink} listo!"
+    puts "#{order.drink} ready!"
   end
   # endregion
 end

@@ -1,4 +1,4 @@
-// --- productos y el resto de la cafetería ---
+// --- products and the rest of the coffee shop ---
 type Order = { branch: string }
 
 // region: Latte
@@ -37,7 +37,7 @@ class Barista {
 class Counter {
   // region: Counter#hand_over
   handOver(drink: object) {
-    console.log(`¡${drink.constructor.name} listo!`)
+    console.log(`${drink.constructor.name} ready!`)
   }
   // endregion
 }

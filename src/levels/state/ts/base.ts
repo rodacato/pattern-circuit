@@ -1,16 +1,16 @@
 class Order {
-  status = 'pendiente'
+  status = 'pending'
   private history = new History()
 
-  // Cada evento cambia el status sin preguntar si tiene sentido.
-  // Las reglas viven repartidas en ifs, en cada método… cuando alguien se acuerda.
+  // Each event changes the status without asking if it makes sense.
+  // The rules are scattered across ifs, in every method… when someone remembers.
   // region: Order#handle
   handle(event: string) {
     switch (event) {
-      case 'pagar': this.status = 'pagado'; break
-      case 'preparar': this.status = 'preparando'; break // ¿y si no está pagado?
-      case 'entregar': this.status = 'entregado'; break  // ¿y si no está preparado?
-      case 'cancelar': this.status = 'cancelado'; break  // ¿y si ya se entregó?
+      case 'pay': this.status = 'paid'; break
+      case 'prepare': this.status = 'preparing'; break // what if it isn't paid?
+      case 'deliver': this.status = 'delivered'; break  // what if it isn't prepared?
+      case 'cancel': this.status = 'cancelled'; break  // what if it was already delivered?
     }
     this.history.record(this, event)
   }

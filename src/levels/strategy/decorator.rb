@@ -1,6 +1,6 @@
 require "delegate"
 
-# Envuelve el pedido y le añade algo, pero no decide nada.
+# Wraps the order and adds something, but decides nothing.
 # region: TrackedOrder
 class TrackedOrder < SimpleDelegator
   def tracking_id = "T-#{object_id}"
@@ -12,7 +12,7 @@ class Cashier
 
   # region: Cashier#charge
   def charge(order)
-    order = TrackedOrder.new(order) # el pedido llega envuelto…
+    order = TrackedOrder.new(order) # the order arrives wrapped…
     # region: Cashier#charge:cash
     if order.payment == :cash
       CashDrawer.collect(order.total)
@@ -23,7 +23,7 @@ class Cashier
     # endregion
     # region: Cashier#charge:else
     else
-      return # …pero cae en el mismo árbol de if
+      return # …but it falls into the same if tree
     # endregion
     end
     @barista.prepare(order)

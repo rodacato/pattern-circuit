@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 class Barista {
   private counter = new Counter()
 
@@ -9,7 +9,7 @@ class Barista {
 
 class Counter {
   // region: Counter#hand_over
-  handOver(order: Order) { console.log('¡Listo!') }
+  handOver(order: Order) { console.log('Ready!') }
   // endregion
 
   // region: Counter#notify

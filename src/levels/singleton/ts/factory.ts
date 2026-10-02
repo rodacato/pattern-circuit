@@ -1,6 +1,6 @@
 class CounterFactory {
   // region: CounterFactory#create
-  create() { return new TicketCounter() } // un contador nuevo en cada pedido: siempre turno 1
+  create() { return new TicketCounter() } // a new counter on every order: always ticket 1
   // endregion
 }
 

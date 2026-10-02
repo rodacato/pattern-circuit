@@ -1,4 +1,4 @@
-# Los productores publican en el bus; los consumidores se suscriben al bus. Nadie se conoce.
+# Producers publish to the bus; consumers subscribe to the bus. Nobody knows each other.
 class EventBus
   # region: EventBus#publish
   def publish(event) = @subscribers.each { |s| s.on_event(event) }
@@ -21,5 +21,5 @@ end
 
 # region: wiring
 bus = EventBus.new
-[Inventory.new, Billing.new, Loyalty.new, Analytics.new].each { |s| bus.subscribe(s) } # ← un suscriptor más, nada más
+[Inventory.new, Billing.new, Loyalty.new, Analytics.new].each { |s| bus.subscribe(s) } # ← one more subscriber, nothing else
 # endregion

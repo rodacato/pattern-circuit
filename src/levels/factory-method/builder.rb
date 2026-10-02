@@ -15,15 +15,15 @@ class OrderFlow
     @barista = barista
   end
 
-  # El Builder arma los detalles… pero la decisión de qué bebida crear sigue aquí.
+  # The Builder assembles the details… but the decision of which drink to create is still here.
   # region: OrderFlow#create_drink
   def create_drink
-    # region: OrderFlow#create_drink:centro
-    if @branch == :centro
+    # region: OrderFlow#create_drink:downtown
+    if @branch == :downtown
       Latte.new
     # endregion
-    # region: OrderFlow#create_drink:playa
-    elsif @branch == :playa
+    # region: OrderFlow#create_drink:beach
+    elsif @branch == :beach
       Frappe.new
     # endregion
     # region: OrderFlow#create_drink:else

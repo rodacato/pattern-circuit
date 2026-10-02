@@ -1,17 +1,17 @@
 class FrontDesk {
-  // El mostrador orquesta la cocina paso a paso.
+  // The front desk orchestrates the kitchen step by step.
   // region: FrontDesk#make_latte
   makeLatte() {
     const ground = new Grinder().grind('arabica')
     const shot = new EspressoMachine().extract(ground)
-    const milk = new MilkFrother().froth('entera')
+    const milk = new MilkFrother().froth('whole')
     new Counter().handOver([shot, milk])
   }
   // endregion
 }
 
 class DeliveryApp {
-  // La app copió la orquestación… y se le olvidó espumar la leche.
+  // The app copied the orchestration… and forgot to froth the milk.
   // region: DeliveryApp#make_latte
   makeLatte() {
     const ground = new Grinder().grind('arabica')

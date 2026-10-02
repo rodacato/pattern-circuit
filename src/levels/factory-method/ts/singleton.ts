@@ -1,12 +1,12 @@
 class DrinkFactory {
   private static _instance?: DrinkFactory
 
-  // Una sola fábrica para todas las sucursales.
+  // One single factory for all the branches.
   static get instance() { return (this._instance ??= new DrinkFactory()) }
 
   // region: DrinkFactory#create
   create() {
-    return new Latte() // la instancia única no sabe de qué sucursal viene el pedido
+    return new Latte() // the single instance does not know which branch the order comes from
   }
   // endregion
 }

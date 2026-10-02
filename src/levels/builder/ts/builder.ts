@@ -8,7 +8,7 @@ class OrderBuilder {
   private _temp?: string
   private _ice?: boolean
 
-  // Cada paso tiene nombre: imposible poner el jarabe donde va la leche.
+  // Every step has a name: impossible to put the syrup where the milk goes.
   // region: OrderBuilder#size
   size(value: string) { this._size = value; return this }
   // endregion
@@ -20,14 +20,14 @@ class OrderBuilder {
   // region: OrderBuilder#extras
   syrup(value: string) { this._syrup = value; return this }
   shots(count: number) { this._shots = count; return this }
-  hot() { this._temp = 'caliente'; return this }
+  hot() { this._temp = 'hot'; return this }
   iced() { this._ice = true; return this }
   // endregion
 
-  // Valida el pedido completo antes de que exista: lo imposible no llega ni a la caja.
+  // Validates the whole order before it exists: the impossible never even reaches the register.
   // region: OrderBuilder#build
   build() {
-    if (this._temp === 'caliente' && this._ice) throw new InvalidOrder('caliente y con hielo no se puede')
+    if (this._temp === 'hot' && this._ice) throw new InvalidOrder('hot and iced is not possible')
     return new Order({ size: this._size, milk: this._milk, syrup: this._syrup, shots: this._shots, temp: this._temp, ice: this._ice })
   }
   // endregion
@@ -42,7 +42,7 @@ class OrderTaker {
   // region: OrderTaker#take
   take(request: OrderRequest) {
     try {
-      const order = new OrderBuilder().size('grande').milk('avena').syrup('vainilla').shots(2).hot().build()
+      const order = new OrderBuilder().size('large').milk('oat').syrup('vanilla').shots(2).hot().build()
       this.cashier.charge(order)
     } catch (e) {
       if (!(e instanceof InvalidOrder)) throw e

@@ -1,4 +1,4 @@
-// Cada paso tiene su acción compensatoria. Si uno falla, se deshacen los anteriores en orden inverso.
+// Each step has its compensating action. If one fails, the previous ones are undone in reverse order.
 type Step = [action: (o: Order) => void, compensation: (o: Order) => void]
 
 class PlaceOrderSaga {
@@ -19,7 +19,7 @@ class PlaceOrderSaga {
     } catch (error) {
       if (!(error instanceof OutOfStock)) throw error
       done.reverse().forEach((compensation) => compensation(order))
-      new Counter().notify(order, 'No había insumos: te devolvimos el dinero')
+      new Counter().notify(order, 'No supplies left: we refunded your money')
     }
   }
   // endregion
@@ -33,7 +33,7 @@ const Payments = {
 // endregion
 
 // region: Payments.refund
-// La compensación del cobro: no borra el pasado, lo corrige con un reembolso.
+// The compensation for the charge: it does not erase the past, it corrects it with a refund.
 // endregion
 
 // region: Inventory.reserve

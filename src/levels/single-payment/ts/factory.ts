@@ -1,5 +1,5 @@
-// Factory Method para crear un único tipo de pago: una jerarquía de creadores con un solo producto.
-const IVA = 0.16
+// Factory Method to create a single payment type: a hierarchy of creators with one product.
+const VAT = 0.16
 
 class PaymentFactory {
   // region: PaymentFactory#create
@@ -19,7 +19,7 @@ class Cashier {
 
   // region: Cashier#charge
   charge(order: Order) {
-    this.factory.create().charge(order.price * (1 + IVA))
+    this.factory.create().charge(order.price * (1 + VAT))
     this.barista.prepare(order)
   }
   // endregion

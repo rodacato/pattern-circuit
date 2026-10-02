@@ -6,7 +6,7 @@ class Cashier
     @barista = barista
   end
 
-  # Cashier no cambió: sigue hablando su idioma.
+  # Cashier did not change: it still speaks its own language.
   # region: Cashier#charge
   def charge(order)
     @gateway.charge(order.total)
@@ -15,7 +15,7 @@ class Cashier
   # endregion
 end
 
-# Traduce la interfaz que Cashier espera a la que el SDK ofrece.
+# Translates the interface Cashier expects into the one the SDK offers.
 # region: PagoFacilAdapter#charge
 class PagoFacilAdapter
   def initialize(sdk) = @sdk = sdk

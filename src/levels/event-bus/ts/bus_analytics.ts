@@ -1,4 +1,4 @@
-// Los productores publican en el bus; los consumidores se suscriben al bus. Nadie se conoce.
+// Producers publish to the bus; consumers subscribe to the bus. Nobody knows each other.
 class EventBus {
   private subscribers: Subscriber[] = []
 
@@ -27,5 +27,5 @@ class Returns {
 
 // region: wiring
 const bus = new EventBus()
-for (const s of [new Inventory(), new Billing(), new Loyalty(), new Analytics()]) bus.subscribe(s) // ← un suscriptor más, nada más
+for (const s of [new Inventory(), new Billing(), new Loyalty(), new Analytics()]) bus.subscribe(s) // ← one more subscriber, nothing else
 // endregion

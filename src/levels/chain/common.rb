@@ -1,10 +1,10 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Refunds
   # region: Refunds#pay
-  def pay(request) = puts("Reembolsado: $#{request.amount}")
+  def pay(request) = puts("Refunded: $#{request.amount}")
   # endregion
 
   # region: Refunds#decline
-  def decline(request) = puts("Nadie puede aprobar $#{request.amount}: se avisa al cliente")
+  def decline(request) = puts("Nobody can approve $#{request.amount}: the customer is notified")
   # endregion
 end

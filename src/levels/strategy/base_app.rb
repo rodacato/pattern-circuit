@@ -1,7 +1,7 @@
 class Cashier
   def initialize(barista) = @barista = barista
 
-  # Cada método de pago nuevo obliga a abrir esta clase otra vez.
+  # Every new payment method forces us to open this class again.
   # region: Cashier#charge
   def charge(order)
     # region: Cashier#charge:cash
@@ -13,12 +13,12 @@ class Cashier
       CardTerminal.charge(order.total)
     # endregion
     # region: Cashier#charge:app
-    elsif order.payment == :app # ← nuevo: Cashier modificado
+    elsif order.payment == :app # ← new: Cashier modified
       AppWallet.charge(order.total)
     # endregion
     # region: Cashier#charge:else
     else
-      return # los vales siguen perdiéndose
+      return # vouchers are still being lost
     # endregion
     end
     @barista.prepare(order)

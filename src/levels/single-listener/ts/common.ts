@@ -1,4 +1,4 @@
-// --- el resto de la cafetería no cambia en este nivel ---
+// --- the rest of the coffee shop doesn't change in this level ---
 type Order = { drink: string }
 
 class OrderTaker {
@@ -19,6 +19,6 @@ class Kitchen {
 
 class Counter {
   // region: Counter#hand_over
-  handOver(order: Order) { console.log(`¡${order.drink} listo!`) }
+  handOver(order: Order) { console.log(`${order.drink} ready!`) }
   // endregion
 }

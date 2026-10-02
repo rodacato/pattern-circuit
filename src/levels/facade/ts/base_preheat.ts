@@ -3,9 +3,9 @@ class FrontDesk {
   makeLatte() {
     const ground = new Grinder().grind('arabica')
     const machine = new EspressoMachine()
-    machine.preheat() // ← cambio 1
+    machine.preheat() // ← change 1
     const shot = machine.extract(ground)
-    const milk = new MilkFrother().froth('entera')
+    const milk = new MilkFrother().froth('whole')
     new Counter().handOver([shot, milk])
   }
   // endregion
@@ -16,7 +16,7 @@ class DeliveryApp {
   makeLatte() {
     const ground = new Grinder().grind('arabica')
     const machine = new EspressoMachine()
-    machine.preheat() // ← cambio 2: la misma edición, en otro lugar
+    machine.preheat() // ← change 2: the same edit, somewhere else
     const shot = machine.extract(ground)
     new Counter().handOver([shot])
   }

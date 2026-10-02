@@ -10,7 +10,7 @@ class Latte implements Drink {
 }
 // endregion
 
-// Strategy elige UNA forma de calcular: aquí solo cabe un extra por bebida.
+// Strategy picks ONE way to calculate: only one extra fits per drink here.
 // region: OatMilkPricing
 class OatMilkPricing implements Pricing {
   cost() { return 8 }
@@ -32,8 +32,8 @@ class CinnamonPricing implements Pricing {
 class Menu {
   // region: Menu#drink_for
   drinkFor(request: DrinkRequest): Drink {
-    const pricing = ({ avena: OatMilkPricing, shot: ShotPricing, canela: CinnamonPricing } as Record<string, new () => Pricing>)[request.extras[0]]
-    return new Latte(new pricing()) // el segundo y tercer extra se pierden
+    const pricing = ({ oat: OatMilkPricing, shot: ShotPricing, cinnamon: CinnamonPricing } as Record<string, new () => Pricing>)[request.extras[0]]
+    return new Latte(new pricing()) // the second and third extras are lost
   }
   // endregion
 }

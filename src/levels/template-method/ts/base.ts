@@ -10,7 +10,7 @@ class CoffeeRecipe {
 }
 
 class TeaRecipe {
-  // Copia de la receta del café… a la que se le olvidó la tapa.
+  // Copy of the coffee recipe… that forgot the lid.
   // region: TeaRecipe#make
   make() {
     this.boilWater()

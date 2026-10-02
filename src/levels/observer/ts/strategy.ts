@@ -1,12 +1,12 @@
 class Order {
-  private status = 'pendiente'
+  private status = 'pending'
 
   constructor(private notifier: Subscriber) {}
 
-  // Strategy elige UNA forma de avisar: pantalla, o push, o lealtad.
+  // Strategy picks ONE way to notify: display, or push, or loyalty.
   // region: Order#complete!
   complete() {
-    this.status = 'listo'
+    this.status = 'ready'
     this.notifier.update(this)
   }
   // endregion

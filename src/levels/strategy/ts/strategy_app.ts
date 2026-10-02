@@ -8,7 +8,7 @@ class Cashier {
     private barista: Barista,
   ) {}
 
-  // Cashier ya no sabe cómo se cobra: solo a quién delegar.
+  // Cashier no longer knows how to charge: only who to delegate to.
   // region: Cashier#charge
   charge(order: Order) {
     this.paymentMethods[order.payment].charge(order)
@@ -36,7 +36,7 @@ class VoucherPayment implements PaymentMethod {
 }
 
 // region: AppPayment#charge
-class AppPayment implements PaymentMethod { // ← nuevo cartucho, nada más
+class AppPayment implements PaymentMethod { // ← new cartridge, nothing else
   charge(order: Order) { AppWallet.charge(order.total) }
 }
 // endregion

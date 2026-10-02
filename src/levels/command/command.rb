@@ -1,4 +1,4 @@
-# Un pedido convertido en objeto: se puede guardar, encolar, ejecutar después… o deshacer.
+# An order turned into an object: it can be saved, queued, run later… or undone.
 class OrderCommand
   attr_reader :order_id
 
@@ -9,14 +9,14 @@ end
 class FrontDesk
   # region: FrontDesk#submit
   def submit(request)
-    return @queue.cancel(request.order_id) if request.action == :cancelar
+    return @queue.cancel(request.order_id) if request.action == :cancel
     @queue.push(OrderCommand.new(@barista, request.drink, request.order_id))
   end
   # endregion
 end
 
 class CommandQueue
-  # Los comandos esperan su turno; deshacer es sacarlos de la cola antes de que corran.
+  # Commands wait their turn; undoing is taking them out of the queue before they run.
   # region: CommandQueue#push
   def push(command) = @pending << command
   def cancel(order_id) = @pending.reject! { |c| c.order_id == order_id }

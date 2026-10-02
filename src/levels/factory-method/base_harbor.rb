@@ -4,24 +4,24 @@ class OrderFlow
     @barista = barista
   end
 
-  # Cada sucursal nueva obliga a abrir el flujo que comparten todas.
+  # Every new branch forces us to open the flow they all share.
   # region: OrderFlow#create_drink
   def create_drink
-    # region: OrderFlow#create_drink:centro
-    if @branch == :centro
+    # region: OrderFlow#create_drink:downtown
+    if @branch == :downtown
       Latte.new
     # endregion
-    # region: OrderFlow#create_drink:playa
-    elsif @branch == :playa
+    # region: OrderFlow#create_drink:beach
+    elsif @branch == :beach
       Frappe.new
     # endregion
-    # region: OrderFlow#create_drink:puerto
-    elsif @branch == :puerto # ← nuevo: OrderFlow modificado
+    # region: OrderFlow#create_drink:harbor
+    elsif @branch == :harbor # ← new: OrderFlow modified
       IcedTea.new
     # endregion
     # region: OrderFlow#create_drink:else
     else
-      Latte.new # Montaña sigue recibiendo lattes
+      Latte.new # Mountain still gets lattes
     # endregion
     end
   end

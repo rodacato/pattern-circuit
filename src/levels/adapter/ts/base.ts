@@ -4,14 +4,14 @@ interface PaymentGateway {
 
 class Cashier {
   constructor(
-    private gateway: PaymentGateway, // ahora es PagoFacil.SDK
+    private gateway: PaymentGateway, // now it is PagoFacil.SDK
     private barista: Barista,
   ) {}
 
-  // Cashier habla "charge(total)"; el SDK entiende "chargeInCents". No encajan.
+  // Cashier speaks "charge(total)"; the SDK understands "chargeInCents". They do not fit.
   // region: Cashier#charge
   charge(order: Order) {
-    this.gateway.charge(order.total) // TypeError: PagoFacil.SDK no tiene charge()
+    this.gateway.charge(order.total) // TypeError: PagoFacil.SDK has no charge()
     this.barista.prepare(order)
   }
   // endregion

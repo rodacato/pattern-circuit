@@ -10,7 +10,7 @@ class CoffeeRecipe {
 }
 
 class TeaRecipe {
-  // Copia de la receta del café… a la que se le olvidó la tapa.
+  // Copy of the coffee recipe… that forgot the lid.
   // region: TeaRecipe#make
   make() {
     this.boilWater()
@@ -20,7 +20,7 @@ class TeaRecipe {
   // endregion
 }
 
-// Armar la taza paso a paso antes de la receta no toca la receta del té.
+// Building the cup step by step before the recipe does not touch the tea recipe.
 // region: CupBuilder
 class CupBuilder {
   private cupSize = ''

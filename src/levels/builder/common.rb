@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Cashier
   def initialize(barista) = @barista = barista
 
@@ -13,10 +13,10 @@ end
 class Barista
   def initialize(counter) = @counter = counter
 
-  # La cocina es el último lugar donde descubrir que un pedido era imposible: ya se cobró.
+  # The kitchen is the last place to find out an order was impossible: it was already charged.
   # region: Barista#prepare
   def prepare(order)
-    raise "¿Hielo en una bebida hirviendo?" if order.hot? && order.ice?
+    raise "Ice in a boiling drink?" if order.hot? && order.ice?
     @counter.hand_over(order)
   end
   # endregion
@@ -24,10 +24,10 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡#{order.name} listo!")
+  def hand_over(order) = puts("#{order.name} ready!")
   # endregion
 
   # region: Counter#notify
-  def notify(message) = puts("Antes de cobrar: #{message}")
+  def notify(message) = puts("Before charging: #{message}")
   # endregion
 end

@@ -1,4 +1,4 @@
-// Command convierte la llamada en un objeto… que nadie encola, deshace ni registra.
+// Command turns the call into an object… that nobody queues, undoes or logs.
 class StartOrder {
   constructor(
     private kitchen: Kitchen,

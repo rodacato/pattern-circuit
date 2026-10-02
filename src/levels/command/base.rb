@@ -1,13 +1,13 @@
 class FrontDesk
-  # Cada pedido se ejecuta en el acto: no queda nada que se pueda deshacer.
+  # Each order runs on the spot: there is nothing left to undo.
   # region: FrontDesk#submit
   def submit(request)
-    # region: FrontDesk#submit:cmd:pedir
+    # region: FrontDesk#submit:cmd:order
     case request.action
-    when :pedir then @barista.prepare(request.drink)
+    when :order then @barista.prepare(request.drink)
     # endregion
-    # region: FrontDesk#submit:cmd:cancelar
-    when :cancelar then Undo.new.call(request)
+    # region: FrontDesk#submit:cmd:cancel
+    when :cancel then Undo.new.call(request)
     # endregion
     end
   end
@@ -16,6 +16,6 @@ end
 
 # region: Undo#call
 class Undo
-  def call(request) = raise "¿Deshacer qué? El café ya se está haciendo"
+  def call(request) = raise "Undo what? The coffee is already being made"
 end
 # endregion

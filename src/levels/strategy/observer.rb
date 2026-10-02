@@ -3,7 +3,7 @@ class Cashier
 
   def subscribe(payment_method) = @subscribers << payment_method
 
-  # Observer avisa a todos; aquí había que elegir a uno.
+  # Observer notifies everyone; here we had to pick one.
   # region: Cashier#charge
   def charge(order)
     @subscribers.each { |s| s.charge(order) }
@@ -16,7 +16,7 @@ class CashPayment
 
   # region: CashPayment#charge
   def charge(order)
-    CashDrawer.collect(order.total) # cobra aunque el cliente pagó con tarjeta
+    CashDrawer.collect(order.total) # charges even though the customer paid by card
     @barista.prepare(order)
   end
   # endregion
@@ -27,7 +27,7 @@ class CardPayment
 
   # region: CardPayment#charge
   def charge(order)
-    CardTerminal.charge(order.total) # ...y aquí se vuelve a cobrar
+    CardTerminal.charge(order.total) # ...and here it charges again
     @barista.prepare(order)
   end
   # endregion
@@ -38,7 +38,7 @@ class VoucherPayment
 
   # region: VoucherPayment#charge
   def charge(order)
-    VoucherBook.redeem(order.total) # ...y otra vez
+    VoucherBook.redeem(order.total) # ...and again
     @barista.prepare(order)
   end
   # endregion

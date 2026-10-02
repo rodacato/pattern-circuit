@@ -11,7 +11,7 @@ class TicketCounter implements Numbering {
 }
 
 class Register {
-  // La caja elige una estrategia de numeración… y cada estrategia lleva su propia cuenta.
+  // The register picks a numbering strategy… and each strategy keeps its own count.
   constructor(
     private display: Display,
     private numbering: Numbering = new TicketCounter(),

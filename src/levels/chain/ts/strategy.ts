@@ -21,11 +21,11 @@ class Owner {
 
 class Cashier {
   static APPROVERS: Record<string, new () => { approve(request: RefundRequest): void }> = {
-    bajo: Clerk, medio: Manager, alto: Owner,
+    low: Clerk, medium: Manager, high: Owner,
   }
 
-  // Elegir aprobador por categoría funciona… mientras sepas de antemano todas las categorías.
+  // Choosing an approver by category works… as long as you know all the categories in advance.
   // region: Cashier#refund
-  refund(request: RefundRequest) { new Cashier.APPROVERS[request.category]().approve(request) } // TypeError con montos enormes
+  refund(request: RefundRequest) { new Cashier.APPROVERS[request.category]().approve(request) } // TypeError with huge amounts
   // endregion
 }

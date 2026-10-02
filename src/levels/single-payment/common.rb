@@ -1,4 +1,4 @@
-# --- el resto de la cafetería no cambia en este nivel ---
+# --- the rest of the coffee shop doesn't change in this level ---
 Order = Struct.new(:drink, :price)
 
 class OrderTaker
@@ -19,6 +19,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡#{order.drink} listo!")
+  def hand_over(order) = puts("#{order.drink} ready!")
   # endregion
 end

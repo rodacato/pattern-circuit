@@ -4,7 +4,7 @@ class PaymentGateway implements Gateway {
   // endregion
 }
 
-// Después de varios fallos seguidos deja de llamar al proveedor y va directo al respaldo.
+// After several consecutive failures it stops calling the provider and goes straight to the fallback.
 class CircuitBreaker implements Gateway {
   private failures = 0
 
@@ -19,7 +19,7 @@ class CircuitBreaker implements Gateway {
     if (this.isOpen()) return this.fallback.charge(order)
     try {
       const result = this.service.charge(order)
-      this.failures = 0 // un éxito reinicia la cuenta: lo que abre el circuito son fallos seguidos
+      this.failures = 0 // a success resets the count: what opens the circuit is consecutive failures
       return result
     } catch (error) {
       if (!(error instanceof TimeoutError)) throw error
@@ -29,9 +29,9 @@ class CircuitBreaker implements Gateway {
   }
   // endregion
 
-  isOpen() { return this.failures >= this.threshold } // (tras un tiempo, un intento de prueba lo cerraría: "half-open")
+  isOpen() { return this.failures >= this.threshold } // (after a while, a trial attempt would close it: "half-open")
 }
 
 // region: Timeout::Error
-// El fallo vuelve al interruptor, que lo cuenta.
+// The failure comes back to the breaker, which counts it.
 // endregion

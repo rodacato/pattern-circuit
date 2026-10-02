@@ -8,7 +8,7 @@ class Cashier {
     private barista: Barista,
   ) {}
 
-  // Cashier no cambió: sigue hablando su idioma.
+  // Cashier did not change: it still speaks its own language.
   // region: Cashier#charge
   charge(order: Order) {
     this.gateway.charge(order.total)
@@ -17,7 +17,7 @@ class Cashier {
   // endregion
 }
 
-// Traduce la interfaz que Cashier espera a la que el SDK ofrece.
+// Translates the interface Cashier expects into the one the SDK offers.
 // region: PagoFacilAdapter#charge
 class PagoFacilAdapter implements PaymentGateway {
   constructor(private sdk: PagoFacil.SDK) {}

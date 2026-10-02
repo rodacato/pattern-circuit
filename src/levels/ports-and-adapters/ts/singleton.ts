@@ -1,5 +1,5 @@
 
-// Una conexión global única: cómoda, y justo lo que impide cambiarla en las pruebas.
+// A single global connection: convenient, and exactly what prevents swapping it in tests.
 // region: Database.instance
 class Database {
   private static _instance?: Connection

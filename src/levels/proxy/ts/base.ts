@@ -1,4 +1,4 @@
-// Cada pedido consulta al almacén remoto, aunque sea la décima vez que preguntamos por café.
+// Every order queries the remote warehouse, even the tenth time we ask about coffee.
 // region: wiring
 const taker = new OrderTaker(new RemoteInventory(), barista)
 // endregion

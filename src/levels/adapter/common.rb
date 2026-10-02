@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class OrderTaker
   def initialize(cashier) = @cashier = cashier
 
@@ -7,7 +7,7 @@ class OrderTaker
   # endregion
 end
 
-# SDK del proveedor externo: no lo podemos modificar.
+# External vendor SDK: we cannot modify it.
 module PagoFacil
   class SDK
     # region: PagoFacil::SDK#charge_in_cents
@@ -26,6 +26,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡#{order.drink} listo!")
+  def hand_over(order) = puts("#{order.drink} ready!")
   # endregion
 end

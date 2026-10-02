@@ -1,28 +1,28 @@
-# Factory Method: cada preset es una subclase que decide qué pedido crear.
+# Factory Method: each preset is a subclass that decides which order to create.
 class PresetOrders
   # region: OrderPresets#create
   def create_order = raise(NotImplementedError)
   # endregion
 end
 
-class LatteGrandePreset < PresetOrders
-  def create_order = Order.new(:grande, :entera, 1, nil, :caliente, false, nil, nil, nil)
+class LargeLattePreset < PresetOrders
+  def create_order = Order.new(:large, :whole, 1, nil, :hot, false, nil, nil, nil)
 end
 
 class AmericanoPreset < PresetOrders
-  def create_order = Order.new(:mediano, nil, 2, nil, :caliente, false, nil, nil, nil)
+  def create_order = Order.new(:medium, nil, 2, nil, :hot, false, nil, nil, nil)
 end
 
-# ¿Latte grande con avena, vainilla y dos shots? No hay subclase para eso.
-# 4 tamaños × 5 leches × 6 jarabes × 2 temperaturas = 240 subclases.
-PRESETS = { "combo:latte-grande" => LatteGrandePreset, "combo:americano" => AmericanoPreset }
+# Large latte with oat, vanilla and two shots? There is no subclass for that.
+# 4 sizes × 5 milks × 6 syrups × 2 temperatures = 240 subclasses.
+PRESETS = { "combo:large-latte" => LargeLattePreset, "combo:americano" => AmericanoPreset }
 
 class OrderTaker
   def initialize(cashier) = @cashier = cashier
 
   # region: OrderTaker#take
   def take(request)
-    preset = PRESETS[request.combo] or return # sin molde: el pedido se pierde
+    preset = PRESETS[request.combo] or return # no preset: the order is lost
     @cashier.charge(preset.new.create_order)
   end
   # endregion

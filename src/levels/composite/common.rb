@@ -1,7 +1,7 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Tray
   # region: Tray#collect
-  def collect(parts) = @parts.concat(parts) # espera todas las partes del pedido
+  def collect(parts) = @parts.concat(parts) # expects all the parts of the order
   # endregion
 
   # region: Tray#serve
@@ -11,6 +11,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(parts) = puts("Bandeja con #{parts.size} cosas")
+  def hand_over(parts) = puts("Tray with #{parts.size} items")
   # endregion
 end

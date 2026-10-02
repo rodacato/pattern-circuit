@@ -4,10 +4,10 @@ class Order
     @push = push
   end
 
-  # Order conoce a cada interesado por nombre… y nadie se acordó de Lealtad.
+  # Order knows each interested party by name… and nobody remembered Loyalty.
   # region: Order#complete!
   def complete!
-    @status = :listo
+    @status = :ready
     @display.update(self)
     @push.update(self)
   end

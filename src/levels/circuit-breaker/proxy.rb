@@ -1,5 +1,5 @@
 
-# Un proxy delante del proveedor… que le reenvía cada cobro y espera el mismo timeout.
+# A proxy in front of the provider… that forwards every charge to it and waits for the same timeout.
 # region: GatewayProxy
 class GatewayProxy
   def charge(order) = PaymentGateway.new.charge(order)

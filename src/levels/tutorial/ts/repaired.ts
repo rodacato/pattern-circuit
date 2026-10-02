@@ -15,7 +15,7 @@ class Cashier {
 
   // region: Cashier#charge
   charge(order: Order) {
-    console.log(`Cobrado: ${order.drink}`)
+    console.log(`Charged: ${order.drink}`)
     this.barista.prepare(order)
   }
   // endregion
@@ -26,7 +26,7 @@ class Barista {
 
   // region: Barista#prepare
   prepare(order: Order) {
-    console.log(`Preparando ${order.drink}...`)
+    console.log(`Preparing ${order.drink}...`)
     this.counter.handOver(order)
   }
   // endregion
@@ -35,13 +35,13 @@ class Barista {
 class Counter {
   // region: Counter#hand_over
   handOver(order: Order) {
-    console.log(`¡${order.drink} listo!`)
+    console.log(`${order.drink} ready!`)
   }
   // endregion
 }
 
 // region: wiring
-// Cada `new` es un cable: así se ve el circuito en código.
+// Each `new` is a wire: this is how the circuit looks in code.
 const taker = new OrderTaker(new Cashier(new Barista(new Counter())))
 taker.take('espresso')
 // endregion

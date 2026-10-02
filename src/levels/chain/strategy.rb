@@ -17,10 +17,10 @@ end
 # endregion
 
 class Cashier
-  APPROVERS = { bajo: Clerk, medio: Manager, alto: Owner }
+  APPROVERS = { low: Clerk, medium: Manager, high: Owner }
 
-  # Elegir aprobador por categoría funciona… mientras sepas de antemano todas las categorías.
+  # Choosing an approver by category works… as long as you know all the categories in advance.
   # region: Cashier#refund
-  def refund(request) = APPROVERS.fetch(request.category).new.approve(request) # KeyError con montos enormes
+  def refund(request) = APPROVERS.fetch(request.category).new.approve(request) # KeyError with huge amounts
   # endregion
 end

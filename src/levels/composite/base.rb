@@ -17,17 +17,17 @@ class Combo
 end
 
 class Kitchen
-  # La cocina pregunta qué es cada cosa… y solo sabe bajar un nivel.
+  # The kitchen asks what each thing is… and can only go down one level.
   # region: Kitchen#prepare
   def prepare(item)
-    # region: Kitchen#prepare:producto
+    # region: Kitchen#prepare:product
     case item
     when Product then @tray.collect([item.make])
     # endregion
     # region: Kitchen#prepare:combo
     when Combo
       item.items.each do |child|
-        raise "¿Un combo dentro de un combo?" if child.is_a?(Combo)
+        raise "A combo inside a combo?" if child.is_a?(Combo)
         @tray.collect([child.make])
       end
     # endregion

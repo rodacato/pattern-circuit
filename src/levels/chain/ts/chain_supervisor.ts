@@ -1,4 +1,4 @@
-// Cada eslabón atiende lo suyo o lo pasa al siguiente. Nadie conoce la cadena completa.
+// Each link handles its own or passes it to the next. Nobody knows the whole chain.
 abstract class Handler {
   private refunds = new Refunds()
 
@@ -26,7 +26,7 @@ class Manager extends Handler {
 // endregion
 
 // region: Supervisor#handle
-class Supervisor extends Handler { // ← un eslabón nuevo; los demás no cambian
+class Supervisor extends Handler { // ← a new link; the others don't change
   canHandle(r: RefundRequest) { return r.amount < 1000 }
 }
 // endregion

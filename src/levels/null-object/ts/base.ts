@@ -1,7 +1,7 @@
 class LoyaltyCards {
   private cards = new Map<string, Card>()
 
-  // Si el cliente no tiene tarjeta, devuelve undefined… y cada uso posterior explota:
+  // If the customer has no card, it returns undefined… and every later use blows up:
   // TypeError: Cannot read properties of undefined (reading 'addPoints')
   // region: LoyaltyCards#find
   find(customer: Customer) { return this.cards.get(customer.id) }

@@ -7,7 +7,7 @@ class Cashier {
 
   subscribe(paymentMethod: PaymentMethod) { this.subscribers.push(paymentMethod) }
 
-  // Observer avisa a todos; aquí había que elegir a uno.
+  // Observer notifies everyone; here we had to pick one.
   // region: Cashier#charge
   charge(order: Order) {
     this.subscribers.forEach((s) => s.charge(order))
@@ -20,7 +20,7 @@ class CashPayment implements PaymentMethod {
 
   // region: CashPayment#charge
   charge(order: Order) {
-    CashDrawer.collect(order.total) // cobra aunque el cliente pagó con tarjeta
+    CashDrawer.collect(order.total) // charges even though the customer paid by card
     this.barista.prepare(order)
   }
   // endregion
@@ -31,7 +31,7 @@ class CardPayment implements PaymentMethod {
 
   // region: CardPayment#charge
   charge(order: Order) {
-    CardTerminal.charge(order.total) // ...y aquí se vuelve a cobrar
+    CardTerminal.charge(order.total) // ...and here it charges again
     this.barista.prepare(order)
   }
   // endregion
@@ -42,7 +42,7 @@ class VoucherPayment implements PaymentMethod {
 
   // region: VoucherPayment#charge
   charge(order: Order) {
-    VoucherBook.redeem(order.total) // ...y otra vez
+    VoucherBook.redeem(order.total) // ...and again
     this.barista.prepare(order)
   }
   // endregion

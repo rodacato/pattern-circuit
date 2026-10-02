@@ -1,4 +1,4 @@
-// Mismo contrato que RemoteInventory; solo va al almacén si no conoce la respuesta.
+// Same contract as RemoteInventory; only goes to the warehouse if it doesn't know the answer.
 // region: CachedInventory#in_stock?
 class CachedInventory implements Inventory {
   private known: Record<string, boolean> = {}
@@ -10,7 +10,7 @@ class CachedInventory implements Inventory {
 }
 // endregion
 
-// OrderTaker no se entera del cambio: recibe algo que responde igual.
+// OrderTaker doesn't notice the change: it gets something that answers the same.
 // region: wiring
 const taker = new OrderTaker(new CachedInventory(new RemoteInventory()), barista)
 // endregion

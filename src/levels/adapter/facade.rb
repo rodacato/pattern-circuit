@@ -12,7 +12,7 @@ class Cashier
   # endregion
 end
 
-# Una fachada simplifica un subsistema, pero no traduce: sigue pidiendo #charge.
+# A facade simplifies a subsystem, but it does not translate: it still asks for #charge.
 # region: Payments#charge
 class Payments
   def initialize(sdk) = @sdk = sdk

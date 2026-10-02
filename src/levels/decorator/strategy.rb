@@ -6,7 +6,7 @@ class Latte
 end
 # endregion
 
-# Strategy elige UNA forma de calcular: aquí solo cabe un extra por bebida.
+# Strategy picks ONE way to calculate: only one extra fits per drink here.
 # region: OatMilkPricing
 class OatMilkPricing
   def cost = 8
@@ -28,8 +28,8 @@ end
 class Menu
   # region: Menu#drink_for
   def drink_for(request)
-    pricing = { avena: OatMilkPricing, shot: ShotPricing, canela: CinnamonPricing }.fetch(request.extras.first)
-    Latte.new(pricing.new) # el segundo y tercer extra se pierden
+    pricing = { oat: OatMilkPricing, shot: ShotPricing, cinnamon: CinnamonPricing }.fetch(request.extras.first)
+    Latte.new(pricing.new) # the second and third extras are lost
   end
   # endregion
 end

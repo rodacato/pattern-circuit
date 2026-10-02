@@ -1,4 +1,4 @@
-# Encolar los eventos como comandos no cambia qué se permite: la cola los ejecuta igual.
+# Queueing events as commands doesn't change what is allowed: the queue runs them anyway.
 # region: EventQueue
 class EventCommand
   def initialize(order, event) = (@order, @event = order, event)
@@ -7,6 +7,6 @@ end
 
 class EventQueue
   def push(command) = (@commands ||= []) << command
-  def run = @commands.each(&:execute) # los ejecuta en orden, tengan sentido o no
+  def run = @commands.each(&:execute) # runs them in order, whether they make sense or not
 end
 # endregion

@@ -1,7 +1,7 @@
 abstract class Branch {
   constructor(private barista: Barista) {}
 
-  // El flujo es el mismo para todas; solo `createDrink` cambia.
+  // The flow is the same for all of them; only `createDrink` changes.
   // region: Branch#take
   take(order: Order) {
     const drink = this.createDrink()

@@ -4,20 +4,20 @@ class OrderFlow
     @barista = barista
   end
 
-  # El flujo compartido conoce cada bebida concreta de cada sucursal.
+  # The shared flow knows every concrete drink of every branch.
   # region: OrderFlow#create_drink
   def create_drink
-    # region: OrderFlow#create_drink:centro
-    if @branch == :centro
+    # region: OrderFlow#create_drink:downtown
+    if @branch == :downtown
       Latte.new
     # endregion
-    # region: OrderFlow#create_drink:playa
-    elsif @branch == :playa
+    # region: OrderFlow#create_drink:beach
+    elsif @branch == :beach
       Frappe.new
     # endregion
     # region: OrderFlow#create_drink:else
     else
-      Latte.new # ¿Montaña? Nadie la contempló: le toca un latte
+      Latte.new # Mountain? Nobody planned for it: it gets a latte
     # endregion
     end
   end

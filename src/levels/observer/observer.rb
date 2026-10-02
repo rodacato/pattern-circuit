@@ -1,12 +1,12 @@
 class Order
   def initialize = @subscribers = []
 
-  # Cualquiera se suscribe; Order no sabe quiénes son.
+  # Anyone can subscribe; Order doesn't know who they are.
   def subscribe(subscriber) = @subscribers << subscriber
 
   # region: Order#complete!
   def complete!
-    @status = :listo
+    @status = :ready
     @subscribers.each { |s| s.update(self) }
   end
   # endregion

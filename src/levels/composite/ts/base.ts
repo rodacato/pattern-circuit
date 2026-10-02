@@ -19,17 +19,17 @@ class Combo {
 class Kitchen {
   constructor(private tray: Tray) {}
 
-  // La cocina pregunta qué es cada cosa… y solo sabe bajar un nivel.
+  // The kitchen asks what each thing is… and can only go down one level.
   // region: Kitchen#prepare
   prepare(item: Item) {
-    // region: Kitchen#prepare:producto
+    // region: Kitchen#prepare:product
     if (item instanceof Product) {
       this.tray.collect([item.make()])
     // endregion
     // region: Kitchen#prepare:combo
     } else if (item instanceof Combo) {
       item.items.forEach((child) => {
-        if (child instanceof Combo) throw new Error('¿Un combo dentro de un combo?')
+        if (child instanceof Combo) throw new Error('A combo inside a combo?')
         this.tray.collect([child.make()])
       })
     // endregion

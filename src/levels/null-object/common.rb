@@ -1,4 +1,4 @@
-# --- quienes usan la tarjeta del cliente ---
+# --- who uses the customer's card ---
 class Loyalty
   # region: Loyalty#reward
   def reward(order) = order.card.add_points(order.total)
@@ -13,12 +13,12 @@ end
 
 class Receipt
   # region: Receipt#print
-  def print(order) = puts("Tarjeta: #{order.card.masked_number}")
+  def print(order) = puts("Card: #{order.card.masked_number}")
   # endregion
 end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡Listo!")
+  def hand_over(order) = puts("Ready!")
   # endregion
 end

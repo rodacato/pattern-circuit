@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type OrderRequest = { action: string; drink: string; orderId: number }
 
 class Barista {
@@ -11,6 +11,6 @@ class Barista {
 
 class Pickup {
   // region: Pickup#hand_over
-  handOver(drink: string) { console.log(`¡${drink} listo!`) }
+  handOver(drink: string) { console.log(`${drink} ready!`) }
   // endregion
 }

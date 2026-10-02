@@ -1,4 +1,4 @@
-# El núcleo solo conoce puertos: interfaces que él mismo define.
+# The core only knows ports: interfaces it defines itself.
 class OrderService
   def initialize(repository:, payments:)
     @repository = repository
@@ -16,14 +16,14 @@ class OrderService
 end
 
 # region: Port::Repository
-# Puerto de salida: guardar y buscar pedidos. El núcleo no sabe dónde.
+# Outbound port: save and find orders. The core does not know where.
 # endregion
 
 # region: Port::Payments
-# Puerto de salida: cobrar un pedido. El núcleo no sabe con quién.
+# Outbound port: charge an order. The core does not know with whom.
 # endregion
 
-# Adaptadores: el mundo exterior se enchufa a los puertos.
+# Adapters: the outside world plugs into the ports.
 # region: InMemoryOrders
 class InMemoryOrders
   def save(order) = (@orders ||= []) << order

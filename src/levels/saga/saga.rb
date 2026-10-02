@@ -1,4 +1,4 @@
-# Cada paso tiene su acción compensatoria. Si uno falla, se deshacen los anteriores en orden inverso.
+# Each step has its compensating action. If one fails, the previous ones are undone in reverse order.
 class PlaceOrderSaga
   STEPS = [
     [->(o) { Payments.charge(o) },  ->(o) { Payments.refund(o) }],
@@ -15,7 +15,7 @@ class PlaceOrderSaga
     Barista.new.prepare(order)
   rescue OutOfStock
     done.reverse_each { |compensation| compensation.call(order) }
-    Counter.new.notify(order, "No había insumos: te devolvimos el dinero")
+    Counter.new.notify(order, "No supplies left: we refunded your money")
   end
   # endregion
 end
@@ -28,7 +28,7 @@ end
 # endregion
 
 # region: Payments.refund
-# La compensación del cobro: no borra el pasado, lo corrige con un reembolso.
+# The compensation for the charge: it does not erase the past, it corrects it with a refund.
 # endregion
 
 # region: Inventory.reserve

@@ -1,13 +1,13 @@
-# --- los interesados en saber que un pedido está listo ---
+# --- those interested in knowing an order is ready ---
 class Display
   # region: Display#update
-  def update(order) = puts("Turno #{order.ticket} listo")
+  def update(order) = puts("Ticket #{order.ticket} ready")
   # endregion
 end
 
 class PushNotifier
   # region: PushNotifier#update
-  def update(order) = Push.send(order.customer, "¡Tu café está listo!")
+  def update(order) = Push.send(order.customer, "Your coffee is ready!")
   # endregion
 end
 

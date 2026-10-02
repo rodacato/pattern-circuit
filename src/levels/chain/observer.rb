@@ -1,5 +1,5 @@
 class Cashier
-  # Avisar a todos los aprobadores: cada uno aprueba… y el reembolso se paga varias veces.
+  # Notify all the approvers: each one approves… and the refund is paid several times.
   # region: Cashier#refund
   def refund(request) = @approvers.each { |a| a.approve(request) }
   # endregion

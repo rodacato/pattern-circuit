@@ -1,4 +1,4 @@
-# --- quien pide y quien confirma ---
+# --- who orders and who confirms ---
 class WebApp
   # region: WebApp#checkout
   def checkout(params) = @orders.place(params)
@@ -7,6 +7,6 @@ end
 
 class Receipt
   # region: Receipt#confirm
-  def confirm(order) = puts("Pedido #{order.id} confirmado")
+  def confirm(order) = puts("Order #{order.id} confirmed")
   # endregion
 end

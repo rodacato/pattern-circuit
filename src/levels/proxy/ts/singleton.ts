@@ -1,4 +1,4 @@
-// Una sola instancia del cliente remoto… que sigue viajando al almacén en cada consulta.
+// A single instance of the remote client… that still travels to the warehouse on every query.
 // region: RemoteInventory.instance
 namespace RemoteInventory {
   let shared: RemoteInventory | undefined

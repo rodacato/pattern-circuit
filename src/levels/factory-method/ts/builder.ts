@@ -18,15 +18,15 @@ class OrderFlow {
     private barista: Barista,
   ) {}
 
-  // El Builder arma los detalles… pero la decisión de qué bebida crear sigue aquí.
+  // The Builder assembles the details… but the decision of which drink to create is still here.
   // region: OrderFlow#create_drink
   createDrink() {
-    // region: OrderFlow#create_drink:centro
-    if (this.branch === 'centro') {
+    // region: OrderFlow#create_drink:downtown
+    if (this.branch === 'downtown') {
       return new Latte()
     // endregion
-    // region: OrderFlow#create_drink:playa
-    } else if (this.branch === 'playa') {
+    // region: OrderFlow#create_drink:beach
+    } else if (this.branch === 'beach') {
       return new Frappe()
     // endregion
     // region: OrderFlow#create_drink:else

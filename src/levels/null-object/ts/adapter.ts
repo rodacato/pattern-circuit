@@ -1,8 +1,8 @@
 
-// Traducir la tarjeta al formato de otro sistema no ayuda cuando no hay tarjeta que traducir.
+// Translating the card to another system's format doesn't help when there is no card to translate.
 // region: CardAdapter
 class CardAdapter {
-  constructor(private card: TarjetaExterna) {}
-  addPoints(amount: number) { this.card.sumarPuntos(amount) }
+  constructor(private card: ExternalCard) {}
+  addPoints(amount: number) { this.card.addPoints(amount) }
 }
 // endregion

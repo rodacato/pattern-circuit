@@ -1,12 +1,12 @@
-# Un solo modelo para todo: las pantallas y el mostrador hacen fila en el mismo lugar.
+# A single model for everything: the screens and the counter queue up in the same place.
 class OrderStore
   # region: OrderStore#handle
   def handle(request)
-    # region: OrderStore#handle:lectura
+    # region: OrderStore#handle:read
     if request.read?
-      @mutex.synchronize { orders_with_items_and_customers } # consulta pesada, una a la vez
+      @mutex.synchronize { orders_with_items_and_customers } # heavy query, one at a time
     # endregion
-    # region: OrderStore#handle:escritura
+    # region: OrderStore#handle:write
     else
       @mutex.synchronize { validate_and_save(request.order) }
     # endregion

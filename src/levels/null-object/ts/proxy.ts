@@ -1,5 +1,5 @@
 
-// Un sustituto de la tarjeta que carga la real al usarla… y la real no existe.
+// A stand-in for the card that loads the real one on use… and the real one doesn't exist.
 // region: LazyCard
 class LazyCard {
   constructor(private customer: Customer) {}

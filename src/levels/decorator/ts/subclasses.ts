@@ -3,24 +3,24 @@ class Latte implements Drink {
   description() { return 'Latte' }
 }
 
-// Una subclase por cada combinación de extras.
+// One subclass for each combination of extras.
 // region: OatMilkLatte
 class OatMilkLatte extends Latte {
   cost() { return super.cost() + 8 }
-  description() { return 'Latte con avena' }
+  description() { return 'Latte with oat' }
 }
 // endregion
 
 // region: ShotLatte
 class ShotLatte extends Latte {
   cost() { return super.cost() + 10 }
-  description() { return 'Latte con shot' }
+  description() { return 'Latte with shot' }
 }
 // endregion
 
 // region: OatShotLatte
 class OatShotLatte extends Latte {
   cost() { return super.cost() + 18 }
-  description() { return 'Latte con avena y shot' }
+  description() { return 'Latte with oat and shot' }
 }
 // endregion

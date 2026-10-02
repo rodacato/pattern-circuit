@@ -1,7 +1,7 @@
 class Branch
   def initialize(barista) = @barista = barista
 
-  # El flujo es el mismo para todas; solo `create_drink` cambia.
+  # The flow is the same for all of them; only `create_drink` changes.
   # region: Branch#take
   def take(order)
     drink = create_drink

@@ -1,10 +1,10 @@
 class Order
   def initialize(first_handler) = @handler = first_handler
 
-  # En una cadena, el primero que atiende se queda con el aviso: los demás nunca se enteran.
+  # In a chain, the first one that handles it keeps the notice: the others never find out.
   # region: Order#complete!
   def complete!
-    @status = :listo
+    @status = :ready
     @handler.handle(self)
   end
   # endregion

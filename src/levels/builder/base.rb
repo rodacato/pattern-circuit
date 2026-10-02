@@ -1,5 +1,5 @@
 class Order
-  # Nueve argumentos posicionales: nada impide cruzar la leche con el jarabe.
+  # Nine positional arguments: nothing stops you from swapping the milk and the syrup.
   # region: Order#initialize
   def initialize(size, milk, shots, syrup, temp, ice, cup, name, to_go)
     @size, @milk, @shots, @syrup = size, milk, shots, syrup
@@ -13,8 +13,8 @@ class OrderTaker
 
   # region: OrderTaker#take
   def take(request)
-    order = Order.new(:grande, :vainilla, 2, :avena, :caliente, false, nil, "Ana", nil)
-    #                          ^ leche y jarabe cruzados, y nadie se queja
+    order = Order.new(:large, :vanilla, 2, :oat, :hot, false, nil, "Ana", nil)
+    #                          ^ milk and syrup swapped, and nobody complains
     @cashier.charge(order)
   end
   # endregion

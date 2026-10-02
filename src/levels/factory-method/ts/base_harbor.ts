@@ -4,24 +4,24 @@ class OrderFlow {
     private barista: Barista,
   ) {}
 
-  // Cada sucursal nueva obliga a abrir el flujo que comparten todas.
+  // Every new branch forces us to open the flow they all share.
   // region: OrderFlow#create_drink
   createDrink() {
-    // region: OrderFlow#create_drink:centro
-    if (this.branch === 'centro') {
+    // region: OrderFlow#create_drink:downtown
+    if (this.branch === 'downtown') {
       return new Latte()
     // endregion
-    // region: OrderFlow#create_drink:playa
-    } else if (this.branch === 'playa') {
+    // region: OrderFlow#create_drink:beach
+    } else if (this.branch === 'beach') {
       return new Frappe()
     // endregion
-    // region: OrderFlow#create_drink:puerto
-    } else if (this.branch === 'puerto') { // ← nuevo: OrderFlow modificado
+    // region: OrderFlow#create_drink:harbor
+    } else if (this.branch === 'harbor') { // ← new: OrderFlow modified
       return new IcedTea()
     // endregion
     // region: OrderFlow#create_drink:else
     } else {
-      return new Latte() // Montaña sigue recibiendo lattes
+      return new Latte() // Mountain still gets lattes
     // endregion
     }
   }

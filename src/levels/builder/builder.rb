@@ -1,7 +1,7 @@
 class InvalidOrder < StandardError; end
 
 class OrderBuilder
-  # Cada paso tiene nombre: imposible poner el jarabe donde va la leche.
+  # Every step has a name: impossible to put the syrup where the milk goes.
   # region: OrderBuilder#size
   def size(value) = tap { @size = value }
   # endregion
@@ -13,14 +13,14 @@ class OrderBuilder
   # region: OrderBuilder#extras
   def syrup(value) = tap { @syrup = value }
   def shots(count) = tap { @shots = count }
-  def hot = tap { @temp = :caliente }
+  def hot = tap { @temp = :hot }
   def iced = tap { @ice = true }
   # endregion
 
-  # Valida el pedido completo antes de que exista: lo imposible no llega ni a la caja.
+  # Validates the whole order before it exists: the impossible never even reaches the register.
   # region: OrderBuilder#build
   def build
-    raise InvalidOrder, "caliente y con hielo no se puede" if @temp == :caliente && @ice
+    raise InvalidOrder, "hot and iced is not possible" if @temp == :hot && @ice
     Order.new(size: @size, milk: @milk, syrup: @syrup, shots: @shots, temp: @temp, ice: @ice)
   end
   # endregion
@@ -34,7 +34,7 @@ class OrderTaker
 
   # region: OrderTaker#take
   def take(request)
-    order = OrderBuilder.new.size(:grande).milk(:avena).syrup(:vainilla).shots(2).hot.build
+    order = OrderBuilder.new.size(:large).milk(:oat).syrup(:vanilla).shots(2).hot.build
     @cashier.charge(order)
   rescue InvalidOrder => e
     @counter.notify(e.message)

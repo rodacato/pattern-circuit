@@ -1,4 +1,4 @@
-# Cada eslabón atiende lo suyo o lo pasa al siguiente. Nadie conoce la cadena completa.
+# Each link handles its own or passes it to the next. Nobody knows the whole chain.
 class Handler
   def initialize(next_handler = nil) = @next = next_handler
 
@@ -22,7 +22,7 @@ end
 # endregion
 
 # region: Supervisor#handle
-class Supervisor < Handler # ← un eslabón nuevo; los demás no cambian
+class Supervisor < Handler # ← a new link; the others don't change
   def can_handle?(r) = r.amount < 1000
 end
 # endregion

@@ -1,15 +1,15 @@
 class FrontDesk {
   constructor(private barista: Barista) {}
 
-  // Cada pedido se ejecuta en el acto: no queda nada que se pueda deshacer.
+  // Each order runs on the spot: there is nothing left to undo.
   // region: FrontDesk#submit
   submit(request: OrderRequest) {
-    // region: FrontDesk#submit:cmd:pedir
+    // region: FrontDesk#submit:cmd:order
     switch (request.action) {
-      case 'pedir': this.barista.prepare(request.drink); break
+      case 'order': this.barista.prepare(request.drink); break
     // endregion
-    // region: FrontDesk#submit:cmd:cancelar
-      case 'cancelar': new Undo().call(request); break
+    // region: FrontDesk#submit:cmd:cancel
+      case 'cancel': new Undo().call(request); break
     // endregion
     }
   }
@@ -18,6 +18,6 @@ class FrontDesk {
 
 // region: Undo#call
 class Undo {
-  call(request: OrderRequest) { throw new Error('¿Deshacer qué? El café ya se está haciendo') }
+  call(request: OrderRequest) { throw new Error('Undo what? The coffee is already being made') }
 }
 // endregion

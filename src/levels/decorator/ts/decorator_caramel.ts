@@ -5,12 +5,12 @@ class Latte implements Drink {
 }
 // endregion
 
-// Cada extra envuelve a la bebida y suma lo suyo. Se combinan solos.
+// Each extra wraps the drink and adds its own cost. They combine on their own.
 // region: WithOatMilk
 class WithOatMilk implements Drink {
   constructor(private drink: Drink) {}
   cost() { return this.drink.cost() + 8 }
-  description() { return `${this.drink.description()} con avena` }
+  description() { return `${this.drink.description()} with oat` }
 }
 // endregion
 
@@ -18,7 +18,7 @@ class WithOatMilk implements Drink {
 class WithShot implements Drink {
   constructor(private drink: Drink) {}
   cost() { return this.drink.cost() + 10 }
-  description() { return `${this.drink.description()} con shot` }
+  description() { return `${this.drink.description()} with shot` }
 }
 // endregion
 
@@ -26,20 +26,20 @@ class WithShot implements Drink {
 class WithCinnamon implements Drink {
   constructor(private drink: Drink) {}
   cost() { return this.drink.cost() + 5 }
-  description() { return `${this.drink.description()} con canela` }
+  description() { return `${this.drink.description()} with cinnamon` }
 }
 // endregion
 
 // region: WithCaramel
-class WithCaramel implements Drink { // ← un extra nuevo: una clase, nada más
+class WithCaramel implements Drink { // ← a new extra: one class, nothing else
   constructor(private drink: Drink) {}
   cost() { return this.drink.cost() + 7 }
-  description() { return `${this.drink.description()} con caramelo` }
+  description() { return `${this.drink.description()} with caramel` }
 }
 // endregion
 
 class Menu {
-  static EXTRAS: Record<string, new (drink: Drink) => Drink> = { avena: WithOatMilk, shot: WithShot, canela: WithCinnamon, caramelo: WithCaramel }
+  static EXTRAS: Record<string, new (drink: Drink) => Drink> = { oat: WithOatMilk, shot: WithShot, cinnamon: WithCinnamon, caramel: WithCaramel }
 
   // region: Menu#drink_for
   drinkFor(request: DrinkRequest): Drink {

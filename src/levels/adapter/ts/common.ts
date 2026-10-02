@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type Order = { drink: string; total: number }
 
 class OrderTaker {
@@ -9,7 +9,7 @@ class OrderTaker {
   // endregion
 }
 
-// SDK del proveedor externo: no lo podemos modificar.
+// External vendor SDK: we cannot modify it.
 namespace PagoFacil {
   export class SDK {
     // region: PagoFacil::SDK#charge_in_cents
@@ -28,6 +28,6 @@ class Barista {
 
 class Counter {
   // region: Counter#hand_over
-  handOver(order: Order) { console.log(`¡${order.drink} listo!`) }
+  handOver(order: Order) { console.log(`${order.drink} ready!`) }
   // endregion
 }

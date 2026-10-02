@@ -1,12 +1,12 @@
-// --- quienes leen y quienes escriben ---
+// --- who reads and who writes ---
 class OrderBoard {
   // region: OrderBoard#show
-  show(orders: OrderSummary[]) { render(orders) } // las pantallas preguntan todo el tiempo
+  show(orders: OrderSummary[]) { render(orders) } // the screens ask all the time
   // endregion
 }
 
 class Counter {
   // region: Counter#saved
-  saved(order: Order) { console.log(`Pedido ${order.id} registrado`) }
+  saved(order: Order) { console.log(`Order ${order.id} saved`) }
   // endregion
 }

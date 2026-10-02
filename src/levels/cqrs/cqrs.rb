@@ -1,9 +1,9 @@
-# Escribir y leer por caminos distintos.
+# Write and read through different paths.
 class PlaceOrder
-  # Lado de escritura: valida reglas del negocio, una orden a la vez.
+  # Write side: validates business rules, one order at a time.
   # region: PlaceOrder#call
   def call(command)
-    raise InvalidOrder unless command.valid? # reglas del negocio, solo en el lado de escritura
+    raise InvalidOrder unless command.valid? # business rules, only on the write side
     order = Order.create!(command.attributes)
     @events.publish(:order_placed, order)
   end
@@ -12,14 +12,14 @@ end
 
 # region: BoardProjection#on_order_placed
 class BoardProjection
-  # Cada cambio actualiza una vista ya lista para leer.
+  # Each change updates a view that is already ready to read.
   def on_order_placed(order) = @board_view.upsert(order.summary)
 end
 # endregion
 
 # region: BoardQuery#call
 class BoardQuery
-  # Lado de lectura: una tabla plana, sin joins ni bloqueos. Rápida y sin fila.
+  # Read side: a flat table, no joins or locks. Fast and no queue.
   def call = @board_view.all
 end
 # endregion

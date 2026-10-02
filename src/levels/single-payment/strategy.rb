@@ -1,5 +1,5 @@
-# Strategy "por si acaso": una interfaz, un registro… y una sola implementación.
-IVA = 0.16
+# Strategy "just in case": an interface, a registry… and a single implementation.
+VAT = 0.16
 
 class Cashier
   def initialize(barista, methods)
@@ -9,7 +9,7 @@ class Cashier
 
   # region: Cashier#charge
   def charge(order)
-    @methods.fetch(:card).charge(order.price * (1 + IVA))
+    @methods.fetch(:card).charge(order.price * (1 + VAT))
     @barista.prepare(order)
   end
   # endregion

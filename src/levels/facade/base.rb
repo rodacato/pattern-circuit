@@ -1,17 +1,17 @@
 class FrontDesk
-  # El mostrador orquesta la cocina paso a paso.
+  # The front desk orchestrates the kitchen step by step.
   # region: FrontDesk#make_latte
   def make_latte
     ground = Grinder.new.grind(:arabica)
     shot = EspressoMachine.new.extract(ground)
-    milk = MilkFrother.new.froth(:entera)
+    milk = MilkFrother.new.froth(:whole)
     Counter.new.hand_over([shot, milk])
   end
   # endregion
 end
 
 class DeliveryApp
-  # La app copió la orquestación… y se le olvidó espumar la leche.
+  # The app copied the orchestration… and forgot to froth the milk.
   # region: DeliveryApp#make_latte
   def make_latte
     ground = Grinder.new.grind(:arabica)

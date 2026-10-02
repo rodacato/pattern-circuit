@@ -1,15 +1,15 @@
 class Order {
-  private status = 'pendiente'
+  private status = 'pending'
 
   constructor(
     private display: Display,
     private push: PushNotifier,
   ) {}
 
-  // Order conoce a cada interesado por nombre… y nadie se acordó de Lealtad.
+  // Order knows each interested party by name… and nobody remembered Loyalty.
   // region: Order#complete!
   complete() {
-    this.status = 'listo'
+    this.status = 'ready'
     this.display.update(this)
     this.push.update(this)
   }

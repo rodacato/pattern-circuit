@@ -10,10 +10,10 @@ class Register {
   private counter: TicketCounter
 
   constructor(private display: Display) {
-    this.counter = new TicketCounter() // cada caja crea su propio contador…
+    this.counter = new TicketCounter() // each register creates its own counter…
   }
 
-  // …y las dos cajas reparten el turno 1, el 2, el 3… dos veces.
+  // …and the two registers hand out ticket 1, 2, 3… twice.
   // region: Register#checkout
   checkout(order: Order) {
     order.ticket = this.counter.next()

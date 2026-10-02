@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class OrderTaker
   def initialize(inventory, barista)
     @inventory = inventory
@@ -13,11 +13,11 @@ class OrderTaker
   # endregion
 end
 
-# El almacén está lejos: cada consulta tarda y atiende de a una.
+# The warehouse is far away: each query takes time and serves one at a time.
 class RemoteInventory
   # region: RemoteInventory#in_stock?
   def in_stock?(item)
-    sleep 2 # viaje de ida y vuelta al almacén
+    sleep 2 # round trip to the warehouse
     Warehouse.api.stock(item).positive?
   end
   # endregion
@@ -33,6 +33,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡#{order.item} listo!")
+  def hand_over(order) = puts("#{order.item} ready!")
   # endregion
 end

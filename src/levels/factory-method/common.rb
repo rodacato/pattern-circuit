@@ -1,4 +1,4 @@
-# --- productos y el resto de la cafetería ---
+# --- products and the rest of the coffee shop ---
 # region: Latte
 class Latte; end
 # endregion
@@ -34,6 +34,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(drink) = puts("¡#{drink.class.name} listo!")
+  def hand_over(drink) = puts("#{drink.class.name} ready!")
   # endregion
 end

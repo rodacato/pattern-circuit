@@ -15,7 +15,7 @@ class Cashier {
 
   // region: Cashier#charge
   charge(order: Order) {
-    console.log(`Cobrado: ${order.drink}`)
+    console.log(`Charged: ${order.drink}`)
     this.barista.prepare(order)
   }
   // endregion
@@ -24,8 +24,8 @@ class Cashier {
 class Barista {
   // region: Barista#prepare
   prepare(order: Order) {
-    console.log(`Preparando ${order.drink}...`)
-    // ¿y ahora a quién se la entrego? Falta un cable.
+    console.log(`Preparing ${order.drink}...`)
+    // and now who do I hand it to? A wire is missing.
   }
   // endregion
 }
@@ -33,7 +33,7 @@ class Barista {
 class Counter {
   // region: Counter#hand_over
   handOver(order: Order) {
-    console.log(`¡${order.drink} listo!`)
+    console.log(`${order.drink} ready!`)
   }
   // endregion
 }

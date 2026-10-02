@@ -1,5 +1,5 @@
 
-# Avisar del fallo a los interesados… que se enteran, pero nadie devuelve el dinero.
+# Notify those interested of the failure… they find out, but nobody refunds the money.
 # region: OrderFailedNotifier
 class OrderFailedNotifier
   def notify(order) = @subscribers.each { |s| s.order_failed(order) }

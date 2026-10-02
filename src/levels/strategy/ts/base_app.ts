@@ -1,7 +1,7 @@
 class Cashier {
   constructor(private barista: Barista) {}
 
-  // Cada método de pago nuevo obliga a abrir esta clase otra vez.
+  // Every new payment method forces us to open this class again.
   // region: Cashier#charge
   charge(order: Order) {
     // region: Cashier#charge:cash
@@ -13,12 +13,12 @@ class Cashier {
       CardTerminal.charge(order.total)
     // endregion
     // region: Cashier#charge:app
-    } else if (order.payment === 'app') { // ← nuevo: Cashier modificado
+    } else if (order.payment === 'app') { // ← new: Cashier modified
       AppWallet.charge(order.total)
     // endregion
     // region: Cashier#charge:else
     } else {
-      return // los vales siguen perdiéndose
+      return // vouchers are still being lost
     // endregion
     }
     this.barista.prepare(order)

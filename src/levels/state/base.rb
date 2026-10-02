@@ -1,17 +1,17 @@
 class Order
   attr_reader :status
 
-  def initialize = @status = :pendiente
+  def initialize = @status = :pending
 
-  # Cada evento cambia el status sin preguntar si tiene sentido.
-  # Las reglas viven repartidas en ifs, en cada método… cuando alguien se acuerda.
+  # Each event changes the status without asking if it makes sense.
+  # The rules are scattered across ifs, in every method… when someone remembers.
   # region: Order#handle
   def handle(event)
     case event
-    when :pagar then @status = :pagado
-    when :preparar then @status = :preparando # ¿y si no está pagado?
-    when :entregar then @status = :entregado  # ¿y si no está preparado?
-    when :cancelar then @status = :cancelado  # ¿y si ya se entregó?
+    when :pay then @status = :paid
+    when :prepare then @status = :preparing # what if it isn't paid?
+    when :deliver then @status = :delivered  # what if it isn't prepared?
+    when :cancel then @status = :cancelled  # what if it was already delivered?
     end
     @history.record(self, event)
   end

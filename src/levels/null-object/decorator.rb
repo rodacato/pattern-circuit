@@ -1,5 +1,5 @@
 require "delegate"
-# Envolver nil no lo convierte en una tarjeta: el envoltorio delega… a nil.
+# Wrapping nil doesn't turn it into a card: the wrapper delegates… to nil.
 # region: CardLogger
 class CardLogger < SimpleDelegator; end
 # endregion

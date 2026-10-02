@@ -1,10 +1,10 @@
 class DrinkFactory
-  # Una sola fábrica para todas las sucursales.
+  # One single factory for all the branches.
   def self.instance = @instance ||= new
 
   # region: DrinkFactory#create
   def create
-    Latte.new # la instancia única no sabe de qué sucursal viene el pedido
+    Latte.new # the single instance does not know which branch the order comes from
   end
   # endregion
 end

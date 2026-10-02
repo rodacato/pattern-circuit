@@ -1,5 +1,5 @@
-# Factory Method para crear un único tipo de pago: una jerarquía de creadores con un solo producto.
-IVA = 0.16
+# Factory Method to create a single payment type: a hierarchy of creators with one product.
+VAT = 0.16
 
 class PaymentFactory
   # region: PaymentFactory#create
@@ -19,7 +19,7 @@ class Cashier
 
   # region: Cashier#charge
   def charge(order)
-    @factory.create.charge(order.price * (1 + IVA))
+    @factory.create.charge(order.price * (1 + VAT))
     @barista.prepare(order)
   end
   # endregion

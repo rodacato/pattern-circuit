@@ -1,4 +1,4 @@
-// Cada eslabón atiende lo suyo o lo pasa al siguiente. Nadie conoce la cadena completa.
+// Each link handles its own or passes it to the next. Nobody knows the whole chain.
 abstract class Handler {
   private refunds = new Refunds()
 

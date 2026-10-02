@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class OrderTaker
   def initialize(menu, barista)
     @menu = menu

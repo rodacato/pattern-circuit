@@ -4,8 +4,8 @@ class PaymentGateway
   # endregion
 end
 
-# Intentar el proveedor y, si falla, pasar al siguiente: nadie se queda sin cobrar…
-# pero cada cliente espera el timeout completo, porque la cadena nunca deja de intentarlo.
+# Try the provider and, if it fails, move on to the next one: nobody goes uncharged…
+# but every customer waits the full timeout, because the chain never stops trying.
 # region: FallbackChain#charge
 class FallbackChain
   def charge(order)

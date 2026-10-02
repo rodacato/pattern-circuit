@@ -1,4 +1,4 @@
-# El esqueleto de la receta vive en un solo lugar; las subclases solo rellenan `brew`.
+# The recipe skeleton lives in one place; subclasses only fill in `brew`.
 class Recipe
   # region: Recipe#make
   def make
@@ -10,7 +10,7 @@ class Recipe
   # endregion
 
   # region: Recipe#boil_water
-  def boil_water = heat(:agua, 92)
+  def boil_water = heat(:water, 92)
   # endregion
 
   # region: Recipe#pour_in_cup
@@ -32,6 +32,6 @@ end
 
 class TeaRecipe < Recipe
   # region: TeaRecipe#brew
-  def brew = steep(180) # segundos
+  def brew = steep(180) # seconds
   # endregion
 end

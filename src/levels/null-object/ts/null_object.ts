@@ -6,11 +6,11 @@ class LoyaltyCards {
   // endregion
 }
 
-// Responde a todo lo que responde una tarjeta, sin hacer nada. Nadie necesita preguntar "¿es undefined?".
+// Responds to everything a card responds to, doing nothing. Nobody needs to ask "is it undefined?".
 // region: NullCard
 class NullCard implements Card {
   addPoints(_amount: number) {}
   get discount() { return 0 }
-  get maskedNumber() { return 'sin tarjeta' }
+  get maskedNumber() { return 'no card' }
 }
 // endregion

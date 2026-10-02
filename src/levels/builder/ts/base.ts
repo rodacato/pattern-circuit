@@ -1,5 +1,5 @@
 class Order {
-  // Nueve argumentos posicionales: nada impide cruzar la leche con el jarabe.
+  // Nine positional arguments: nothing stops you from swapping the milk and the syrup.
   // region: Order#initialize
   constructor(
     private size: string, private milk: string, private shots: number, private syrup: string,
@@ -13,8 +13,8 @@ class OrderTaker {
 
   // region: OrderTaker#take
   take(request: OrderRequest) {
-    const order = new Order('grande', 'vainilla', 2, 'avena', 'caliente', false, null, 'Ana', null)
-    //                                ^ leche y jarabe cruzados, y nadie se queja
+    const order = new Order('large', 'vanilla', 2, 'oat', 'hot', false, null, 'Ana', null)
+    //                                ^ milk and syrup swapped, and nobody complains
     this.cashier.charge(order)
   }
   // endregion

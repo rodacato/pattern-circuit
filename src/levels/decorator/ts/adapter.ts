@@ -6,7 +6,7 @@ class Menu {
   // endregion
 }
 
-// Traduce el pedido al formato del punto de venta viejo… que tampoco conoce combinaciones.
+// Translates the request to the old POS format… which doesn't know combinations either.
 // region: LegacyMenuAdapter
 class LegacyMenuAdapter {
   constructor(private pos: OldPos) {}

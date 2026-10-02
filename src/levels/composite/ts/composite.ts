@@ -1,4 +1,4 @@
-// Hoja y grupo responden al mismo mensaje: `make`.
+// Leaf and group answer the same message: `make`.
 interface Item {
   make(): Product[]
 }
@@ -14,7 +14,7 @@ class Combo implements Item {
 
   constructor(...items: Item[]) { this.items = items }
 
-  // Un combo prepara lo suyo pidiéndole `make` a cada parte, sea producto o combo.
+  // A combo makes its own by asking each part for `make`, whether product or combo.
   // region: Combo#make
   make() { return this.items.flatMap((item) => item.make()) }
   // endregion
@@ -23,7 +23,7 @@ class Combo implements Item {
 class Kitchen {
   constructor(private tray: Tray) {}
 
-  // Ni un if: la cocina ya no pregunta qué es cada cosa.
+  // Not a single if: the kitchen no longer asks what each thing is.
   // region: Kitchen#prepare
   prepare(item: Item) { this.tray.collect(item.make()) }
   // endregion

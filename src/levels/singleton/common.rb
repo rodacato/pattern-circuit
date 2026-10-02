@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Lobby
   def initialize(registers) = @registers = registers
 
@@ -9,6 +9,6 @@ end
 
 class Display
   # region: Display#show
-  def show(order) = puts("Turno #{order.ticket}")
+  def show(order) = puts("Ticket #{order.ticket}")
   # endregion
 end

@@ -7,7 +7,7 @@ class TicketCounter
 end
 
 class Register
-  # La caja elige una estrategia de numeración… y cada estrategia lleva su propia cuenta.
+  # The register picks a numbering strategy… and each strategy keeps its own count.
   def initialize(display, numbering = TicketCounter.new)
     @display = display
     @numbering = numbering

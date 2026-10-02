@@ -7,37 +7,37 @@ class Latte
 end
 # endregion
 
-# Cada extra envuelve a la bebida y suma lo suyo. Se combinan solos.
+# Each extra wraps the drink and adds its own cost. They combine on their own.
 # region: WithOatMilk
 class WithOatMilk < SimpleDelegator
   def cost = super + 8
-  def description = "#{super} con avena"
+  def description = "#{super} with oat"
 end
 # endregion
 
 # region: WithShot
 class WithShot < SimpleDelegator
   def cost = super + 10
-  def description = "#{super} con shot"
+  def description = "#{super} with shot"
 end
 # endregion
 
 # region: WithCinnamon
 class WithCinnamon < SimpleDelegator
   def cost = super + 5
-  def description = "#{super} con canela"
+  def description = "#{super} with cinnamon"
 end
 # endregion
 
 # region: WithCaramel
-class WithCaramel < SimpleDelegator # ← un extra nuevo: una clase, nada más
+class WithCaramel < SimpleDelegator # ← a new extra: one class, nothing else
   def cost = super + 7
-  def description = "#{super} con caramelo"
+  def description = "#{super} with caramel"
 end
 # endregion
 
 class Menu
-  EXTRAS = { avena: WithOatMilk, shot: WithShot, canela: WithCinnamon, caramelo: WithCaramel }
+  EXTRAS = { oat: WithOatMilk, shot: WithShot, cinnamon: WithCinnamon, caramel: WithCaramel }
 
   # region: Menu#drink_for
   def drink_for(request)

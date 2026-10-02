@@ -1,5 +1,5 @@
 
-# Un intermediario que controla el acceso a la máquina… sin arreglar lo que la app se salta.
+# An intermediary that controls access to the machine… without fixing what the app skips.
 # region: EspressoMachineProxy
 class EspressoMachineProxy
   def initialize(machine) = @machine = machine

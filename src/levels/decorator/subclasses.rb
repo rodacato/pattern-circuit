@@ -3,24 +3,24 @@ class Latte
   def description = "Latte"
 end
 
-# Una subclase por cada combinación de extras.
+# One subclass for each combination of extras.
 # region: OatMilkLatte
 class OatMilkLatte < Latte
   def cost = super + 8
-  def description = "Latte con avena"
+  def description = "Latte with oat"
 end
 # endregion
 
 # region: ShotLatte
 class ShotLatte < Latte
   def cost = super + 10
-  def description = "Latte con shot"
+  def description = "Latte with shot"
 end
 # endregion
 
 # region: OatShotLatte
 class OatShotLatte < Latte
   def cost = super + 18
-  def description = "Latte con avena y shot"
+  def description = "Latte with oat and shot"
 end
 # endregion

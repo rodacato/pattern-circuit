@@ -4,7 +4,7 @@ class Cashier
     @barista = barista
   end
 
-  # Cashier ya no sabe cómo se cobra: solo a quién delegar.
+  # Cashier no longer knows how to charge: only who to delegate to.
   # region: Cashier#charge
   def charge(order)
     @payment_methods.fetch(order.payment).charge(order)

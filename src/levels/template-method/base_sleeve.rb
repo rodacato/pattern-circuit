@@ -5,19 +5,19 @@ class CoffeeRecipe
     extract
     pour_in_cup
     put_lid
-    add_sleeve # ← cambio 1
+    add_sleeve # ← change 1
   end
   # endregion
 end
 
 class TeaRecipe
-  # Copia de la receta del café… a la que se le olvidó la tapa.
+  # Copy of the coffee recipe… that forgot the lid.
   # region: TeaRecipe#make
   def make
     boil_water
     steep
     pour_in_cup
-    add_sleeve # ← cambio 2: la misma línea en la otra copia
+    add_sleeve # ← change 2: the same line in the other copy
   end
   # endregion
 end

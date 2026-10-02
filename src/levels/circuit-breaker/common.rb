@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Cashier
   # region: Cashier#charge
   def charge(order) = @gateway.charge(order)
@@ -6,7 +6,7 @@ class Cashier
 end
 
 class OfflinePayments
-  # Respaldo: anota el cobro y lo procesa cuando el proveedor vuelva.
+  # Fallback: records the charge and processes it when the provider is back.
   # region: OfflinePayments#charge
   def charge(order) = @pending << order
   # endregion
@@ -20,6 +20,6 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡Listo!")
+  def hand_over(order) = puts("Ready!")
   # endregion
 end

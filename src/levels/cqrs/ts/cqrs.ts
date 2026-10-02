@@ -1,11 +1,11 @@
-// Escribir y leer por caminos distintos.
+// Write and read through different paths.
 class PlaceOrder {
   constructor(private events: EventBus) {}
 
-  // Lado de escritura: valida reglas del negocio, una orden a la vez.
+  // Write side: validates business rules, one order at a time.
   // region: PlaceOrder#call
   call(command: PlaceOrderCommand) {
-    if (!command.isValid()) throw new InvalidOrder() // reglas del negocio, solo en el lado de escritura
+    if (!command.isValid()) throw new InvalidOrder() // business rules, only on the write side
     const order = Order.create(command.attributes)
     this.events.publish('order_placed', order)
   }
@@ -16,7 +16,7 @@ class PlaceOrder {
 class BoardProjection {
   constructor(private boardView: BoardView) {}
 
-  // Cada cambio actualiza una vista ya lista para leer.
+  // Each change updates a view that is already ready to read.
   onOrderPlaced(order: Order) { this.boardView.upsert(order.summary) }
 }
 // endregion
@@ -25,7 +25,7 @@ class BoardProjection {
 class BoardQuery {
   constructor(private boardView: BoardView) {}
 
-  // Lado de lectura: una tabla plana, sin joins ni bloqueos. Rápida y sin fila.
+  // Read side: a flat table, no joins or locks. Fast and no queue.
   call() { return this.boardView.all() }
 }
 // endregion

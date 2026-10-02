@@ -1,5 +1,5 @@
 
-# Un adaptador para Stripe ayuda… pero el núcleo sigue atado a Postgres.
+# An adapter for Stripe helps… but the core is still tied to Postgres.
 # region: StripeAdapter
 class StripeAdapter
   def charge(order) = Stripe::Charge.create(amount: order.total_cents)

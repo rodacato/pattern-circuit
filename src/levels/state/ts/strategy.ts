@@ -1,15 +1,15 @@
-// Una estrategia por evento… pero ninguna recuerda en qué estado está el pedido.
+// One strategy per event… but none remembers which state the order is in.
 class Order {
-  status = 'pendiente'
+  status = 'pending'
   private history = new History()
 
   static HANDLERS: Record<string, new () => { apply(): string }> = {
-    pagar: PayHandler, preparar: PrepareHandler, entregar: DeliverHandler, cancelar: CancelHandler,
+    pay: PayHandler, prepare: PrepareHandler, deliver: DeliverHandler, cancel: CancelHandler,
   }
 
   // region: EventHandlers
   handle(event: string) {
-    this.status = new Order.HANDLERS[event]().apply() // siempre aplica, pase lo que pase
+    this.status = new Order.HANDLERS[event]().apply() // always applies, no matter what
     this.history.record(this, event)
   }
   // endregion

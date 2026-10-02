@@ -9,10 +9,10 @@ end
 class Register
   def initialize(display)
     @display = display
-    @counter = TicketCounter.new # cada caja crea su propio contador…
+    @counter = TicketCounter.new # each register creates its own counter…
   end
 
-  # …y las dos cajas reparten el turno 1, el 2, el 3… dos veces.
+  # …and the two registers hand out ticket 1, 2, 3… twice.
   # region: Register#checkout
   def checkout(order)
     order.ticket = @counter.next

@@ -1,4 +1,4 @@
-# Cada evento del pedido es un comando: se encola y se puede retirar antes de ejecutarse.
+# Each order event is a command: it is queued and can be withdrawn before it runs.
 class OrderEventCommand
   attr_reader :id
 

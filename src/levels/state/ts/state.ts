@@ -1,4 +1,4 @@
-// Cada estado es un objeto que sabe qué eventos acepta y a qué estado lleva.
+// Each state is an object that knows which events it accepts and which state it leads to.
 interface State {
   name: string
   on(event: string): State | undefined
@@ -22,35 +22,35 @@ class Order {
 
 // region: Order#handle:pendiente
 class Pending implements State {
-  name = 'pendiente'
-  on(event: string) { return ({ pagar: new Paid(), cancelar: new Cancelled() } as Record<string, State>)[event] }
+  name = 'pending'
+  on(event: string) { return ({ pay: new Paid(), cancel: new Cancelled() } as Record<string, State>)[event] }
 }
 // endregion
 
 // region: Order#handle:pagado
 class Paid implements State {
-  name = 'pagado'
-  on(event: string) { return ({ preparar: new Preparing(), cancelar: new Cancelled() } as Record<string, State>)[event] }
+  name = 'paid'
+  on(event: string) { return ({ prepare: new Preparing(), cancel: new Cancelled() } as Record<string, State>)[event] }
 }
 // endregion
 
 // region: Order#handle:preparando
 class Preparing implements State {
-  name = 'preparando'
-  on(event: string) { return ({ entregar: new Delivered() } as Record<string, State>)[event] }
+  name = 'preparing'
+  on(event: string) { return ({ deliver: new Delivered() } as Record<string, State>)[event] }
 }
 // endregion
 
 // region: Order#handle:entregado
 class Delivered implements State {
-  name = 'entregado'
-  on(_event: string) { return undefined } // un pedido entregado ya no cambia
+  name = 'delivered'
+  on(_event: string) { return undefined } // a delivered order no longer changes
 }
 // endregion
 
 // region: Order#handle:cancelado
 class Cancelled implements State {
-  name = 'cancelado'
+  name = 'cancelled'
   on(_event: string) { return undefined }
 }
 // endregion

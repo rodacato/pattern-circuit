@@ -1,4 +1,4 @@
-# --- los servicios que reaccionan a lo que pasa en la cafetería ---
+# --- the services that react to what happens in the coffee shop ---
 class Inventory
   # region: Inventory#on_event
   def on_event(event) = event.type == :returned ? restock(event) : reserve(event)

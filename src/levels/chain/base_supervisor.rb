@@ -1,21 +1,21 @@
 class Cashier
-  # El cajero conoce a todos los que aprueban y decide a quién mandarle cada caso.
+  # The cashier knows everyone who approves and decides who to send each case to.
   # region: Cashier#refund
   def refund(request)
-    # region: Cashier#refund:monto:bajo
+    # region: Cashier#refund:amount:low
     if request.amount < 100 then @refunds.pay(request)
     # endregion
-    # region: Cashier#refund:monto:medio
+    # region: Cashier#refund:amount:medium
     elsif request.amount < 500 then Manager.new.approve(request)
     # endregion
-    # region: Cashier#refund:monto:medio-alto
-    elsif request.amount < 1000 then Supervisor.new.approve(request) # ← Cashier modificado
+    # region: Cashier#refund:amount:medium-high
+    elsif request.amount < 1000 then Supervisor.new.approve(request) # ← Cashier modified
     # endregion
-    # region: Cashier#refund:monto:alto
+    # region: Cashier#refund:amount:high
     elsif request.amount < 2000 then Owner.new.approve(request)
     # endregion
     # region: Cashier#refund:else
-    else raise "¿Y ahora quién?" # nadie pensó en montos enormes
+    else raise "Now who?" # nobody thought of huge amounts
     # endregion
     end
   end

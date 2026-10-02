@@ -1,4 +1,4 @@
-// Envolver undefined no lo convierte en una tarjeta: el envoltorio delega… a undefined.
+// Wrapping undefined doesn't turn it into a card: the wrapper delegates… to undefined.
 // region: CardLogger
 class CardLogger {
   constructor(private inner: Card | undefined) {}

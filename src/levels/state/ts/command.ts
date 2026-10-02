@@ -1,4 +1,4 @@
-// Encolar los eventos como comandos no cambia qué se permite: la cola los ejecuta igual.
+// Queueing events as commands doesn't change what is allowed: the queue runs them anyway.
 // region: EventQueue
 class EventCommand {
   constructor(private order: Order, private event: string) {}
@@ -8,6 +8,6 @@ class EventCommand {
 class EventQueue {
   private commands: EventCommand[] = []
   push(command: EventCommand) { this.commands.push(command) }
-  run() { this.commands.forEach((c) => c.execute()) } // los ejecuta en orden, tengan sentido o no
+  run() { this.commands.forEach((c) => c.execute()) } // runs them in order, whether they make sense or not
 }
 // endregion

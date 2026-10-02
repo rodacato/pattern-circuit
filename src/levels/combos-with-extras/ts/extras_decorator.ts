@@ -1,7 +1,7 @@
 // region: WithOatMilk
 class WithOatMilk extends Product {
   constructor(private inner: Product) { super() }
-  make() { const drink = this.inner.make(); drink.extras.push('avena'); return drink }
+  make() { const drink = this.inner.make(); drink.extras.push('oat'); return drink }
 }
 // endregion
 
@@ -13,9 +13,9 @@ class WithShot extends Product {
 // endregion
 
 class CoffeeMenu {
-  static EXTRAS: Record<string, new (drink: Product) => Product> = { avena: WithOatMilk, shot: WithShot }
+  static EXTRAS: Record<string, new (drink: Product) => Product> = { oat: WithOatMilk, shot: WithShot }
 
-  // El café del combo se envuelve con cada extra: sigue siendo un Product más dentro del combo.
+  // The combo's coffee is wrapped with each extra: it is still just another Product inside the combo.
   // region: CoffeeMenu#drink_for
   drinkFor(extras: string[]) { return extras.reduce<Product>((drink, e) => new CoffeeMenu.EXTRAS[e](drink), new Latte()) }
   // endregion

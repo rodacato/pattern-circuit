@@ -1,4 +1,4 @@
-// El esqueleto de la receta vive en un solo lugar; las subclases solo rellenan `brew`.
+// The recipe skeleton lives in one place; subclasses only fill in `brew`.
 abstract class Recipe {
   protected cup = new Cup()
 
@@ -8,12 +8,12 @@ abstract class Recipe {
     this.brew()
     this.pourInCup()
     this.putLid()
-    this.addSleeve() // ← un solo lugar
+    this.addSleeve() // ← a single place
   }
   // endregion
 
   // region: Recipe#boil_water
-  boilWater() { this.heat('agua', 92) }
+  boilWater() { this.heat('water', 92) }
   // endregion
 
   // region: Recipe#pour_in_cup

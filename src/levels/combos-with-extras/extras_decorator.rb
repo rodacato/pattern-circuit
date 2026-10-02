@@ -1,7 +1,7 @@
 require "delegate"
 # region: WithOatMilk
 class WithOatMilk < SimpleDelegator
-  def make = super.tap { |parts| parts.last.extras << :avena }
+  def make = super.tap { |parts| parts.last.extras << :oat }
 end
 # endregion
 
@@ -12,9 +12,9 @@ end
 # endregion
 
 class CoffeeMenu
-  EXTRAS = { avena: WithOatMilk, shot: WithShot }
+  EXTRAS = { oat: WithOatMilk, shot: WithShot }
 
-  # El café del combo se envuelve con cada extra: sigue siendo un Product más dentro del combo.
+  # The combo's coffee is wrapped with each extra: it is still just another Product inside the combo.
   # region: CoffeeMenu#drink_for
   def drink_for(extras) = extras.reduce(Latte.new) { |drink, e| EXTRAS.fetch(e).new(drink) }
   # endregion

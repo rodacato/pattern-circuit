@@ -1,9 +1,9 @@
 class PlaceOrder
-  # Tres pasos, cada uno en su propio servicio: no hay una transacción que los envuelva a todos.
+  # Three steps, each in its own service: there is no transaction wrapping them all.
   # region: PlaceOrder#call
   def call(order)
-    Payments.charge(order)      # 1. se cobra (ya no hay vuelta atrás)
-    Inventory.reserve(order)    # 2. ¿sin avena? OutOfStock… y el cliente ya pagó
+    Payments.charge(order)      # 1. charge (no way back now)
+    Inventory.reserve(order)    # 2. out of oat? OutOfStock… and the customer already paid
     Barista.new.prepare(order)  # 3.
   end
   # endregion

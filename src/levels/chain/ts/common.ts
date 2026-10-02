@@ -1,12 +1,12 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type RefundRequest = { amount: number; category: string }
 
 class Refunds {
   // region: Refunds#pay
-  pay(request: RefundRequest) { console.log(`Reembolsado: $${request.amount}`) }
+  pay(request: RefundRequest) { console.log(`Refunded: $${request.amount}`) }
   // endregion
 
   // region: Refunds#decline
-  decline(request: RefundRequest) { console.log(`Nadie puede aprobar $${request.amount}: se avisa al cliente`) }
+  decline(request: RefundRequest) { console.log(`Nobody can approve $${request.amount}: the customer is notified`) }
   // endregion
 }

@@ -4,20 +4,20 @@ class OrderFlow {
     private barista: Barista,
   ) {}
 
-  // El flujo compartido conoce cada bebida concreta de cada sucursal.
+  // The shared flow knows every concrete drink of every branch.
   // region: OrderFlow#create_drink
   createDrink() {
-    // region: OrderFlow#create_drink:centro
-    if (this.branch === 'centro') {
+    // region: OrderFlow#create_drink:downtown
+    if (this.branch === 'downtown') {
       return new Latte()
     // endregion
-    // region: OrderFlow#create_drink:playa
-    } else if (this.branch === 'playa') {
+    // region: OrderFlow#create_drink:beach
+    } else if (this.branch === 'beach') {
       return new Frappe()
     // endregion
     // region: OrderFlow#create_drink:else
     } else {
-      return new Latte() // ¿Montaña? Nadie la contempló: le toca un latte
+      return new Latte() // Mountain? Nobody planned for it: it gets a latte
     // endregion
     }
   }

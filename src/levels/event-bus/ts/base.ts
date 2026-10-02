@@ -1,4 +1,4 @@
-// Cada servicio que produce algo llama a mano a cada servicio interesado.
+// Each service that produces something calls each interested service by hand.
 class Orders {
   // region: Orders#place
   place(order: Event) {
@@ -10,7 +10,7 @@ class Orders {
 }
 
 class Returns {
-  // Devoluciones copió la lista… y se le olvidó Facturación y Lealtad.
+  // Returns copied the list… and forgot Billing and Loyalty.
   // region: Returns#process
   process(returnRequest: Event) {
     new Inventory().onEvent(returnRequest)

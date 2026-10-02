@@ -1,6 +1,6 @@
-# La cafetería completa: cada pieza es un patrón que ya conoces.
+# The full coffee shop: every piece is a pattern you already know.
 
-# Builder: el pedido se arma por pasos con nombre y se valida antes de cobrar.
+# Builder: the order is assembled in named steps and validated before charging.
 class OrderBuilder
   # region: OrderBuilder#size
   def size(value) = tap { @size = value }
@@ -11,13 +11,13 @@ class OrderBuilder
 
   # region: OrderBuilder#build
   def build
-    raise InvalidOrder, "caliente y con hielo" if @hot && @iced
+    raise InvalidOrder, "hot and iced" if @hot && @iced
     Order.new(size: @size, extras: @extras)
   end
   # endregion
 end
 
-# Strategy: cada forma de pago es un cartucho.
+# Strategy: each payment method is a cartridge.
 class Cashier
   # region: Cashier#charge
   def charge(order) = @payment_methods.fetch(order.payment).charge(order)
@@ -42,7 +42,7 @@ class AppPayment
 end
 # endregion
 
-# Command: los pedidos esperan en cola y se pueden cancelar a tiempo.
+# Command: orders wait in a queue and can be cancelled in time.
 class CommandQueue
   # region: CommandQueue#push
   def push(command) = @pending << command
@@ -50,7 +50,7 @@ class CommandQueue
   # endregion
 end
 
-# Facade: una puerta simple a la cocina.
+# Facade: a simple door to the kitchen.
 class KitchenFacade
   # region: KitchenFacade#latte
   def latte(order)
@@ -67,7 +67,7 @@ class EspressoMachine
 end
 # endregion
 
-# Observer: cuando el pedido está listo, se enteran todos los suscriptores.
+# Observer: when the order is ready, all subscribers find out.
 class Order
   # region: Order#complete!
   def complete!(drink) = @subscribers.each { |s| s.update(self) }
@@ -76,18 +76,18 @@ end
 
 class Display
   # region: Display#update
-  def update(order) = puts("Turno #{order.ticket} listo")
+  def update(order) = puts("Ticket #{order.ticket} ready")
   # endregion
 end
 
 class LoyaltyProgram
   # region: LoyaltyProgram#update
-  def update(order) = order.card.add_points(10) # NullCard si no tiene tarjeta
+  def update(order) = order.card.add_points(10) # NullCard if it has no card
   # endregion
 end
 
 class Counter
   # region: Counter#notify
-  def notify(message) = puts("Antes de cobrar: #{message}")
+  def notify(message) = puts("Before charging: #{message}")
   # endregion
 end

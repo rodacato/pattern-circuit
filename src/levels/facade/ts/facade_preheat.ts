@@ -1,12 +1,12 @@
-// Una puerta simple a la cocina. Los clientes ya no conocen las máquinas.
+// A simple door to the kitchen. Clients no longer know the machines.
 class KitchenFacade {
   // region: KitchenFacade#latte
   latte() {
     const ground = new Grinder().grind('arabica')
     const machine = new EspressoMachine()
-    machine.preheat() // ← un solo lugar que cambiar
+    machine.preheat() // ← only one place to change
     const shot = machine.extract(ground)
-    const milk = new MilkFrother().froth('entera')
+    const milk = new MilkFrother().froth('whole')
     new Counter().handOver([shot, milk])
   }
   // endregion

@@ -1,12 +1,12 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 class Bar {
   // region: Bar#order
-  order(kind: 'cafe' | 'te') { new { cafe: CoffeeRecipe, te: TeaRecipe }[kind]().make() }
+  order(kind: 'coffee' | 'tea') { new { coffee: CoffeeRecipe, tea: TeaRecipe }[kind]().make() }
   // endregion
 }
 
 class Pickup {
   // region: Pickup#hand_over
-  handOver(cup: Cup) { console.log('¡Listo!') }
+  handOver(cup: Cup) { console.log('Ready!') }
   // endregion
 }

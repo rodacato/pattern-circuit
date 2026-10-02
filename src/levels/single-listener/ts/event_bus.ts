@@ -1,4 +1,4 @@
-// Un bus para un solo suscriptor: para saber qué pasa tras cobrar hay que buscar quién se suscribió.
+// A bus for a single subscriber: to know what happens after charging you have to look up who subscribed.
 type Handler = (payload: Order) => void
 
 class EventBus {

@@ -1,4 +1,4 @@
-// --- el resto de la cafetería ---
+// --- the rest of the coffee shop ---
 type Order = { register: string; ticket?: number }
 
 class Lobby {
@@ -11,6 +11,6 @@ class Lobby {
 
 class Display {
   // region: Display#show
-  show(order: Order) { console.log(`Turno ${order.ticket}`) }
+  show(order: Order) { console.log(`Ticket ${order.ticket}`) }
   // endregion
 }

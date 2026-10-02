@@ -10,7 +10,7 @@ class CoffeeRecipe
 end
 
 class TeaRecipe
-  # Copia de la receta del café… a la que se le olvidó la tapa.
+  # Copy of the coffee recipe… that forgot the lid.
   # region: TeaRecipe#make
   def make
     boil_water
@@ -20,7 +20,7 @@ class TeaRecipe
   # endregion
 end
 
-# Elegir la receta como estrategia no quita la duplicación: son dos algoritmos completos.
+# Picking the recipe as a strategy does not remove the duplication: they are two complete algorithms.
 # region: RecipeStrategy
-RECIPES = { cafe: CoffeeRecipe, te: TeaRecipe }
+RECIPES = { coffee: CoffeeRecipe, tea: TeaRecipe }
 # endregion

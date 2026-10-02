@@ -1,4 +1,4 @@
-// Una fachada con una sola puerta… que llama igual de seguido al almacén.
+// A facade with a single door… that calls the warehouse just as often.
 // region: StockDesk#in_stock?
 class StockDesk implements Inventory {
   constructor(private inventory: Inventory) {}

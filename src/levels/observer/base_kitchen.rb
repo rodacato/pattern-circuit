@@ -2,15 +2,15 @@ class Order
   def initialize(display, push, kitchen)
     @display = display
     @push = push
-    @kitchen = kitchen # ← otro interesado, otra dependencia
+    @kitchen = kitchen # ← another interested party, another dependency
   end
 
   # region: Order#complete!
   def complete!
-    @status = :listo
+    @status = :ready
     @display.update(self)
     @push.update(self)
-    @kitchen.update(self) # ← Order modificado otra vez
+    @kitchen.update(self) # ← Order modified again
   end
   # endregion
 end

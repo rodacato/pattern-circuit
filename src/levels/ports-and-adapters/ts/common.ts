@@ -1,4 +1,4 @@
-// --- quien pide y quien confirma ---
+// --- who orders and who confirms ---
 class WebApp {
   constructor(private orders: OrderService) {}
 
@@ -9,6 +9,6 @@ class WebApp {
 
 class Receipt {
   // region: Receipt#confirm
-  confirm(order: Order) { console.log(`Pedido ${order.id} confirmado`) }
+  confirm(order: Order) { console.log(`Order ${order.id} confirmed`) }
   // endregion
 }

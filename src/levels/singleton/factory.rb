@@ -1,6 +1,6 @@
 class CounterFactory
   # region: CounterFactory#create
-  def create = TicketCounter.new # un contador nuevo en cada pedido: siempre turno 1
+  def create = TicketCounter.new # a new counter on every order: always ticket 1
   # endregion
 end
 

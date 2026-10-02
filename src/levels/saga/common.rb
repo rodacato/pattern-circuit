@@ -1,4 +1,4 @@
-# --- el resto de la cafetería ---
+# --- the rest of the coffee shop ---
 class Barista
   # region: Barista#prepare
   def prepare(order) = @counter.hand_over(order)
@@ -7,7 +7,7 @@ end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(order) = puts("¡Listo!")
+  def hand_over(order) = puts("Ready!")
   # endregion
 
   # region: Counter#notify

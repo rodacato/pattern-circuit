@@ -1,4 +1,4 @@
-// Un pedido convertido en objeto: se puede guardar, encolar, ejecutar después… o deshacer.
+// An order turned into an object: it can be saved, queued, run later… or undone.
 class OrderCommand {
   constructor(private barista: Barista, private drink: string, readonly orderId: number) {}
   execute() { this.barista.prepare(this.drink) }
@@ -9,7 +9,7 @@ class FrontDesk {
 
   // region: FrontDesk#submit
   submit(request: OrderRequest) {
-    if (request.action === 'cancelar') return this.queue.cancel(request.orderId)
+    if (request.action === 'cancel') return this.queue.cancel(request.orderId)
     this.queue.push(new OrderCommand(this.barista, request.drink, request.orderId))
   }
   // endregion
@@ -18,7 +18,7 @@ class FrontDesk {
 class CommandQueue {
   private pending: OrderCommand[] = []
 
-  // Los comandos esperan su turno; deshacer es sacarlos de la cola antes de que corran.
+  // Commands wait their turn; undoing is taking them out of the queue before they run.
   // region: CommandQueue#push
   push(command: OrderCommand) { this.pending.push(command) }
   cancel(orderId: number) { this.pending = this.pending.filter((c) => c.orderId !== orderId) }

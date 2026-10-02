@@ -4,11 +4,11 @@ class LoyaltyCards
   # endregion
 end
 
-# Responde a todo lo que responde una tarjeta, sin hacer nada. Nadie necesita preguntar "¿es nil?".
+# Responds to everything a card responds to, doing nothing. Nobody needs to ask "is it nil?".
 # region: NullCard
 class NullCard
   def add_points(_amount) = nil
   def discount = 0
-  def masked_number = "sin tarjeta"
+  def masked_number = "no card"
 end
 # endregion

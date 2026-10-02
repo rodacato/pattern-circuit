@@ -15,7 +15,7 @@ class Cashier
 
   # region: Cashier#charge
   def charge(order)
-    puts "Cobrado: #{order.drink}"
+    puts "Charged: #{order.drink}"
     @barista.prepare(order)
   end
   # endregion
@@ -26,7 +26,7 @@ class Barista
 
   # region: Barista#prepare
   def prepare(order)
-    puts "Preparando #{order.drink}..."
+    puts "Preparing #{order.drink}..."
     @counter.hand_over(order)
   end
   # endregion
@@ -35,13 +35,13 @@ end
 class Counter
   # region: Counter#hand_over
   def hand_over(order)
-    puts "¡#{order.drink} listo!"
+    puts "#{order.drink} ready!"
   end
   # endregion
 end
 
 # region: wiring
-# Cada `new` es un cable: así se ve el circuito en código.
+# Each `new` is a wire: this is how the circuit looks in code.
 taker = OrderTaker.new(Cashier.new(Barista.new(Counter.new)))
 taker.take(:espresso)
 # endregion

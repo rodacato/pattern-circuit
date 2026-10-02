@@ -3,14 +3,14 @@ interface Handler {
 }
 
 class Order {
-  private status = 'pendiente'
+  private status = 'pending'
 
   constructor(private handler: Handler) {}
 
-  // En una cadena, el primero que atiende se queda con el aviso: los demás nunca se enteran.
+  // In a chain, the first one that handles it keeps the notice: the others never find out.
   // region: Order#complete!
   complete() {
-    this.status = 'listo'
+    this.status = 'ready'
     this.handler.handle(this)
   }
   // endregion

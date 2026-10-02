@@ -1,4 +1,4 @@
-// Un solo interesado: Cashier lo llama directo y el flujo se lee de corrido.
+// A single interested party: Cashier calls it directly and the flow reads straight through.
 class Cashier {
   constructor(private kitchen: Kitchen) {}
 

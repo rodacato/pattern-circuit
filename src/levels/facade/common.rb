@@ -1,7 +1,7 @@
-# --- el subsistema de la cocina: piezas finas que hay que usar en orden ---
+# --- the kitchen subsystem: fine-grained parts that must be used in order ---
 class Grinder
   # region: Grinder#grind
-  def grind(beans) = :molido
+  def grind(beans) = :ground
   # endregion
 end
 
@@ -11,18 +11,18 @@ class EspressoMachine
   # endregion
 
   # region: EspressoMachine#preheat
-  def preheat = :caliente
+  def preheat = :hot
   # endregion
 end
 
 class MilkFrother
   # region: MilkFrother#froth
-  def froth(milk) = :espuma
+  def froth(milk) = :foam
   # endregion
 end
 
 class Counter
   # region: Counter#hand_over
-  def hand_over(drink) = puts("¡Latte listo!")
+  def hand_over(drink) = puts("Latte ready!")
   # endregion
 end

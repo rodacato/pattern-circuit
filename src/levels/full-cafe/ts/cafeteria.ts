@@ -1,8 +1,8 @@
-// La cafetería completa: cada pieza es un patrón que ya conoces.
+// The full coffee shop: every piece is a pattern you already know.
 
-// Builder: el pedido se arma por pasos con nombre y se valida antes de cobrar.
+// Builder: the order is assembled in named steps and validated before charging.
 class OrderBuilder {
-  private sizeValue = 'mediano'
+  private sizeValue = 'medium'
   private isHot = false
   private isIced = false
   private extras: string[] = []
@@ -16,13 +16,13 @@ class OrderBuilder {
 
   // region: OrderBuilder#build
   build() {
-    if (this.isHot && this.isIced) throw new InvalidOrder('caliente y con hielo')
+    if (this.isHot && this.isIced) throw new InvalidOrder('hot and iced')
     return new Order({ size: this.sizeValue, extras: this.extras })
   }
   // endregion
 }
 
-// Strategy: cada forma de pago es un cartucho.
+// Strategy: each payment method is a cartridge.
 interface PaymentMethod {
   charge(order: Order): void
 }
@@ -53,7 +53,7 @@ class AppPayment implements PaymentMethod {
 }
 // endregion
 
-// Command: los pedidos esperan en cola y se pueden cancelar a tiempo.
+// Command: orders wait in a queue and can be cancelled in time.
 type OrderCommand = { orderId: number; execute(): void }
 
 class CommandQueue {
@@ -65,7 +65,7 @@ class CommandQueue {
   // endregion
 }
 
-// Facade: una puerta simple a la cocina.
+// Facade: a simple door to the kitchen.
 class KitchenFacade {
   // region: KitchenFacade#latte
   latte(order: Order) {
@@ -82,7 +82,7 @@ class EspressoMachine {
 }
 // endregion
 
-// Observer: cuando el pedido está listo, se enteran todos los suscriptores.
+// Observer: when the order is ready, all subscribers find out.
 interface Subscriber {
   update(order: Order): void
 }
@@ -98,18 +98,18 @@ class Order {
 
 class Display implements Subscriber {
   // region: Display#update
-  update(order: Order) { console.log(`Turno ${order.ticket} listo`) }
+  update(order: Order) { console.log(`Ticket ${order.ticket} ready`) }
   // endregion
 }
 
 class LoyaltyProgram implements Subscriber {
   // region: LoyaltyProgram#update
-  update(order: Order) { order.card.addPoints(10) } // NullCard si no tiene tarjeta
+  update(order: Order) { order.card.addPoints(10) } // NullCard if it has no card
   // endregion
 }
 
 class Counter {
   // region: Counter#notify
-  notify(message: string) { console.log(`Antes de cobrar: ${message}`) }
+  notify(message: string) { console.log(`Before charging: ${message}`) }
   // endregion
 }

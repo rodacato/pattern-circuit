@@ -1,5 +1,5 @@
-// Strategy "por si acaso": una interfaz, un registro… y una sola implementación.
-const IVA = 0.16
+// Strategy "just in case": an interface, a registry… and a single implementation.
+const VAT = 0.16
 
 interface PaymentMethod {
   charge(total: number): void
@@ -13,7 +13,7 @@ class Cashier {
 
   // region: Cashier#charge
   charge(order: Order) {
-    this.methods['card'].charge(order.price * (1 + IVA))
+    this.methods['card'].charge(order.price * (1 + VAT))
     this.barista.prepare(order)
   }
   // endregion

@@ -1,4 +1,4 @@
-// --- los servicios que reaccionan a lo que pasa en la cafetería ---
+// --- the services that react to what happens in the coffee shop ---
 type Event = { type: string }
 
 interface Subscriber {

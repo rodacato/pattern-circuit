@@ -1,9 +1,9 @@
-# El núcleo del negocio habla directo con la base de datos y con Stripe.
+# The business core talks directly to the database and to Stripe.
 class OrderService
   # region: OrderService#place
   def place(params)
     order = Order.new(params)
-    db = PG.connect(ENV.fetch("DATABASE_URL")) # la base real, siempre
+    db = PG.connect(ENV.fetch("DATABASE_URL")) # always the real database
     db.exec("INSERT INTO orders …", order.to_row)
     Stripe::Charge.create(amount: order.total_cents, source: params[:card])
     Receipt.new.confirm(order)
@@ -12,9 +12,9 @@ class OrderService
 end
 
 # region: Postgres
-# En el entorno de pruebas no hay DATABASE_URL: PG.connect explota.
+# In the test environment there is no DATABASE_URL: PG.connect blows up.
 # endregion
 
 # region: Stripe
-# Y cada prueba intentaría cobrar de verdad.
+# And every test would try to really charge.
 # endregion

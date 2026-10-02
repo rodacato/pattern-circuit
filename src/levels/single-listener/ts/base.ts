@@ -1,9 +1,9 @@
-// Solo la cocina necesita saber que se cobró un pedido… y nadie le avisa.
+// Only the kitchen needs to know an order was charged… and nobody tells it.
 class Cashier {
   // region: Cashier#charge
   charge(order: Order) {
     CardTerminal.charge(order)
-    // ¿y la cocina? El pedido se queda esperando.
+    // and the kitchen? The order is left waiting.
   }
   // endregion
 }

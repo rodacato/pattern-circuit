@@ -3,9 +3,9 @@ class FrontDesk
   def make_latte
     ground = Grinder.new.grind(:arabica)
     machine = EspressoMachine.new
-    machine.preheat # ← cambio 1
+    machine.preheat # ← change 1
     shot = machine.extract(ground)
-    milk = MilkFrother.new.froth(:entera)
+    milk = MilkFrother.new.froth(:whole)
     Counter.new.hand_over([shot, milk])
   end
   # endregion
@@ -16,7 +16,7 @@ class DeliveryApp
   def make_latte
     ground = Grinder.new.grind(:arabica)
     machine = EspressoMachine.new
-    machine.preheat # ← cambio 2: la misma edición, en otro lugar
+    machine.preheat # ← change 2: the same edit, somewhere else
     shot = machine.extract(ground)
     Counter.new.hand_over([shot])
   end
