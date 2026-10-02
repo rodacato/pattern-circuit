@@ -2,17 +2,17 @@ import { defineLevel, type NodeInput } from '../../engine'
 import { actor, chain, node, pulse, skinned, wire, withCommon } from '../kit'
 import adapter from './adapter.rb?raw'
 import base from './base.rb?raw'
-import basePrecalentar from './base_precalentar.rb?raw'
+import basePreheat from './base_preheat.rb?raw'
 import common from './common.rb?raw'
 import facade from './facade.rb?raw'
-import facadePrecalentar from './facade_precalentar.rb?raw'
+import facadePreheat from './facade_preheat.rb?raw'
 import proxy from './proxy.rb?raw'
 import tsAdapter from './ts/adapter.ts?raw'
 import tsBase from './ts/base.ts?raw'
-import tsBasePrecalentar from './ts/base_precalentar.ts?raw'
+import tsBasePreheat from './ts/base_preheat.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsFacade from './ts/facade.ts?raw'
-import tsFacadePrecalentar from './ts/facade_precalentar.ts?raw'
+import tsFacadePreheat from './ts/facade_preheat.ts?raw'
 import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
@@ -123,7 +123,7 @@ export default defineLevel({
         removeWires: ['molino->espresso'],
         add: { nodes: [skinned('facade', preheat('precal', [7.5, -0.5]))], wires: chain('molino', 'precal', 'espresso') },
       },
-      code: { without: 'base_precalentar', with: 'facade_precalentar' },
+      code: { without: 'base_preheat', with: 'facade_preheat' },
     },
   ],
   winWhen: [
@@ -134,17 +134,17 @@ export default defineLevel({
   code: {
     rb: {
       base: code(base),
-      base_precalentar: code(basePrecalentar),
+      base_preheat: code(basePreheat),
       facade: code(facade),
-      facade_precalentar: code(facadePrecalentar),
+      facade_preheat: code(facadePreheat),
       adapter: code(base + adapter),
       proxy: code(base + proxy),
     },
     ts: {
       base: codeTs(tsBase),
-      base_precalentar: codeTs(tsBasePrecalentar),
+      base_preheat: codeTs(tsBasePreheat),
       facade: codeTs(tsFacade),
-      facade_precalentar: codeTs(tsFacadePrecalentar),
+      facade_preheat: codeTs(tsFacadePreheat),
       adapter: codeTs(tsBase + tsAdapter),
       proxy: codeTs(tsBase + tsProxy),
     },

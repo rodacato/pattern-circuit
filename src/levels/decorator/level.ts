@@ -2,18 +2,18 @@ import { defineLevel, type Predicate } from '../../engine'
 import { abstract, actor, node, pulse, skinned, wire, withCommon } from '../kit'
 import adapter from './adapter.rb?raw'
 import base from './base.rb?raw'
-import baseCaramelo from './base_caramelo.rb?raw'
+import baseCaramel from './base_caramel.rb?raw'
 import common from './common.rb?raw'
 import decorator from './decorator.rb?raw'
-import decoratorCaramelo from './decorator_caramelo.rb?raw'
+import decoratorCaramel from './decorator_caramel.rb?raw'
 import strategy from './strategy.rb?raw'
 import subclasses from './subclasses.rb?raw'
 import tsAdapter from './ts/adapter.ts?raw'
 import tsBase from './ts/base.ts?raw'
-import tsBaseCaramelo from './ts/base_caramelo.ts?raw'
+import tsBaseCaramel from './ts/base_caramel.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsDecorator from './ts/decorator.ts?raw'
-import tsDecoratorCaramelo from './ts/decorator_caramelo.ts?raw'
+import tsDecoratorCaramel from './ts/decorator_caramel.ts?raw'
 import tsStrategy from './ts/strategy.ts?raw'
 import tsSubclasses from './ts/subclasses.ts?raw'
 
@@ -163,7 +163,7 @@ export default defineLevel({
           wires: [abstract('wCanela', 'wCaramelo'), abstract('wCaramelo', 'preparar')],
         },
       },
-      code: { without: 'base_caramelo', with: 'decorator_caramelo' },
+      code: { without: 'base_caramel', with: 'decorator_caramel' },
     },
   ],
   winWhen: [
@@ -174,17 +174,17 @@ export default defineLevel({
   code: {
     rb: {
       base: code(`${subclasses}\n${base}`),
-      base_caramelo: code(baseCaramelo),
+      base_caramel: code(baseCaramel),
       decorator: code(decorator),
-      decorator_caramelo: code(decoratorCaramelo),
+      decorator_caramel: code(decoratorCaramel),
       strategy: code(strategy),
       adapter: code(`${subclasses}\n${adapter}`),
     },
     ts: {
       base: codeTs(`${tsSubclasses}\n${tsBase}`),
-      base_caramelo: codeTs(tsBaseCaramelo),
+      base_caramel: codeTs(tsBaseCaramel),
       decorator: codeTs(tsDecorator),
-      decorator_caramelo: codeTs(tsDecoratorCaramelo),
+      decorator_caramel: codeTs(tsDecoratorCaramel),
       strategy: codeTs(tsStrategy),
       adapter: codeTs(`${tsSubclasses}\n${tsAdapter}`),
     },

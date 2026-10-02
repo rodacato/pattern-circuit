@@ -1,19 +1,19 @@
 import { defineLevel, type NodeInput } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire, withCommon } from '../kit'
 import base from './base.rb?raw'
-import baseManga from './base_manga.rb?raw'
+import baseSleeve from './base_sleeve.rb?raw'
 import builder from './builder.rb?raw'
 import common from './common.rb?raw'
 import strategy from './strategy.rb?raw'
 import template from './template.rb?raw'
-import templateManga from './template_manga.rb?raw'
+import templateSleeve from './template_sleeve.rb?raw'
 import tsBase from './ts/base.ts?raw'
-import tsBaseManga from './ts/base_manga.ts?raw'
+import tsBaseSleeve from './ts/base_sleeve.ts?raw'
 import tsBuilder from './ts/builder.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsStrategy from './ts/strategy.ts?raw'
 import tsTemplate from './ts/template.ts?raw'
-import tsTemplateManga from './ts/template_manga.ts?raw'
+import tsTemplateSleeve from './ts/template_sleeve.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
@@ -142,7 +142,7 @@ export default defineLevel({
           wires: chain('tapa', 'manga', 'entregar'),
         },
       },
-      code: { without: 'base_manga', with: 'template_manga' },
+      code: { without: 'base_sleeve', with: 'template_sleeve' },
     },
   ],
   winWhen: [
@@ -153,17 +153,17 @@ export default defineLevel({
   code: {
     rb: {
       base: code(base),
-      base_manga: code(baseManga),
+      base_sleeve: code(baseSleeve),
       template: code(template),
-      template_manga: code(templateManga),
+      template_sleeve: code(templateSleeve),
       strategy: code(strategy),
       builder: code(builder),
     },
     ts: {
       base: codeTs(tsBase),
-      base_manga: codeTs(tsBaseManga),
+      base_sleeve: codeTs(tsBaseSleeve),
       template: codeTs(tsTemplate),
-      template_manga: codeTs(tsTemplateManga),
+      template_sleeve: codeTs(tsTemplateSleeve),
       strategy: codeTs(tsStrategy),
       builder: codeTs(tsBuilder),
     },

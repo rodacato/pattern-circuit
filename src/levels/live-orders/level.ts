@@ -1,22 +1,22 @@
 import { defineLevel } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire } from '../kit'
-import avisosBase from '../observer/base.rb?raw'
-import avisosCommon from '../observer/common.rb?raw'
-import avisosObserver from '../observer/observer.rb?raw'
-import estadosBase from '../state/base.rb?raw'
-import estadosCommon from '../state/common.rb?raw'
+import noticesBase from '../observer/base.rb?raw'
+import noticesCommon from '../observer/common.rb?raw'
+import noticesObserver from '../observer/observer.rb?raw'
+import statesBase from '../state/base.rb?raw'
+import statesCommon from '../state/common.rb?raw'
 import { permissive, strict } from '../state/level'
-import eventosCommand from './events_command.rb?raw'
-import estadosState from '../state/state.rb?raw'
-import eventosBase from '../command/base.rb?raw'
-import tsAvisosBase from '../observer/ts/base.ts?raw'
-import tsAvisosCommon from '../observer/ts/common.ts?raw'
-import tsAvisosObserver from '../observer/ts/observer.ts?raw'
-import tsEstadosBase from '../state/ts/base.ts?raw'
-import tsEstadosCommon from '../state/ts/common.ts?raw'
-import tsEstadosState from '../state/ts/state.ts?raw'
-import tsEventosBase from '../command/ts/base.ts?raw'
-import tsEventosCommand from './ts/events_command.ts?raw'
+import eventsCommand from './events_command.rb?raw'
+import statesState from '../state/state.rb?raw'
+import eventsBase from '../command/base.rb?raw'
+import tsNoticesBase from '../observer/ts/base.ts?raw'
+import tsNoticesCommon from '../observer/ts/common.ts?raw'
+import tsNoticesObserver from '../observer/ts/observer.ts?raw'
+import tsStatesBase from '../state/ts/base.ts?raw'
+import tsStatesCommon from '../state/ts/common.ts?raw'
+import tsStatesState from '../state/ts/state.ts?raw'
+import tsEventsBase from '../command/ts/base.ts?raw'
+import tsEventsCommand from './ts/events_command.ts?raw'
 
 const notFuera = { not: { hasTag: 'fuera-de-orden' } }
 const event = (at: number, name: string, cmd: number, label = name) => pulse(at, label, ['cmd:evento', name], { cmd }, 'eventos')
@@ -48,12 +48,12 @@ export default defineLevel({
       id: 'eventos',
       at: 'mostrador',
       label: 'Eventos',
-      code: 'eventos_base',
+      code: 'events_base',
       inventory: ['command', 'chain-of-responsibility', 'proxy'],
       options: {
         command: {
           outcome: 'solves',
-          code: 'eventos_command',
+          code: 'events_command',
           note: { title: 'Command: eventos que se pueden retirar', body: 'Cada evento es una tarjeta en cola. El "entregar" enviado por error se retira antes de que llegue al pedido.' },
           patch: {
             remove: ['deshacer'],
@@ -67,13 +67,13 @@ export default defineLevel({
         },
         'chain-of-responsibility': {
           outcome: 'misfit',
-          code: 'eventos_base',
+          code: 'events_base',
           note: { title: 'Una cadena no deshace', body: 'Pasar la cancelación de mano en mano no sirve si el evento ya se ejecutó: nadie puede atenderla.' },
           patch: reskin('deshacer', 'chain-of-responsibility'),
         },
         proxy: {
           outcome: 'misfit',
-          code: 'eventos_base',
+          code: 'events_base',
           note: { title: 'Un proxy no vuelve en el tiempo', body: 'Un intermediario delante del pedido no guarda los eventos como objetos que se puedan retirar.' },
           patch: reskin('deshacer', 'proxy'),
         },
@@ -83,12 +83,12 @@ export default defineLevel({
       id: 'estados',
       at: 'pedido',
       label: 'Estados',
-      code: 'estados_base',
+      code: 'states_base',
       inventory: ['state', 'strategy', 'template-method'],
       options: {
         state: {
           outcome: 'solves',
-          code: 'estados_state',
+          code: 'states_state',
           note: { title: 'State: cada estado sabe qué acepta', body: 'Cancelar algo ya entregado se rechaza en el estado "entregado", sin ifs repartidos.' },
           patch: {
             update: [{ id: 'pedido', behavior: { type: 'machine', initial: 'pendiente', states: strict, else: 'rechazo' }, skin: 'state' }],
@@ -98,10 +98,10 @@ export default defineLevel({
             },
           },
         },
-        strategy: { outcome: 'misfit', code: 'estados_base', note: { title: 'Strategy la elige quien llama; en State decide el estado actual', body: 'Una estrategia por evento aplica su cambio sin saber en qué estado está el pedido. En State decide el estado actual, y normalmente él mismo indica el siguiente.' }, patch: reskin('pedido', 'strategy') },
+        strategy: { outcome: 'misfit', code: 'states_base', note: { title: 'Strategy la elige quien llama; en State decide el estado actual', body: 'Una estrategia por evento aplica su cambio sin saber en qué estado está el pedido. En State decide el estado actual, y normalmente él mismo indica el siguiente.' }, patch: reskin('pedido', 'strategy') },
         'template-method': {
           outcome: 'misfit',
-          code: 'estados_base',
+          code: 'states_base',
           note: { title: 'Un esqueleto fijo no valida transiciones', body: 'Template Method fija el orden de unos pasos; aquí el problema es qué eventos tienen sentido según el estado.' },
           patch: reskin('pedido', 'template-method'),
         },
@@ -111,12 +111,12 @@ export default defineLevel({
       id: 'avisos',
       at: 'listo',
       label: 'Avisos',
-      code: 'avisos_base',
+      code: 'notices_base',
       inventory: ['observer', 'facade', 'singleton'],
       options: {
         observer: {
           outcome: 'solves',
-          code: 'avisos_observer',
+          code: 'notices_observer',
           note: { title: 'Observer: cada cambio llega a todos', body: 'Pantalla y Lealtad se suscriben al pedido. Los tres patrones conviven: Command decide qué llega, State qué se acepta, Observer quién se entera.' },
           patch: {
             removeWires: ['listo->pantalla'],
@@ -124,8 +124,8 @@ export default defineLevel({
             add: { wires: [abstract('listo', 'pantalla'), abstract('listo', 'lealtad')] },
           },
         },
-        facade: { outcome: 'misfit', code: 'avisos_base', note: { title: 'Facade no difunde', body: 'Una puerta simple para avisar sigue llamando a quien conoce: Lealtad sigue sin enterarse.' }, patch: reskin('listo', 'facade') },
-        singleton: { outcome: 'misfit', code: 'avisos_base', note: { title: 'Singleton no suma interesados', body: 'Tener un único notificador compartido no cambia a quién le avisa.' }, patch: reskin('listo', 'singleton') },
+        facade: { outcome: 'misfit', code: 'notices_base', note: { title: 'Facade no difunde', body: 'Una puerta simple para avisar sigue llamando a quien conoce: Lealtad sigue sin enterarse.' }, patch: reskin('listo', 'facade') },
+        singleton: { outcome: 'misfit', code: 'notices_base', note: { title: 'Singleton no suma interesados', body: 'Tener un único notificador compartido no cambia a quién le avisa.' }, patch: reskin('listo', 'singleton') },
       },
     },
   ],
@@ -150,22 +150,22 @@ export default defineLevel({
   ],
   code: {
     rb: {
-      base: `${estadosCommon}\n${avisosCommon}`,
-      eventos_base: eventosBase,
-      eventos_command: eventosCommand,
-      estados_base: estadosBase,
-      estados_state: estadosState,
-      avisos_base: avisosBase,
-      avisos_observer: avisosObserver,
+      base: `${statesCommon}\n${noticesCommon}`,
+      events_base: eventsBase,
+      events_command: eventsCommand,
+      states_base: statesBase,
+      states_state: statesState,
+      notices_base: noticesBase,
+      notices_observer: noticesObserver,
     },
     ts: {
-      base: `${tsEstadosCommon}\n${tsAvisosCommon}`,
-      eventos_base: tsEventosBase,
-      eventos_command: tsEventosCommand,
-      estados_base: tsEstadosBase,
-      estados_state: tsEstadosState,
-      avisos_base: tsAvisosBase,
-      avisos_observer: tsAvisosObserver,
+      base: `${tsStatesCommon}\n${tsNoticesCommon}`,
+      events_base: tsEventsBase,
+      events_command: tsEventsCommand,
+      states_base: tsStatesBase,
+      states_state: tsStatesState,
+      notices_base: tsNoticesBase,
+      notices_observer: tsNoticesObserver,
     },
   },
 })

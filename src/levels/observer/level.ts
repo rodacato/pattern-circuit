@@ -1,18 +1,18 @@
 import { defineLevel } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire, withCommon } from '../kit'
 import base from './base.rb?raw'
-import baseCocina from './base_cocina.rb?raw'
+import baseKitchen from './base_kitchen.rb?raw'
 import chainCode from './chain.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
-import observerCocina from './observer_cocina.rb?raw'
+import observerKitchen from './observer_kitchen.rb?raw'
 import strategy from './strategy.rb?raw'
 import tsBase from './ts/base.ts?raw'
-import tsBaseCocina from './ts/base_cocina.ts?raw'
+import tsBaseKitchen from './ts/base_kitchen.ts?raw'
 import tsChain from './ts/chain.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsObserver from './ts/observer.ts?raw'
-import tsObserverCocina from './ts/observer_cocina.ts?raw'
+import tsObserverKitchen from './ts/observer_kitchen.ts?raw'
 import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
@@ -97,7 +97,7 @@ export default defineLevel({
       scenario: 'main',
       without: { add: { nodes: [subscriber('cocina', 'Cocina', 'Kitchen', 6)], wires: [wire('listo', 'cocina')] } },
       with: { add: { nodes: [skinned('observer', subscriber('cocina', 'Cocina', 'Kitchen', 6))], wires: [abstract('listo', 'cocina')] } },
-      code: { without: 'base_cocina', with: 'observer_cocina' },
+      code: { without: 'base_kitchen', with: 'observer_kitchen' },
     },
   ],
   winWhen: [
@@ -107,17 +107,17 @@ export default defineLevel({
   code: {
     rb: {
       base: code(base),
-      base_cocina: code(baseCocina),
+      base_kitchen: code(baseKitchen),
       observer: code(observer),
-      observer_cocina: code(observerCocina),
+      observer_kitchen: code(observerKitchen),
       strategy: code(strategy),
       chain: code(chainCode),
     },
     ts: {
       base: codeTs(tsBase),
-      base_cocina: codeTs(tsBaseCocina),
+      base_kitchen: codeTs(tsBaseKitchen),
       observer: codeTs(tsObserver),
-      observer_cocina: codeTs(tsObserverCocina),
+      observer_kitchen: codeTs(tsObserverKitchen),
       strategy: codeTs(tsStrategy),
       chain: codeTs(tsChain),
     },

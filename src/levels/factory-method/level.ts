@@ -1,18 +1,18 @@
 import { defineLevel, type NodeDef, type Predicate, type WireDef } from '../../engine'
 import base from './base.rb?raw'
-import basePuerto from './base_puerto.rb?raw'
+import baseHarbor from './base_harbor.rb?raw'
 import builder from './builder.rb?raw'
 import common from './common.rb?raw'
 import { withCommon } from '../kit'
 import factory from './factory.rb?raw'
-import factoryPuerto from './factory_puerto.rb?raw'
+import factoryHarbor from './factory_harbor.rb?raw'
 import singleton from './singleton.rb?raw'
 import tsBase from './ts/base.ts?raw'
-import tsBasePuerto from './ts/base_puerto.ts?raw'
+import tsBaseHarbor from './ts/base_harbor.ts?raw'
 import tsBuilder from './ts/builder.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsFactory from './ts/factory.ts?raw'
-import tsFactoryPuerto from './ts/factory_puerto.ts?raw'
+import tsFactoryHarbor from './ts/factory_harbor.ts?raw'
 import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
@@ -188,7 +188,7 @@ export default defineLevel({
           wires: [{ from: 'crear', to: 'sucPuerto', key: 'puerto', port: 'out', dep: 'abstract' }, toBarista('sucPuerto')],
         },
       },
-      code: { without: 'base_puerto', with: 'factory_puerto' },
+      code: { without: 'base_harbor', with: 'factory_harbor' },
     },
   ],
   winWhen: [
@@ -199,17 +199,17 @@ export default defineLevel({
   code: {
     rb: {
       base: code(base),
-      base_puerto: code(basePuerto),
+      base_harbor: code(baseHarbor),
       factory: code(factory),
-      factory_puerto: code(factoryPuerto),
+      factory_harbor: code(factoryHarbor),
       singleton: code(singleton),
       builder: code(builder),
     },
     ts: {
       base: codeTs(tsBase),
-      base_puerto: codeTs(tsBasePuerto),
+      base_harbor: codeTs(tsBaseHarbor),
       factory: codeTs(tsFactory),
-      factory_puerto: codeTs(tsFactoryPuerto),
+      factory_harbor: codeTs(tsFactoryHarbor),
       singleton: codeTs(tsSingleton),
       builder: codeTs(tsBuilder),
     },
