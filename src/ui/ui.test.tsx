@@ -174,7 +174,7 @@ describe('Review', () => {
     expect(screen.getByRole('dialog').textContent).toContain('¿Efectivo o tarjeta?')
     fireEvent.click(screen.getByRole('button', { name: /^Observer/ }))
     expect(screen.getByText(/La respuesta era Strategy/)).toBeTruthy()
-    expect(store.load().review['strategy/metodo-de-pago']).toMatchObject({ box: 1 })
+    expect(store.load().review['strategy/payment-method']).toMatchObject({ box: 1 })
     fireEvent.click(screen.getByRole('button', { name: 'Ver resultado' }))
     expect(screen.getByRole('dialog').textContent).toContain('Acertaste 0 de 1')
   })

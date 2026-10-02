@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'ports-and-adapters' | 'adapter' | 'facade' | 'singleton') => ({ sockets: [{ id: 'dependencias', pattern }] })
+const socket = (pattern: 'ports-and-adapters' | 'adapter' | 'facade' | 'singleton') => ({ sockets: [{ id: 'dependencies', pattern }] })
 
 describe('L18 · Ports & Adapters', () => {
   it('sin patrón: los pedidos de prueba no tienen base de datos', () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'chain-of-responsibility' | 'strategy' | 'observer') => ({ id: 'aprobacion', pattern })
+const socket = (pattern: 'chain-of-responsibility' | 'strategy' | 'observer') => ({ id: 'approval', pattern })
 
 describe('L12 · Chain of Responsibility', () => {
   it('sin patrón: el monto enorme no tiene quién lo atienda', () => {
@@ -10,7 +10,7 @@ describe('L12 · Chain of Responsibility', () => {
   })
 
   it('sin patrón + supervisor: hay que abrir al cajero', () => {
-    expect(evaluate(level, { ticket: 'supervisor' }).touched).toEqual(['cajero'])
+    expect(evaluate(level, { ticket: 'supervisor' }).touched).toEqual(['cashier'])
   })
 
   it('la cadena atiende o rechaza con aviso, y el supervisor se inserta sin tocar a nadie', () => {

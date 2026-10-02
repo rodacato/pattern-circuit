@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'event-bus' | 'observer' | 'facade') => ({ id: 'eventos', pattern })
+const socket = (pattern: 'event-bus' | 'observer' | 'facade') => ({ id: 'events', pattern })
 
 describe('L19 · Event Bus', () => {
   it('sin patrón: la devolución solo llega a Inventario', () => {

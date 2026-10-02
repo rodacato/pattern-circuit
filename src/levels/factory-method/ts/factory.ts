@@ -12,20 +12,20 @@ abstract class Branch {
   abstract createDrink(): object
 }
 
-class CentroBranch extends Branch {
-  // region: CentroBranch#create_drink
+class DowntownBranch extends Branch {
+  // region: DowntownBranch#create_drink
   createDrink() { return new Latte() }
   // endregion
 }
 
-class PlayaBranch extends Branch {
-  // region: PlayaBranch#create_drink
+class BeachBranch extends Branch {
+  // region: BeachBranch#create_drink
   createDrink() { return new Frappe() }
   // endregion
 }
 
-class MontanaBranch extends Branch {
-  // region: MontanaBranch#create_drink
+class MountainBranch extends Branch {
+  // region: MountainBranch#create_drink
   createDrink() { return new HotChocolate() }
   // endregion
 }

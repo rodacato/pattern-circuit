@@ -16,19 +16,19 @@ import tsProxy from './ts/proxy.ts?raw'
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 const usesCard = (id: string, label: string, className: string, codeRef: string, x: number): NodeInput =>
-  node(id, label, className, [x, 2], { type: 'guard', require: { not: { hasTag: 'tarjeta:nil' } }, onFail: 'drop' }, { codeRef })
+  node(id, label, className, [x, 2], { type: 'guard', require: { not: { hasTag: 'card:nil' } }, onFail: 'drop' }, { codeRef })
 
 const customers = [
-  pulse(0, 'Ana (con tarjeta)', ['tarjeta:ok']),
-  pulse(35, 'Beto (sin tarjeta)', ['tarjeta:nil']),
-  pulse(70, 'Carla (con tarjeta)', ['tarjeta:ok']),
-  pulse(105, 'Dani (sin tarjeta)', ['tarjeta:nil']),
+  pulse(0, 'Ana (con tarjeta)', ['card:ok']),
+  pulse(35, 'Beto (sin tarjeta)', ['card:nil']),
+  pulse(70, 'Carla (con tarjeta)', ['card:ok']),
+  pulse(105, 'Dani (sin tarjeta)', ['card:nil']),
 ]
 
 export default defineLevel({
   id: 'null-object',
   order: 21,
-  chapter: 'resiliencia',
+  chapter: 'resilience',
   title: 'El cliente sin tarjeta',
   targetPattern: 'null-object',
   brief: {
@@ -37,19 +37,19 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('cliente', 'Cliente', [0, 2]),
-      node('buscar', 'Buscar tarjeta', 'LoyaltyCards', [3, 2], { type: 'pass' }, { codeRef: 'LoyaltyCards#find' }),
-      usesCard('lealtad', 'Lealtad', 'Loyalty', 'Loyalty#reward', 6),
-      usesCard('descuento', 'Descuento', 'Discounts', 'Discounts#apply', 9),
-      usesCard('recibo', 'Recibo', 'Receipt', 'Receipt#print', 12),
-      node('entregar', 'Entregar', 'Counter', [15, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', 'Cliente', [0, 2]),
+      node('lookup', 'Buscar tarjeta', 'LoyaltyCards', [3, 2], { type: 'pass' }, { codeRef: 'LoyaltyCards#find' }),
+      usesCard('loyalty', 'Lealtad', 'Loyalty', 'Loyalty#reward', 6),
+      usesCard('discount', 'Descuento', 'Discounts', 'Discounts#apply', 9),
+      usesCard('receipt', 'Recibo', 'Receipt', 'Receipt#print', 12),
+      node('handOver', 'Entregar', 'Counter', [15, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
-    wires: chain('cliente', 'buscar', 'lealtad', 'descuento', 'recibo', 'entregar'),
+    wires: chain('customer', 'lookup', 'loyalty', 'discount', 'receipt', 'handOver'),
   },
   sockets: [
     {
-      id: 'tarjeta',
-      at: 'buscar',
+      id: 'card',
+      at: 'lookup',
       label: 'Tarjeta',
       inventory: ['null-object', 'decorator', 'proxy', 'adapter'],
       options: {
@@ -61,26 +61,26 @@ export default defineLevel({
             body: 'En lugar de nil, buscar devuelve una NullCard que responde a todo lo que responde una tarjeta, sin efecto: cero puntos, cero descuento. Los que la usan no cambian ni preguntan nada.',
           },
           patch: {
-            update: [{ id: 'buscar', behavior: { type: 'transform', when: { hasTag: 'tarjeta:nil' }, removeTags: ['tarjeta:nil'], addTags: ['tarjeta:nula'] }, skin: 'null-object' }],
+            update: [{ id: 'lookup', behavior: { type: 'transform', when: { hasTag: 'card:nil' }, removeTags: ['card:nil'], addTags: ['card:null'] }, skin: 'null-object' }],
           },
         },
         decorator: {
           outcome: 'misfit',
           code: 'decorator',
           note: { title: 'Envolver nil sigue siendo nil', body: 'Un decorador delega en lo que envuelve. Si envuelve nil, la primera llamada explota igual.' },
-          patch: { update: [{ id: 'buscar', skin: 'decorator' }] },
+          patch: { update: [{ id: 'lookup', skin: 'decorator' }] },
         },
         proxy: {
           outcome: 'misfit',
           code: 'proxy',
           note: { title: 'Un proxy necesita un objeto real detrás', body: 'El sustituto intenta cargar la tarjeta real al usarla, pero no existe: el problema solo se posterga.' },
-          patch: { update: [{ id: 'buscar', skin: 'proxy' }] },
+          patch: { update: [{ id: 'lookup', skin: 'proxy' }] },
         },
         adapter: {
           outcome: 'misfit',
           code: 'adapter',
           note: { title: 'No hay nada que adaptar', body: 'Un adaptador traduce una interfaz existente. Sin tarjeta, no hay interfaz que traducir.' },
-          patch: { update: [{ id: 'buscar', skin: 'adapter' }] },
+          patch: { update: [{ id: 'lookup', skin: 'adapter' }] },
         },
       },
     },

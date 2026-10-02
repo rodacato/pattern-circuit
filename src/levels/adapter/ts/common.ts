@@ -12,8 +12,8 @@ class OrderTaker {
 // SDK del proveedor externo: no lo podemos modificar.
 namespace PagoFacil {
   export class SDK {
-    // region: PagoFacil::SDK#cobrar_en_centavos
-    cobrarEnCentavos({ montoCentavos, referencia }: { montoCentavos: number; referencia: string }) { return { estado: 'ok' } }
+    // region: PagoFacil::SDK#charge_in_cents
+    chargeInCents({ amountCents, reference }: { amountCents: number; reference: string }) { return { status: 'ok' } }
     // endregion
   }
 }

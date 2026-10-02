@@ -19,7 +19,7 @@ import tsSubclasses from './ts/subclasses.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const EXTRAS = ['avena', 'shot', 'canela', 'caramelo']
+const EXTRAS = ['oat', 'shot', 'cinnamon', 'caramel']
 
 // Cada extra pedido tiene que estar aplicado (+extra) en la bebida entregada.
 const allExtrasApplied: Predicate = { all: EXTRAS.map((e) => ({ any: [{ not: { hasTag: e } }, { hasTag: `+${e}` }] })) }
@@ -33,16 +33,16 @@ const wrapper = (id: string, label: string, className: string, x: number, extra:
 const order = (at: number, label: string, extras: string[]) => pulse(at, label, [`combo:${extras.join('-')}`, ...extras])
 
 const main = [
-  order(0, 'Latte + avena', ['avena']),
+  order(0, 'Latte + avena', ['oat']),
   order(40, 'Latte + shot', ['shot']),
-  order(80, 'Latte + avena + shot', ['avena', 'shot']),
-  order(120, 'Latte + avena + shot + canela', ['avena', 'shot', 'canela']),
+  order(80, 'Latte + avena + shot', ['oat', 'shot']),
+  order(120, 'Latte + avena + shot + canela', ['oat', 'shot', 'cinnamon']),
 ]
 
 export default defineLevel({
   id: 'decorator',
   order: 6,
-  chapter: 'barra',
+  chapter: 'bar',
   title: 'Extras sin fin',
   targetPattern: 'decorator',
   brief: {
@@ -51,25 +51,25 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('cliente', 'Cliente', [0, 2]),
-      node('tomar', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
-      node('menu', 'Menú', 'Menu', [6, 2], { type: 'branch', cases: { 'combo:avena': 'a', 'combo:shot': 's', 'combo:avena-shot': 'as' } }, { codeRef: 'Menu#drink_for' }),
-      subclass('conAvena', 'Con avena', 'LatteConAvena', 0, ['avena']),
-      subclass('conShot', 'Con shot', 'LatteConShot', 2, ['shot']),
-      subclass('conAvenaShot', 'Avena y shot', 'LatteConAvenaYShot', 4, ['avena', 'shot']),
-      node('preparar', 'Preparar', 'Barista', [15, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
-      node('entregar', 'Entregar', 'Counter', [18, 2], { type: 'sink', expects: allExtrasApplied }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', 'Cliente', [0, 2]),
+      node('take', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
+      node('menu', 'Menú', 'Menu', [6, 2], { type: 'branch', cases: { 'combo:oat': 'a', 'combo:shot': 's', 'combo:oat-shot': 'as' } }, { codeRef: 'Menu#drink_for' }),
+      subclass('withOat', 'Con avena', 'OatMilkLatte', 0, ['oat']),
+      subclass('withShot', 'Con shot', 'ShotLatte', 2, ['shot']),
+      subclass('withOatShot', 'Avena y shot', 'OatShotLatte', 4, ['oat', 'shot']),
+      node('prepare', 'Preparar', 'Barista', [15, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
+      node('handOver', 'Entregar', 'Counter', [18, 2], { type: 'sink', expects: allExtrasApplied }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [
-      wire('cliente', 'tomar'),
-      wire('tomar', 'menu'),
-      wire('menu', 'conAvena', { port: 'a' }),
-      wire('menu', 'conShot', { port: 's' }),
-      wire('menu', 'conAvenaShot', { port: 'as' }),
-      wire('conAvena', 'preparar'),
-      wire('conShot', 'preparar'),
-      wire('conAvenaShot', 'preparar'),
-      wire('preparar', 'entregar'),
+      wire('customer', 'take'),
+      wire('take', 'menu'),
+      wire('menu', 'withOat', { port: 'a' }),
+      wire('menu', 'withShot', { port: 's' }),
+      wire('menu', 'withOatShot', { port: 'as' }),
+      wire('withOat', 'prepare'),
+      wire('withShot', 'prepare'),
+      wire('withOatShot', 'prepare'),
+      wire('prepare', 'handOver'),
     ],
   },
   sockets: [
@@ -87,11 +87,11 @@ export default defineLevel({
             body: 'Cada extra es una envoltura que suma su precio y su descripción y delega el resto. Se apilan en cualquier orden y cantidad: tres extras son tres envolturas, no ocho subclases.',
           },
           patch: {
-            remove: ['conAvena', 'conShot', 'conAvenaShot'],
+            remove: ['withOat', 'withShot', 'withOatShot'],
             update: [{ id: 'menu', label: 'Latte', className: 'Latte', behavior: { type: 'pass' }, codeRef: 'Latte' }],
             add: {
-              nodes: [wrapper('wAvena', 'Con avena', 'WithOatMilk', 8, 'avena'), wrapper('wShot', 'Con shot', 'WithShot', 10, 'shot'), wrapper('wCanela', 'Con canela', 'WithCinnamon', 12, 'canela')],
-              wires: [abstract('menu', 'wAvena'), abstract('wAvena', 'wShot'), abstract('wShot', 'wCanela'), abstract('wCanela', 'preparar')],
+              nodes: [wrapper('wOat', 'Con avena', 'WithOatMilk', 8, 'oat'), wrapper('wShot', 'Con shot', 'WithShot', 10, 'shot'), wrapper('wCinnamon', 'Con canela', 'WithCinnamon', 12, 'cinnamon')],
+              wires: [abstract('menu', 'wOat'), abstract('wOat', 'wShot'), abstract('wShot', 'wCinnamon'), abstract('wCinnamon', 'prepare')],
             },
           },
         },
@@ -103,21 +103,21 @@ export default defineLevel({
             body: 'La bebida recibe una estrategia de precio… una sola. Con dos o tres extras, todos menos el primero se pierden.',
           },
           patch: {
-            remove: ['conAvena', 'conShot', 'conAvenaShot'],
+            remove: ['withOat', 'withShot', 'withOatShot'],
             update: [{ id: 'menu', behavior: { type: 'slot' }, skin: 'strategy' }],
             add: {
               nodes: [
-                skinned('strategy', node('pAvena', 'Precio avena', 'OatMilkPricing', [10, 0], { type: 'transform', addTags: ['+avena'] })),
+                skinned('strategy', node('pOat', 'Precio avena', 'OatMilkPricing', [10, 0], { type: 'transform', addTags: ['+oat'] })),
                 skinned('strategy', node('pShot', 'Precio shot', 'ShotPricing', [10, 2], { type: 'transform', addTags: ['+shot'] })),
-                skinned('strategy', node('pCanela', 'Precio canela', 'CinnamonPricing', [10, 4], { type: 'transform', addTags: ['+canela'] })),
+                skinned('strategy', node('pCinnamon', 'Precio canela', 'CinnamonPricing', [10, 4], { type: 'transform', addTags: ['+cinnamon'] })),
               ],
               wires: [
-                abstract('menu', 'pAvena', 'avena'),
+                abstract('menu', 'pOat', 'oat'),
                 abstract('menu', 'pShot', 'shot'),
-                abstract('menu', 'pCanela', 'canela'),
-                wire('pAvena', 'preparar'),
-                wire('pShot', 'preparar'),
-                wire('pCanela', 'preparar'),
+                abstract('menu', 'pCinnamon', 'cinnamon'),
+                wire('pOat', 'prepare'),
+                wire('pShot', 'prepare'),
+                wire('pCinnamon', 'prepare'),
               ],
             },
           },
@@ -130,10 +130,10 @@ export default defineLevel({
             body: 'Adaptar el pedido al punto de venta viejo cambia el formato, pero el sistema viejo tampoco conoce la combinación con tres extras.',
           },
           patch: {
-            removeWires: ['tomar->menu'],
+            removeWires: ['take->menu'],
             add: {
-              nodes: [skinned('adapter', node('adaptador', 'Adaptador', 'LegacyMenuAdapter', [4.5, 0], { type: 'transform', setShape: 'square' }))],
-              wires: [wire('tomar', 'adaptador'), wire('adaptador', 'menu')],
+              nodes: [skinned('adapter', node('adapter', 'Adaptador', 'LegacyMenuAdapter', [4.5, 0], { type: 'transform', setShape: 'square' }))],
+              wires: [wire('take', 'adapter'), wire('adapter', 'menu')],
             },
           },
         },
@@ -142,25 +142,25 @@ export default defineLevel({
   ],
   scenarios: [
     { id: 'main', pulses: main },
-    { id: 'con-caramelo', pulses: [...main, order(160, 'Latte + caramelo + shot', ['caramelo', 'shot'])] },
+    { id: 'with-caramel', pulses: [...main, order(160, 'Latte + caramelo + shot', ['caramel', 'shot'])] },
   ],
   changeTickets: [
     {
-      id: 'caramelo',
+      id: 'caramel',
       text: 'Nuevo extra en el menú: caramelo.',
-      scenario: 'con-caramelo',
+      scenario: 'with-caramel',
       without: {
-        update: [{ id: 'menu', behavior: { type: 'branch', cases: { 'combo:avena': 'a', 'combo:shot': 's', 'combo:avena-shot': 'as', 'combo:caramelo': 'c' } } }],
+        update: [{ id: 'menu', behavior: { type: 'branch', cases: { 'combo:oat': 'a', 'combo:shot': 's', 'combo:oat-shot': 'as', 'combo:caramel': 'c' } } }],
         add: {
-          nodes: [subclass('conCaramelo', 'Con caramelo', 'LatteConCaramelo', 6, ['caramelo'])],
-          wires: [wire('menu', 'conCaramelo', { port: 'c' }), wire('conCaramelo', 'preparar')],
+          nodes: [subclass('withCaramel', 'Con caramelo', 'CaramelLatte', 6, ['caramel'])],
+          wires: [wire('menu', 'withCaramel', { port: 'c' }), wire('withCaramel', 'prepare')],
         },
       },
       with: {
-        removeWires: ['wCanela->preparar'],
+        removeWires: ['wCinnamon->prepare'],
         add: {
-          nodes: [wrapper('wCaramelo', 'Con caramelo', 'WithCaramel', 14, 'caramelo')],
-          wires: [abstract('wCanela', 'wCaramelo'), abstract('wCaramelo', 'preparar')],
+          nodes: [wrapper('wCaramel', 'Con caramelo', 'WithCaramel', 14, 'caramel')],
+          wires: [abstract('wCinnamon', 'wCaramel'), abstract('wCaramel', 'prepare')],
         },
       },
       code: { without: 'base_caramel', with: 'decorator_caramel' },

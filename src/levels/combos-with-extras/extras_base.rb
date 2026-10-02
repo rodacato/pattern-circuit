@@ -4,10 +4,10 @@ class CoffeeMenu
   # region: CoffeeMenu#drink_for
   def drink_for(extras)
     # region: CoffeeMenu#drink_for:avena
-    if extras.include?(:avena) then LatteConAvena.new
+    if extras.include?(:avena) then OatMilkLatte.new
     # endregion
     # region: CoffeeMenu#drink_for:shot
-    elsif extras.include?(:shot) then LatteConShot.new
+    elsif extras.include?(:shot) then ShotLatte.new
     # endregion
     # region: CoffeeMenu#drink_for:else
     else raise "¿Qué subclase le toca?"
@@ -17,10 +17,10 @@ class CoffeeMenu
   # endregion
 end
 
-# region: LatteConAvena
-class LatteConAvena < Product; end
+# region: OatMilkLatte
+class OatMilkLatte < Product; end
 # endregion
 
-# region: LatteConShot
-class LatteConShot < Product; end
+# region: ShotLatte
+class ShotLatte < Product; end
 # endregion

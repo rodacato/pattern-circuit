@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const command = { id: 'eventos', pattern: 'command' as const }
-const state = { id: 'estados', pattern: 'state' as const }
-const observer = { id: 'avisos', pattern: 'observer' as const }
+const command = { id: 'events', pattern: 'command' as const }
+const state = { id: 'states', pattern: 'state' as const }
+const observer = { id: 'notices', pattern: 'observer' as const }
 
 describe('L17 · State + Observer + Command', () => {
   it('los tres juntos resuelven el nivel', () => {

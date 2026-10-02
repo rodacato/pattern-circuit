@@ -13,13 +13,13 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const reads = Array.from({ length: 8 }, (_, i) => pulse(i * 10, 'Ver pedidos', ['lectura'], {}, 'pantallas'))
-const writes = [5, 35, 65].map((at, i) => pulse(at, `Pedido nuevo ${i + 1}`, ['escritura'], {}, 'mostrador'))
+const reads = Array.from({ length: 8 }, (_, i) => pulse(i * 10, 'Ver pedidos', ['read'], {}, 'displays'))
+const writes = [5, 35, 65].map((at, i) => pulse(at, `Pedido nuevo ${i + 1}`, ['write'], {}, 'counter'))
 
 export default defineLevel({
   id: 'cqrs',
   order: 20,
-  chapter: 'arquitectura',
+  chapter: 'architecture',
   title: 'Mil pantallas, un mostrador',
   targetPattern: 'cqrs',
   brief: {
@@ -28,17 +28,17 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('pantallas', 'Pantallas', [0, 0]),
-      actor('mostrador', 'Mostrador', [0, 4]),
-      node('store', 'Modelo de pedidos', 'OrderStore', [5, 2], { type: 'branch', cases: { lectura: 'lectura', escritura: 'escritura' } }, { cost: 16, capacity: 1, codeRef: 'OrderStore#handle' }),
-      node('tablero', 'Tablero', 'OrderBoard', [10, 0], { type: 'sink', message: '📺 tablero actualizado' }, { codeRef: 'OrderBoard#show' }),
-      node('registrado', 'Registrado', 'Counter', [10, 4], { type: 'sink', message: '✔ registrado' }, { codeRef: 'Counter#saved' }),
+      actor('displays', 'Pantallas', [0, 0]),
+      actor('counter', 'Mostrador', [0, 4]),
+      node('store', 'Modelo de pedidos', 'OrderStore', [5, 2], { type: 'branch', cases: { read: 'read', write: 'write' } }, { cost: 16, capacity: 1, codeRef: 'OrderStore#handle' }),
+      node('board', 'Tablero', 'OrderBoard', [10, 0], { type: 'sink', message: '📺 tablero actualizado' }, { codeRef: 'OrderBoard#show' }),
+      node('registered', 'Registrado', 'Counter', [10, 4], { type: 'sink', message: '✔ registrado' }, { codeRef: 'Counter#saved' }),
     ],
-    wires: [wire('pantallas', 'store'), wire('mostrador', 'store'), wire('store', 'tablero', { port: 'lectura' }), wire('store', 'registrado', { port: 'escritura' })],
+    wires: [wire('displays', 'store'), wire('counter', 'store'), wire('store', 'board', { port: 'read' }), wire('store', 'registered', { port: 'write' })],
   },
   sockets: [
     {
-      id: 'modelo',
+      id: 'model',
       at: 'store',
       label: 'Modelo',
       inventory: ['cqrs', 'singleton', 'facade'],
@@ -54,11 +54,11 @@ export default defineLevel({
             remove: ['store'],
             add: {
               nodes: [
-                skinned('cqrs', node('comandos', 'Escritura', 'PlaceOrder', [4, 4], { type: 'pass' }, { cost: 16, capacity: 1, codeRef: 'PlaceOrder#call' })),
-                skinned('cqrs', node('proyeccion', 'Proyección', 'BoardProjection', [7, 4], { type: 'broadcast' }, { codeRef: 'BoardProjection#on_order_placed' })),
-                skinned('cqrs', node('vista', 'Vista de lectura', 'BoardQuery', [4, 0], { type: 'pass' }, { cost: 6, codeRef: 'BoardQuery#call' })),
+                skinned('cqrs', node('commands', 'Escritura', 'PlaceOrder', [4, 4], { type: 'pass' }, { cost: 16, capacity: 1, codeRef: 'PlaceOrder#call' })),
+                skinned('cqrs', node('projection', 'Proyección', 'BoardProjection', [7, 4], { type: 'broadcast' }, { codeRef: 'BoardProjection#on_order_placed' })),
+                skinned('cqrs', node('view', 'Vista de lectura', 'BoardQuery', [4, 0], { type: 'pass' }, { cost: 6, codeRef: 'BoardQuery#call' })),
               ],
-              wires: [...chain('pantallas', 'vista', 'tablero'), ...chain('mostrador', 'comandos', 'proyeccion'), wire('proyeccion', 'registrado'), abstract('proyeccion', 'tablero')],
+              wires: [...chain('displays', 'view', 'board'), ...chain('counter', 'commands', 'projection'), wire('projection', 'registered'), abstract('projection', 'board')],
             },
           },
         },
@@ -73,10 +73,10 @@ export default defineLevel({
           code: 'facade',
           note: { title: 'Facade no separa caminos', body: 'Una ventanilla única delante del modelo es otra puerta hacia la misma fila.' },
           patch: {
-            removeWires: ['pantallas->store', 'mostrador->store'],
+            removeWires: ['displays->store', 'counter->store'],
             add: {
-              nodes: [skinned('facade', node('ventanilla', 'Ventanilla', 'OrdersDesk', [2.5, 2], { type: 'pass' }, { codeRef: 'OrdersDesk' }))],
-              wires: [wire('pantallas', 'ventanilla'), wire('mostrador', 'ventanilla'), wire('ventanilla', 'store')],
+              nodes: [skinned('facade', node('desk', 'Ventanilla', 'OrdersDesk', [2.5, 2], { type: 'pass' }, { codeRef: 'OrdersDesk' }))],
+              wires: [wire('displays', 'desk'), wire('counter', 'desk'), wire('desk', 'store')],
             },
           },
         },

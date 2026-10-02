@@ -19,12 +19,12 @@ const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 const step = (id: string, label: string, className: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
   node(id, label, className, at, { type: 'transform', addTags: [tag] }, { codeRef })
-const preheat = (id: string, at: [number, number]) => step(id, 'Precalentar', 'EspressoMachine', 'EspressoMachine#preheat', at, 'precalentado')
+const preheat = (id: string, at: [number, number]) => step(id, 'Precalentar', 'EspressoMachine', 'EspressoMachine#preheat', at, 'preheated')
 
 export default defineLevel({
   id: 'facade',
   order: 8,
-  chapter: 'barra',
+  chapter: 'bar',
   title: 'La cocina por dentro',
   targetPattern: 'facade',
   brief: {
@@ -33,21 +33,21 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('mostrador', 'Mostrador', [0, 1]),
+      actor('counter', 'Mostrador', [0, 1]),
       actor('app', 'App delivery', [0, 4]),
-      step('molino', 'Molino', 'Grinder', 'Grinder#grind', [6, 1], 'molido'),
-      step('espresso', 'Máquina', 'EspressoMachine', 'EspressoMachine#extract', [9, 1], 'extraido'),
-      step('espumador', 'Espumador', 'MilkFrother', 'MilkFrother#froth', [12, 1], 'espumado'),
-      step('molinoApp', 'Molino (app)', 'Grinder', 'DeliveryApp#make_latte', [6, 4], 'molido'),
-      step('espressoApp', 'Máquina (app)', 'EspressoMachine', 'DeliveryApp#make_latte', [9, 4], 'extraido'),
-      node('entregar', 'Entregar', 'Counter', [15, 2.5], { type: 'sink', expects: { all: [{ hasTag: 'molido' }, { hasTag: 'extraido' }, { hasTag: 'espumado' }] } }, { codeRef: 'Counter#hand_over' }),
+      step('grinder', 'Molino', 'Grinder', 'Grinder#grind', [6, 1], 'ground'),
+      step('espresso', 'Máquina', 'EspressoMachine', 'EspressoMachine#extract', [9, 1], 'extracted'),
+      step('frother', 'Espumador', 'MilkFrother', 'MilkFrother#froth', [12, 1], 'frothed'),
+      step('grinderApp', 'Molino (app)', 'Grinder', 'DeliveryApp#make_latte', [6, 4], 'ground'),
+      step('espressoApp', 'Máquina (app)', 'EspressoMachine', 'DeliveryApp#make_latte', [9, 4], 'extracted'),
+      node('handOver', 'Entregar', 'Counter', [15, 2.5], { type: 'sink', expects: { all: [{ hasTag: 'ground' }, { hasTag: 'extracted' }, { hasTag: 'frothed' }] } }, { codeRef: 'Counter#hand_over' }),
     ],
-    wires: [...chain('mostrador', 'molino', 'espresso', 'espumador', 'entregar'), ...chain('app', 'molinoApp', 'espressoApp', 'entregar')],
+    wires: [...chain('counter', 'grinder', 'espresso', 'frother', 'handOver'), ...chain('app', 'grinderApp', 'espressoApp', 'handOver')],
   },
   sockets: [
     {
-      id: 'cocina',
-      at: 'molino',
+      id: 'kitchen',
+      at: 'grinder',
       label: 'Cocina',
       inventory: ['facade', 'adapter', 'proxy'],
       options: {
@@ -59,12 +59,12 @@ export default defineLevel({
             body: 'Mostrador y app piden "un latte" a la fachada, y solo ella conoce el orden de las máquinas. La orquestación vive en un único lugar: nadie se salta un paso y un cambio en la cocina se hace una vez.',
           },
           patch: {
-            remove: ['molinoApp', 'espressoApp'],
-            removeWires: ['mostrador->molino'],
-            update: ['molino', 'espresso', 'espumador'].map((id) => ({ id, skin: 'facade' as const })),
+            remove: ['grinderApp', 'espressoApp'],
+            removeWires: ['counter->grinder'],
+            update: ['grinder', 'espresso', 'frother'].map((id) => ({ id, skin: 'facade' as const })),
             add: {
-              nodes: [skinned('facade', node('cocina', 'Cocina', 'KitchenFacade', [3, 2.5], { type: 'pass' }, { codeRef: 'KitchenFacade#latte' }))],
-              wires: [wire('mostrador', 'cocina'), wire('app', 'cocina'), wire('cocina', 'molino')],
+              nodes: [skinned('facade', node('kitchen', 'Cocina', 'KitchenFacade', [3, 2.5], { type: 'pass' }, { codeRef: 'KitchenFacade#latte' }))],
+              wires: [wire('counter', 'kitchen'), wire('app', 'kitchen'), wire('kitchen', 'grinder')],
             },
           },
         },
@@ -76,10 +76,10 @@ export default defineLevel({
             body: 'Adaptar el pedido de la app al formato del mostrador no cambia que la app siga orquestando las máquinas por su cuenta, sin espumador.',
           },
           patch: {
-            removeWires: ['app->molinoApp'],
+            removeWires: ['app->grinderApp'],
             add: {
-              nodes: [skinned('adapter', node('adaptador', 'Adaptador', 'DeliveryRequestAdapter', [3, 4], { type: 'transform', setShape: 'square' }))],
-              wires: [wire('app', 'adaptador'), wire('adaptador', 'molinoApp')],
+              nodes: [skinned('adapter', node('adapter', 'Adaptador', 'DeliveryRequestAdapter', [3, 4], { type: 'transform', setShape: 'square' }))],
+              wires: [wire('app', 'adapter'), wire('adapter', 'grinderApp')],
             },
           },
         },
@@ -91,10 +91,10 @@ export default defineLevel({
             body: 'Un intermediario frente a la máquina puede registrar o limitar su uso, pero no sabe que a la app le falta un paso de la receta.',
           },
           patch: {
-            removeWires: ['molinoApp->espressoApp'],
+            removeWires: ['grinderApp->espressoApp'],
             add: {
-              nodes: [skinned('proxy', node('proxyMaquina', 'Proxy', 'EspressoMachineProxy', [7.5, 5.5]))],
-              wires: [wire('molinoApp', 'proxyMaquina'), wire('proxyMaquina', 'espressoApp')],
+              nodes: [skinned('proxy', node('machineProxy', 'Proxy', 'EspressoMachineProxy', [7.5, 5.5]))],
+              wires: [wire('grinderApp', 'machineProxy'), wire('machineProxy', 'espressoApp')],
             },
           },
         },
@@ -104,24 +104,24 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Latte', [], {}, 'mostrador'), pulse(0, 'Latte (app)', ['app'], {}, 'app'), pulse(60, 'Latte', [], {}, 'mostrador'), pulse(60, 'Latte (app)', ['app'], {}, 'app')],
+      pulses: [pulse(0, 'Latte', [], {}, 'counter'), pulse(0, 'Latte (app)', ['app'], {}, 'app'), pulse(60, 'Latte', [], {}, 'counter'), pulse(60, 'Latte (app)', ['app'], {}, 'app')],
     },
   ],
   changeTickets: [
     {
-      id: 'precalentar',
+      id: 'preheat',
       text: 'La máquina nueva necesita precalentarse antes de extraer.',
       scenario: 'main',
       without: {
-        removeWires: ['molino->espresso', 'molinoApp->espressoApp'],
+        removeWires: ['grinder->espresso', 'grinderApp->espressoApp'],
         add: {
-          nodes: [preheat('precal', [7.5, -0.5]), preheat('precalApp', [7.5, 5.5])],
-          wires: [...chain('molino', 'precal', 'espresso'), ...chain('molinoApp', 'precalApp', 'espressoApp')],
+          nodes: [preheat('preheat', [7.5, -0.5]), preheat('preheatApp', [7.5, 5.5])],
+          wires: [...chain('grinder', 'preheat', 'espresso'), ...chain('grinderApp', 'preheatApp', 'espressoApp')],
         },
       },
       with: {
-        removeWires: ['molino->espresso'],
-        add: { nodes: [skinned('facade', preheat('precal', [7.5, -0.5]))], wires: chain('molino', 'precal', 'espresso') },
+        removeWires: ['grinder->espresso'],
+        add: { nodes: [skinned('facade', preheat('preheat', [7.5, -0.5]))], wires: chain('grinder', 'preheat', 'espresso') },
       },
       code: { without: 'base_preheat', with: 'facade_preheat' },
     },

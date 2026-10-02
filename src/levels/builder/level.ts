@@ -14,7 +14,7 @@ import tsFactory from './ts/factory.ts?raw'
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 
-const impossible: Predicate = { all: [{ hasTag: 'caliente' }, { hasTag: 'hielo' }] }
+const impossible: Predicate = { all: [{ hasTag: 'hot' }, { hasTag: 'ice' }] }
 
 const station = (id: string, label: string, codeRef: string, x: number, behavior: NodeDef['behavior'] = { type: 'pass' }): NodeDef => ({
   id,
@@ -28,12 +28,12 @@ const station = (id: string, label: string, codeRef: string, x: number, behavior
 })
 
 // Los argumentos cruzados se arreglan en cuanto cada dato tiene nombre propio.
-const fixCrossedArgs: NodeDef['behavior'] = { type: 'transform', when: { hasTag: 'args-cruzados' }, removeTags: ['args-cruzados'] }
+const fixCrossedArgs: NodeDef['behavior'] = { type: 'transform', when: { hasTag: 'crossed-args' }, removeTags: ['crossed-args'] }
 
 export default defineLevel({
   id: 'builder',
   order: 3,
-  chapter: 'mostrador',
+  chapter: 'counter',
   title: 'Pedido a la medida',
   targetPattern: 'builder',
   brief: {
@@ -42,19 +42,19 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      { id: 'cliente', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
-      { id: 'tomar', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
+      { id: 'customer', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
+      { id: 'take', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
       {
-        id: 'pedido',
+        id: 'order',
         label: 'Crear pedido',
         className: 'Order',
         at: [6, 2],
-        behavior: { type: 'transform', when: { hasTag: 'args-cruzados' }, addTags: ['leche-en-jarabe'] },
+        behavior: { type: 'transform', when: { hasTag: 'crossed-args' }, addTags: ['milk-in-syrup'] },
         codeRef: 'Order#initialize',
       },
-      { id: 'cobrar', label: 'Cobrar', className: 'Cashier', at: [10, 2], behavior: { type: 'pass' }, codeRef: 'Cashier#charge' },
+      { id: 'charge', label: 'Cobrar', className: 'Cashier', at: [10, 2], behavior: { type: 'pass' }, codeRef: 'Cashier#charge' },
       {
-        id: 'preparar',
+        id: 'prepare',
         label: 'Preparar',
         className: 'Barista',
         at: [13, 2],
@@ -62,26 +62,26 @@ export default defineLevel({
         codeRef: 'Barista#prepare',
       },
       {
-        id: 'entregar',
+        id: 'handOver',
         label: 'Entregar',
         className: 'Counter',
         at: [16, 2],
-        behavior: { type: 'sink', expects: { not: { hasTag: 'leche-en-jarabe' } } },
+        behavior: { type: 'sink', expects: { not: { hasTag: 'milk-in-syrup' } } },
         codeRef: 'Counter#hand_over',
       },
     ],
     wires: [
-      { from: 'cliente', to: 'tomar' },
-      { from: 'tomar', to: 'pedido' },
-      { from: 'pedido', to: 'cobrar' },
-      { from: 'cobrar', to: 'preparar' },
-      { from: 'preparar', to: 'entregar' },
+      { from: 'customer', to: 'take' },
+      { from: 'take', to: 'order' },
+      { from: 'order', to: 'charge' },
+      { from: 'charge', to: 'prepare' },
+      { from: 'prepare', to: 'handOver' },
     ],
   },
   sockets: [
     {
-      id: 'crear-pedido',
-      at: 'pedido',
+      id: 'create-order',
+      at: 'order',
       label: 'Crear pedido',
       inventory: ['builder', 'factory-method', 'decorator'],
       options: {
@@ -93,22 +93,22 @@ export default defineLevel({
             body: 'Cada parte del pedido se fija con un método con nombre, así que no se puede cruzar la leche con el jarabe. Como build() recibe el pedido completo, puede revisarlo antes de crearlo y rechazar lo imposible en el mostrador, antes de cobrar.',
           },
           patch: {
-            remove: ['pedido'],
+            remove: ['order'],
             add: {
               nodes: [
-                station('bTamano', 'Tamaño', 'OrderBuilder#size', 4),
-                station('bLeche', 'Leche', 'OrderBuilder#milk', 6, fixCrossedArgs),
+                station('bSize', 'Tamaño', 'OrderBuilder#size', 4),
+                station('bMilk', 'Leche', 'OrderBuilder#milk', 6, fixCrossedArgs),
                 station('bExtras', 'Extras', 'OrderBuilder#extras', 8),
-                station('build', 'build()', 'OrderBuilder#build', 10, { type: 'guard', require: { not: impossible }, onFail: 'rechazo' }),
-                { id: 'avisar', label: 'Avisar al cliente', className: 'Counter', kind: 'class', at: [13, 0], behavior: { type: 'sink', message: '✋ rechazado antes de cobrar' }, codeRef: 'Counter#notify' },
+                station('build', 'build()', 'OrderBuilder#build', 10, { type: 'guard', require: { not: impossible }, onFail: 'reject' }),
+                { id: 'notify', label: 'Avisar al cliente', className: 'Counter', kind: 'class', at: [13, 0], behavior: { type: 'sink', message: '✋ rechazado antes de cobrar' }, codeRef: 'Counter#notify' },
               ],
               wires: [
-                { from: 'tomar', to: 'bTamano', port: 'out', dep: 'concrete' },
-                { from: 'bTamano', to: 'bLeche', port: 'out', dep: 'concrete' },
-                { from: 'bLeche', to: 'bExtras', port: 'out', dep: 'concrete' },
+                { from: 'take', to: 'bSize', port: 'out', dep: 'concrete' },
+                { from: 'bSize', to: 'bMilk', port: 'out', dep: 'concrete' },
+                { from: 'bMilk', to: 'bExtras', port: 'out', dep: 'concrete' },
                 { from: 'bExtras', to: 'build', port: 'out', dep: 'concrete' },
-                { from: 'build', to: 'cobrar', port: 'out', dep: 'concrete' },
-                { from: 'build', to: 'avisar', port: 'rechazo', dep: 'concrete' },
+                { from: 'build', to: 'charge', port: 'out', dep: 'concrete' },
+                { from: 'build', to: 'notify', port: 'reject', dep: 'concrete' },
               ],
             },
           },
@@ -121,19 +121,19 @@ export default defineLevel({
             body: 'Una fábrica crea productos de catálogo. Un pedido a la medida no está en el catálogo: harían falta cientos de moldes, uno por combinación, y los pedidos sin molde se pierden.',
           },
           patch: {
-            remove: ['pedido'],
+            remove: ['order'],
             add: {
               nodes: [
-                { id: 'moldes', label: 'Moldes', className: 'OrderPresets', kind: 'class', at: [6, 2], behavior: { type: 'slot' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
-                { id: 'moldeLatte', label: 'Latte grande', className: 'OrderPresets', kind: 'class', at: [8, 0], behavior: { type: 'pass' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
-                { id: 'moldeAmericano', label: 'Americano', className: 'OrderPresets', kind: 'class', at: [8, 4], behavior: { type: 'pass' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
+                { id: 'presets', label: 'Moldes', className: 'OrderPresets', kind: 'class', at: [6, 2], behavior: { type: 'slot' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
+                { id: 'lattePreset', label: 'Latte grande', className: 'OrderPresets', kind: 'class', at: [8, 0], behavior: { type: 'pass' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
+                { id: 'americanoPreset', label: 'Americano', className: 'OrderPresets', kind: 'class', at: [8, 4], behavior: { type: 'pass' }, codeRef: 'OrderPresets#create', skin: 'factory-method' },
               ],
               wires: [
-                { from: 'tomar', to: 'moldes', port: 'out', dep: 'concrete' },
-                { from: 'moldes', to: 'moldeLatte', key: 'combo:latte-grande', port: 'out', dep: 'abstract' },
-                { from: 'moldes', to: 'moldeAmericano', key: 'combo:americano', port: 'out', dep: 'abstract' },
-                { from: 'moldeLatte', to: 'cobrar', port: 'out', dep: 'concrete' },
-                { from: 'moldeAmericano', to: 'cobrar', port: 'out', dep: 'concrete' },
+                { from: 'take', to: 'presets', port: 'out', dep: 'concrete' },
+                { from: 'presets', to: 'lattePreset', key: 'combo:large-latte', port: 'out', dep: 'abstract' },
+                { from: 'presets', to: 'americanoPreset', key: 'combo:americano', port: 'out', dep: 'abstract' },
+                { from: 'lattePreset', to: 'charge', port: 'out', dep: 'concrete' },
+                { from: 'americanoPreset', to: 'charge', port: 'out', dep: 'concrete' },
               ],
             },
           },
@@ -146,16 +146,16 @@ export default defineLevel({
             body: 'Envolver el pedido con cada extra evita cruzar la leche con el jarabe. Pero nadie mira el pedido completo antes de cobrar: caliente y con hielo sigue explotando en la cocina.',
           },
           patch: {
-            remove: ['pedido'],
+            remove: ['order'],
             add: {
               nodes: [
-                { id: 'conLeche', label: 'Con leche', className: 'WithMilk', kind: 'class', at: [6, 2], behavior: fixCrossedArgs, codeRef: 'WithMilk', skin: 'decorator' },
-                { id: 'conJarabe', label: 'Con jarabe', className: 'WithSyrup', kind: 'class', at: [8, 0], behavior: { type: 'pass' }, codeRef: 'WithSyrup', skin: 'decorator' },
+                { id: 'withMilk', label: 'Con leche', className: 'WithMilk', kind: 'class', at: [6, 2], behavior: fixCrossedArgs, codeRef: 'WithMilk', skin: 'decorator' },
+                { id: 'withSyrup', label: 'Con jarabe', className: 'WithSyrup', kind: 'class', at: [8, 0], behavior: { type: 'pass' }, codeRef: 'WithSyrup', skin: 'decorator' },
               ],
               wires: [
-                { from: 'tomar', to: 'conLeche', port: 'out', dep: 'concrete' },
-                { from: 'conLeche', to: 'conJarabe', port: 'out', dep: 'concrete' },
-                { from: 'conJarabe', to: 'cobrar', port: 'out', dep: 'concrete' },
+                { from: 'take', to: 'withMilk', port: 'out', dep: 'concrete' },
+                { from: 'withMilk', to: 'withSyrup', port: 'out', dep: 'concrete' },
+                { from: 'withSyrup', to: 'charge', port: 'out', dep: 'concrete' },
               ],
             },
           },
@@ -167,9 +167,9 @@ export default defineLevel({
     {
       id: 'main',
       pulses: [
-        { at: 0, from: 'cliente', tags: ['combo:latte-grande'], label: 'Latte grande' },
-        { at: 45, from: 'cliente', tags: ['combo:latte-avena-vainilla', 'args-cruzados'], label: 'Latte avena + vainilla' },
-        { at: 90, from: 'cliente', tags: ['combo:americano-hielo', 'caliente', 'hielo'], label: 'Americano caliente con hielo' },
+        { at: 0, from: 'customer', tags: ['combo:large-latte'], label: 'Latte grande' },
+        { at: 45, from: 'customer', tags: ['combo:oat-vanilla-latte', 'crossed-args'], label: 'Latte avena + vainilla' },
+        { at: 90, from: 'customer', tags: ['combo:iced-americano', 'hot', 'ice'], label: 'Americano caliente con hielo' },
       ],
     },
   ],

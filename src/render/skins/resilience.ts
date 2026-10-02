@@ -13,7 +13,7 @@ export function nullObject(): Skin {
       d.moveTo(at.x + NODE_W / 2 - 16, at.y - NODE_H / 2 + 14).lineTo(at.x + NODE_W / 2 - 8, at.y - NODE_H / 2 + 6).stroke({ width: 1.5, color: C.violet })
     },
     drawPulse({ d }, pulse, pos) {
-      if (!pulse.tags.includes('tarjeta:nula')) return
+      if (!pulse.tags.includes('card:null')) return
       for (let i = 0; i < 8; i++) {
         const a = (Math.PI / 4) * i
         d.circle(pos.x + Math.cos(a) * 11, pos.y + Math.sin(a) * 11, 1.2).fill({ color: C.violet })

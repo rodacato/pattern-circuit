@@ -10,8 +10,8 @@ end
 # SDK del proveedor externo: no lo podemos modificar.
 module PagoFacil
   class SDK
-    # region: PagoFacil::SDK#cobrar_en_centavos
-    def cobrar_en_centavos(monto_centavos:, referencia:) = { estado: "ok" }
+    # region: PagoFacil::SDK#charge_in_cents
+    def charge_in_cents(amount_cents:, reference:) = { status: "ok" }
     # endregion
   end
 end

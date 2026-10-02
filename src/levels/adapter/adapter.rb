@@ -21,7 +21,7 @@ class PagoFacilAdapter
   def initialize(sdk) = @sdk = sdk
 
   def charge(total)
-    @sdk.cobrar_en_centavos(monto_centavos: (total * 100).round, referencia: SecureRandom.uuid)
+    @sdk.charge_in_cents(amount_cents: (total * 100).round, reference: SecureRandom.uuid)
   end
 end
 # endregion

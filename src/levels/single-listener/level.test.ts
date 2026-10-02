@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const plug = (pattern: 'keep-simple' | 'event-bus' | 'command') => ({ sockets: [{ id: 'aviso', pattern }] })
+const plug = (pattern: 'keep-simple' | 'event-bus' | 'command') => ({ sockets: [{ id: 'notice', pattern }] })
 
 describe('L25 · Un solo interesado', () => {
   it('sin aviso: la cocina nunca recibe los pedidos', () => {

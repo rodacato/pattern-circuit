@@ -5,17 +5,17 @@ export type Track = { id: string; name: string; chapters: Record<string, string>
 
 export const TRACKS: Track[] = [
   {
-    id: 'patrones',
+    id: 'patterns',
     name: 'Patrones de diseño',
     chapters: {
-      apertura: 'Apertura',
-      mostrador: 'El mostrador',
-      barra: 'La barra crece',
-      'hora-pico': 'Hora pico',
-      'todo-junto': 'Todo junto',
-      arquitectura: 'Arquitectura',
-      resiliencia: 'Resiliencia',
-      criterio: 'Criterio: cuándo no',
+      opening: 'Apertura',
+      counter: 'El mostrador',
+      bar: 'La barra crece',
+      'rush-hour': 'Hora pico',
+      'all-together': 'Todo junto',
+      architecture: 'Arquitectura',
+      resilience: 'Resiliencia',
+      judgment: 'Criterio: cuándo no',
       final: 'La cafetería completa',
     },
   },

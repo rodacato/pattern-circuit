@@ -16,12 +16,12 @@ const codeTs = withCommon(tsCommon)
 const counter = (id: string, at: [number, number], key: string, fresh = false, codeRef = 'TicketCounter#next') =>
   node(id, 'Contador', 'TicketCounter', at, { type: 'counter', key, field: 'ticket', fresh }, { codeRef })
 
-const orders = ['a', 'b', 'a', 'b', 'a', 'b'].map((caja, i) => pulse(i * 22, `Caja ${caja.toUpperCase()}`, [`caja:${caja}`]))
+const orders = ['a', 'b', 'a', 'b', 'a', 'b'].map((register, i) => pulse(i * 22, `Caja ${register.toUpperCase()}`, [`register:${register}`]))
 
 export default defineLevel({
   id: 'singleton',
   order: 4,
-  chapter: 'mostrador',
+  chapter: 'counter',
   title: 'Turnos repetidos',
   targetPattern: 'singleton',
   brief: {
@@ -30,26 +30,26 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('cliente', 'Cliente', [0, 2]),
-      node('fila', 'Fila', 'Lobby', [3, 2], { type: 'branch', cases: { 'caja:a': 'a', 'caja:b': 'b' } }, { codeRef: 'Lobby#route' }),
-      node('cajaA', 'Caja A', 'Register', [6, 0], { type: 'pass' }, { codeRef: 'Register#checkout' }),
-      node('cajaB', 'Caja B', 'Register', [6, 4], { type: 'pass' }, { codeRef: 'Register#checkout' }),
-      counter('contA', [9, 0], 'A'),
-      counter('contB', [9, 4], 'B'),
-      node('pantalla', 'Pantalla', 'Display', [12, 2], { type: 'sink', uniqueBy: 'ticket' }, { codeRef: 'Display#show' }),
+      actor('customer', 'Cliente', [0, 2]),
+      node('lobby', 'Fila', 'Lobby', [3, 2], { type: 'branch', cases: { 'register:a': 'a', 'register:b': 'b' } }, { codeRef: 'Lobby#route' }),
+      node('registerA', 'Caja A', 'Register', [6, 0], { type: 'pass' }, { codeRef: 'Register#checkout' }),
+      node('registerB', 'Caja B', 'Register', [6, 4], { type: 'pass' }, { codeRef: 'Register#checkout' }),
+      counter('counterA', [9, 0], 'A'),
+      counter('counterB', [9, 4], 'B'),
+      node('display', 'Pantalla', 'Display', [12, 2], { type: 'sink', uniqueBy: 'ticket' }, { codeRef: 'Display#show' }),
     ],
     wires: [
-      wire('cliente', 'fila'),
-      wire('fila', 'cajaA', { port: 'a' }),
-      wire('fila', 'cajaB', { port: 'b' }),
-      ...chain('cajaA', 'contA', 'pantalla'),
-      ...chain('cajaB', 'contB', 'pantalla'),
+      wire('customer', 'lobby'),
+      wire('lobby', 'registerA', { port: 'a' }),
+      wire('lobby', 'registerB', { port: 'b' }),
+      ...chain('registerA', 'counterA', 'display'),
+      ...chain('registerB', 'counterB', 'display'),
     ],
   },
   sockets: [
     {
-      id: 'contador',
-      at: 'fila',
+      id: 'ticketCounter',
+      at: 'lobby',
       label: 'Contador de turnos',
       inventory: ['singleton', 'factory-method', 'strategy'],
       options: {
@@ -61,10 +61,10 @@ export default defineLevel({
             body: 'Todas las cajas usan el mismo contador y los turnos ya no se repiten. Ojo con el precio: ahora cualquier clase puede alcanzar ese contador global. Ese acoplamiento vuelve en el nivel de Ports & Adapters.',
           },
           patch: {
-            remove: ['contA', 'contB'],
+            remove: ['counterA', 'counterB'],
             add: {
-              nodes: [skinned('singleton', counter('contador', [9, 2], 'global'))],
-              wires: [wire('cajaA', 'contador'), wire('cajaB', 'contador'), wire('contador', 'pantalla')],
+              nodes: [skinned('singleton', counter('ticketCounter', [9, 2], 'global'))],
+              wires: [wire('registerA', 'ticketCounter'), wire('registerB', 'ticketCounter'), wire('ticketCounter', 'display')],
             },
           },
         },
@@ -76,13 +76,13 @@ export default defineLevel({
             body: 'Una fábrica entrega un contador recién hecho en cada pedido: todos los turnos salen con el número 1. Aquí no hacía falta crear más, sino compartir uno.',
           },
           patch: {
-            remove: ['contA', 'contB'],
+            remove: ['counterA', 'counterB'],
             add: {
               nodes: [
-                skinned('factory-method', counter('fabA', [9, 0], 'A', true, 'CounterFactory#create')),
-                skinned('factory-method', counter('fabB', [9, 4], 'B', true, 'CounterFactory#create')),
+                skinned('factory-method', counter('factoryA', [9, 0], 'A', true, 'CounterFactory#create')),
+                skinned('factory-method', counter('factoryB', [9, 4], 'B', true, 'CounterFactory#create')),
               ],
-              wires: [...chain('cajaA', 'fabA', 'pantalla'), ...chain('cajaB', 'fabB', 'pantalla')],
+              wires: [...chain('registerA', 'factoryA', 'display'), ...chain('registerB', 'factoryB', 'display')],
             },
           },
         },
@@ -95,8 +95,8 @@ export default defineLevel({
           },
           patch: {
             update: [
-              { id: 'contA', skin: 'strategy' },
-              { id: 'contB', skin: 'strategy' },
+              { id: 'counterA', skin: 'strategy' },
+              { id: 'counterB', skin: 'strategy' },
             ],
           },
         },

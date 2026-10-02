@@ -4,7 +4,7 @@ class Cashier
     @barista = barista
   end
 
-  # Cashier habla "charge(total)"; el SDK entiende "cobrar_en_centavos". No encajan.
+  # Cashier habla "charge(total)"; el SDK entiende "charge_in_cents". No encajan.
   # region: Cashier#charge
   def charge(order)
     @gateway.charge(order.total) # NoMethodError: PagoFacil::SDK no tiene #charge

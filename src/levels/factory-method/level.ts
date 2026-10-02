@@ -19,7 +19,7 @@ const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 
 // Cada sucursal tiene su bebida; entregar otra es un pedido equivocado.
-const MENU: Record<string, string> = { centro: 'latte', playa: 'frappe', montana: 'chocolate', puerto: 'te' }
+const MENU: Record<string, string> = { downtown: 'latte', beach: 'frappe', mountain: 'chocolate', harbor: 'tea' }
 const rightDrink: Predicate = { any: Object.entries(MENU).map(([branch, drink]) => ({ all: [{ hasTag: branch }, { hasTag: `made:${drink}` }] })) }
 
 const product = (id: string, label: string, className: string, drink: string, at: [number, number]): NodeDef => ({
@@ -33,9 +33,9 @@ const product = (id: string, label: string, className: string, drink: string, at
 })
 
 const BRANCHES = [
-  { key: 'centro', id: 'sucCentro', label: 'Centro', className: 'CentroBranch', drink: 'latte', row: 0 },
-  { key: 'playa', id: 'sucPlaya', label: 'Playa', className: 'PlayaBranch', drink: 'frappe', row: 2 },
-  { key: 'montana', id: 'sucMontana', label: 'Montaña', className: 'MontanaBranch', drink: 'chocolate', row: 4 },
+  { key: 'downtown', id: 'downtownBranch', label: 'Centro', className: 'DowntownBranch', drink: 'latte', row: 0 },
+  { key: 'beach', id: 'beachBranch', label: 'Playa', className: 'BeachBranch', drink: 'frappe', row: 2 },
+  { key: 'mountain', id: 'mountainBranch', label: 'Montaña', className: 'MountainBranch', drink: 'chocolate', row: 4 },
 ] as const
 
 const creator = (b: { id: string; label: string; className: string; drink: string; row: number }): NodeDef => ({
@@ -49,14 +49,14 @@ const creator = (b: { id: string; label: string; className: string; drink: strin
   skin: 'factory-method',
 })
 
-const toBarista = (id: string): WireDef => ({ from: id, to: 'preparar', port: 'out', dep: 'concrete' })
+const toBarista = (id: string): WireDef => ({ from: id, to: 'prepare', port: 'out', dep: 'concrete' })
 
-const order = (at: number, branch: string, label: string) => ({ at, from: 'cliente', tags: [branch], data: { branch }, label })
+const order = (at: number, branch: string, label: string) => ({ at, from: 'customer', tags: [branch], data: { branch }, label })
 
 export default defineLevel({
   id: 'factory-method',
   order: 2,
-  chapter: 'mostrador',
+  chapter: 'counter',
   title: 'Dos sucursales, dos menús',
   targetPattern: 'factory-method',
   brief: {
@@ -65,35 +65,35 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      { id: 'cliente', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
-      { id: 'tomar', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
+      { id: 'customer', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
+      { id: 'take', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
       {
-        id: 'crear',
+        id: 'create',
         label: 'Crear bebida',
         className: 'OrderFlow',
         at: [6, 2],
-        behavior: { type: 'branch', cases: { centro: 'latte', playa: 'frappe' }, else: 'latte' },
+        behavior: { type: 'branch', cases: { downtown: 'latte', beach: 'frappe' }, else: 'latte' },
         codeRef: 'OrderFlow#create_drink',
       },
       product('frappe', 'Frappé', 'Frappe', 'frappe', [9, 1]),
       product('latte', 'Latte', 'Latte', 'latte', [9, 3]),
-      { id: 'preparar', label: 'Preparar', className: 'Barista', at: [12, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
-      { id: 'entregar', label: 'Entregar', className: 'Counter', at: [15, 2], behavior: { type: 'sink', expects: rightDrink }, codeRef: 'Counter#hand_over' },
+      { id: 'prepare', label: 'Preparar', className: 'Barista', at: [12, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
+      { id: 'handOver', label: 'Entregar', className: 'Counter', at: [15, 2], behavior: { type: 'sink', expects: rightDrink }, codeRef: 'Counter#hand_over' },
     ],
     wires: [
-      { from: 'cliente', to: 'tomar' },
-      { from: 'tomar', to: 'crear' },
-      { from: 'crear', port: 'frappe', to: 'frappe' },
-      { from: 'crear', port: 'latte', to: 'latte' },
-      { from: 'frappe', to: 'preparar' },
-      { from: 'latte', to: 'preparar' },
-      { from: 'preparar', to: 'entregar' },
+      { from: 'customer', to: 'take' },
+      { from: 'take', to: 'create' },
+      { from: 'create', port: 'frappe', to: 'frappe' },
+      { from: 'create', port: 'latte', to: 'latte' },
+      { from: 'frappe', to: 'prepare' },
+      { from: 'latte', to: 'prepare' },
+      { from: 'prepare', to: 'handOver' },
     ],
   },
   sockets: [
     {
-      id: 'crear-bebida',
-      at: 'crear',
+      id: 'create-drink',
+      at: 'create',
       label: 'Crear bebida',
       inventory: ['factory-method', 'singleton', 'builder'],
       options: {
@@ -106,10 +106,10 @@ export default defineLevel({
           },
           patch: {
             remove: ['frappe', 'latte'],
-            update: [{ id: 'crear', label: 'Sucursal', className: 'Branch', behavior: { type: 'slot' }, codeRef: 'Branch#take', skin: 'factory-method' }],
+            update: [{ id: 'create', label: 'Sucursal', className: 'Branch', behavior: { type: 'slot' }, codeRef: 'Branch#take', skin: 'factory-method' }],
             add: {
               nodes: BRANCHES.map(creator),
-              wires: BRANCHES.flatMap((b) => [{ from: 'crear', to: b.id, key: b.key, port: 'out', dep: 'abstract' as const }, toBarista(b.id)]),
+              wires: BRANCHES.flatMap((b) => [{ from: 'create', to: b.id, key: b.key, port: 'out', dep: 'abstract' as const }, toBarista(b.id)]),
             },
           },
         },
@@ -124,7 +124,7 @@ export default defineLevel({
             remove: ['frappe', 'latte'],
             update: [
               {
-                id: 'crear',
+                id: 'create',
                 label: 'Fábrica única',
                 className: 'DrinkFactory',
                 behavior: { type: 'transform', addTags: ['made:latte'], setShape: 'diamond' },
@@ -132,7 +132,7 @@ export default defineLevel({
                 skin: 'singleton',
               },
             ],
-            add: { wires: [toBarista('crear')] },
+            add: { wires: [toBarista('create')] },
           },
         },
         builder: {
@@ -143,16 +143,16 @@ export default defineLevel({
             body: 'Builder sirve para armar un objeto con muchas partes. Aquí el problema no era cuántas piezas tiene la bebida sino qué bebida crear: el if del flujo compartido sigue decidiendo mal.',
           },
           patch: {
-            removeWires: ['tomar->crear'],
+            removeWires: ['take->create'],
             add: {
               nodes: [
-                { id: 'bTamano', label: 'Tamaño', className: 'DrinkBuilder', kind: 'class', at: [4, 0], behavior: { type: 'pass' }, codeRef: 'DrinkBuilder#size', skin: 'builder' },
+                { id: 'bSize', label: 'Tamaño', className: 'DrinkBuilder', kind: 'class', at: [4, 0], behavior: { type: 'pass' }, codeRef: 'DrinkBuilder#size', skin: 'builder' },
                 { id: 'bTemp', label: 'Temperatura', className: 'DrinkBuilder', kind: 'class', at: [6, 0], behavior: { type: 'pass' }, codeRef: 'DrinkBuilder#temperature', skin: 'builder' },
               ],
               wires: [
-                { from: 'tomar', to: 'bTamano', port: 'out', dep: 'concrete' },
-                { from: 'bTamano', to: 'bTemp', port: 'out', dep: 'concrete' },
-                { from: 'bTemp', to: 'crear', port: 'out', dep: 'concrete' },
+                { from: 'take', to: 'bSize', port: 'out', dep: 'concrete' },
+                { from: 'bSize', to: 'bTemp', port: 'out', dep: 'concrete' },
+                { from: 'bTemp', to: 'create', port: 'out', dep: 'concrete' },
               ],
             },
           },
@@ -161,31 +161,31 @@ export default defineLevel({
     },
   ],
   scenarios: [
-    { id: 'main', pulses: [order(0, 'centro', 'Centro'), order(45, 'playa', 'Playa'), order(90, 'montana', 'Montaña')] },
+    { id: 'main', pulses: [order(0, 'downtown', 'Centro'), order(45, 'beach', 'Playa'), order(90, 'mountain', 'Montaña')] },
     {
-      id: 'con-puerto',
-      pulses: [order(0, 'centro', 'Centro'), order(45, 'playa', 'Playa'), order(90, 'montana', 'Montaña'), order(135, 'puerto', 'Puerto')],
+      id: 'with-harbor',
+      pulses: [order(0, 'downtown', 'Centro'), order(45, 'beach', 'Playa'), order(90, 'mountain', 'Montaña'), order(135, 'harbor', 'Puerto')],
     },
   ],
   changeTickets: [
     {
-      id: 'sucursal-puerto',
+      id: 'harbor-branch',
       text: 'Abre la sucursal Puerto: solo vende té helado.',
-      scenario: 'con-puerto',
+      scenario: 'with-harbor',
       without: {
-        update: [{ id: 'crear', behavior: { type: 'branch', cases: { centro: 'latte', playa: 'frappe', puerto: 'te' }, else: 'latte' } }],
+        update: [{ id: 'create', behavior: { type: 'branch', cases: { downtown: 'latte', beach: 'frappe', harbor: 'tea' }, else: 'latte' } }],
         add: {
-          nodes: [product('te', 'Té helado', 'IcedTea', 'te', [9, 5])],
+          nodes: [product('tea', 'Té helado', 'IcedTea', 'tea', [9, 5])],
           wires: [
-            { from: 'crear', port: 'te', to: 'te', dep: 'concrete' },
-            { from: 'te', port: 'out', to: 'preparar', dep: 'concrete' },
+            { from: 'create', port: 'tea', to: 'tea', dep: 'concrete' },
+            { from: 'tea', port: 'out', to: 'prepare', dep: 'concrete' },
           ],
         },
       },
       with: {
         add: {
-          nodes: [creator({ id: 'sucPuerto', label: 'Puerto', className: 'PuertoBranch', drink: 'te', row: 6 })],
-          wires: [{ from: 'crear', to: 'sucPuerto', key: 'puerto', port: 'out', dep: 'abstract' }, toBarista('sucPuerto')],
+          nodes: [creator({ id: 'harborBranch', label: 'Puerto', className: 'HarborBranch', drink: 'tea', row: 6 })],
+          wires: [{ from: 'create', to: 'harborBranch', key: 'harbor', port: 'out', dep: 'abstract' }, toBarista('harborBranch')],
         },
       },
       code: { without: 'base_harbor', with: 'factory_harbor' },

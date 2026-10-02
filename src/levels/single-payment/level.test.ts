@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const plug = (pattern: 'keep-simple' | 'strategy' | 'factory-method') => ({ sockets: [{ id: 'cobro', pattern }] })
+const plug = (pattern: 'keep-simple' | 'strategy' | 'factory-method') => ({ sockets: [{ id: 'charging', pattern }] })
 
 describe('L24 · Un solo método de pago', () => {
   it('sin arreglo: cada cobro lleva el IVA dos veces', () => {

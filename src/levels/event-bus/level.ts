@@ -23,7 +23,7 @@ const consumer = (id: string, label: string, className: string, y: number) =>
 export default defineLevel({
   id: 'event-bus',
   order: 19,
-  chapter: 'arquitectura',
+  chapter: 'architecture',
   title: 'Servicios que se enteran',
   targetPattern: 'event-bus',
   brief: {
@@ -32,26 +32,26 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('clientes', 'Pedidos', [0, 1]),
-      actor('devoluciones', 'Devoluciones', [0, 4]),
+      actor('customers', 'Pedidos', [0, 1]),
+      actor('refundEvents', 'Devoluciones', [0, 4]),
       node('orders', 'Servicio de pedidos', 'Orders', [3, 1], { type: 'broadcast' }, { codeRef: 'Orders#place' }),
       node('returns', 'Servicio de devoluciones', 'Returns', [3, 4], { type: 'broadcast' }, { codeRef: 'Returns#process' }),
-      consumer('inventario', 'Inventario', 'Inventory', 0),
-      consumer('facturacion', 'Facturación', 'Billing', 2.5),
-      consumer('lealtad', 'Lealtad', 'Loyalty', 5),
+      consumer('inventory', 'Inventario', 'Inventory', 0),
+      consumer('billing', 'Facturación', 'Billing', 2.5),
+      consumer('loyalty', 'Lealtad', 'Loyalty', 5),
     ],
     wires: [
-      wire('clientes', 'orders'),
-      wire('devoluciones', 'returns'),
-      wire('orders', 'inventario'),
-      wire('orders', 'facturacion'),
-      wire('orders', 'lealtad'),
-      wire('returns', 'inventario'),
+      wire('customers', 'orders'),
+      wire('refundEvents', 'returns'),
+      wire('orders', 'inventory'),
+      wire('orders', 'billing'),
+      wire('orders', 'loyalty'),
+      wire('returns', 'inventory'),
     ],
   },
   sockets: [
     {
-      id: 'eventos',
+      id: 'events',
       at: 'orders',
       label: 'Eventos',
       inventory: ['event-bus', 'observer', 'facade'],
@@ -64,14 +64,14 @@ export default defineLevel({
             body: 'Los productores publican en el bus y los consumidores se suscriben al bus. Ninguno conoce a los demás: un evento llega a todos los interesados venga de donde venga.',
           },
           patch: {
-            removeWires: ['orders->inventario', 'orders->facturacion', 'orders->lealtad', 'returns->inventario'],
+            removeWires: ['orders->inventory', 'orders->billing', 'orders->loyalty', 'returns->inventory'],
             update: [
               { id: 'orders', behavior: { type: 'pass' }, skin: 'event-bus' },
               { id: 'returns', behavior: { type: 'pass' }, skin: 'event-bus' },
             ],
             add: {
               nodes: [skinned('event-bus', node('bus', 'Bus de eventos', 'EventBus', [6, 2.5], { type: 'broadcast' }, { codeRef: 'EventBus#publish' }))],
-              wires: [abstract('orders', 'bus'), abstract('returns', 'bus'), abstract('bus', 'inventario'), abstract('bus', 'facturacion'), abstract('bus', 'lealtad')],
+              wires: [abstract('orders', 'bus'), abstract('returns', 'bus'), abstract('bus', 'inventory'), abstract('bus', 'billing'), abstract('bus', 'loyalty')],
             },
           },
         },
@@ -83,12 +83,12 @@ export default defineLevel({
             body: 'Cada productor como sujeto con suscriptores ya no llama a mano, pero cada uno sigue llevando su propia lista, y la de Devoluciones sigue incompleta. El bus centraliza las suscripciones para todos los productores.',
           },
           patch: {
-            removeWires: ['orders->inventario', 'orders->facturacion', 'orders->lealtad', 'returns->inventario'],
+            removeWires: ['orders->inventory', 'orders->billing', 'orders->loyalty', 'returns->inventory'],
             update: [
               { id: 'orders', skin: 'observer' },
               { id: 'returns', skin: 'observer' },
             ],
-            add: { wires: [abstract('orders', 'inventario'), abstract('orders', 'facturacion'), abstract('orders', 'lealtad'), abstract('returns', 'inventario')] },
+            add: { wires: [abstract('orders', 'inventory'), abstract('orders', 'billing'), abstract('orders', 'loyalty'), abstract('returns', 'inventory')] },
           },
         },
         facade: {
@@ -103,7 +103,7 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Pedido', ['evento:pedido'], {}, 'clientes'), pulse(20, 'Devolución', ['evento:devolucion'], {}, 'devoluciones'), pulse(50, 'Pedido', ['evento:pedido'], {}, 'clientes')],
+      pulses: [pulse(0, 'Pedido', ['event:order'], {}, 'customers'), pulse(20, 'Devolución', ['event:refund'], {}, 'refundEvents'), pulse(50, 'Pedido', ['event:order'], {}, 'customers')],
     },
   ],
   changeTickets: [

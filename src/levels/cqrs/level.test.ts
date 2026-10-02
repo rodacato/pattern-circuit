@@ -8,7 +8,7 @@ describe('L20 · CQRS', () => {
   })
 
   it('CQRS: cada camino con su ritmo, sin filas largas', () => {
-    const r = evaluate(level, { sockets: [{ id: 'modelo', pattern: 'cqrs' }] })
+    const r = evaluate(level, { sockets: [{ id: 'model', pattern: 'cqrs' }] })
     expect(r.metrics.maxLoad).toBe(3)
     expect(r.metrics.dropped).toBe(0)
   })

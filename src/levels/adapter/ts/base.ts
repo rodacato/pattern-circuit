@@ -8,7 +8,7 @@ class Cashier {
     private barista: Barista,
   ) {}
 
-  // Cashier habla "charge(total)"; el SDK entiende "cobrarEnCentavos". No encajan.
+  // Cashier habla "charge(total)"; el SDK entiende "chargeInCents". No encajan.
   // region: Cashier#charge
   charge(order: Order) {
     this.gateway.charge(order.total) // TypeError: PagoFacil.SDK no tiene charge()

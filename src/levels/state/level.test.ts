@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createSim, evaluate, runToEnd, buildCircuit, scenarioFor } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'state' | 'strategy' | 'command') => ({ sockets: [{ id: 'estados', pattern }] })
+const socket = (pattern: 'state' | 'strategy' | 'command') => ({ sockets: [{ id: 'states', pattern }] })
 
 describe('L11 · State', () => {
   it('sin patrón: tres eventos fuera de orden llegan al historial', () => {
@@ -13,7 +13,7 @@ describe('L11 · State', () => {
     const variant = socket('state')
     expect(evaluate(level, variant).metrics).toMatchObject({ invalidAtSink: 0, dropped: 0 })
     const { sim } = runToEnd(createSim(buildCircuit(level, variant).circuit, scenarioFor(level, variant)))
-    expect(sim.state.nodeState.pedido).toBe('entregado')
+    expect(sim.state.nodeState.order).toBe('entregado')
   })
 
   it.each(['strategy', 'command'] as const)('%s deja pasar los eventos fuera de orden', (p) => {

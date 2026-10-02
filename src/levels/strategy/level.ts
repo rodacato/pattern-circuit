@@ -19,9 +19,9 @@ const withCommon = withCommonCode(common)
 const withCommonTs = withCommonCode(tsCommon)
 
 const PAYMENTS = [
-  { key: 'cash', id: 'pagoEfectivo', label: 'Efectivo', className: 'CashPayment', row: 0 },
-  { key: 'card', id: 'pagoTarjeta', label: 'Tarjeta', className: 'CardPayment', row: 2 },
-  { key: 'voucher', id: 'pagoVale', label: 'Vale', className: 'VoucherPayment', row: 4 },
+  { key: 'cash', id: 'cashPayment', label: 'Efectivo', className: 'CashPayment', row: 0 },
+  { key: 'card', id: 'cardPayment', label: 'Tarjeta', className: 'CardPayment', row: 2 },
+  { key: 'voucher', id: 'voucherPayment', label: 'Vale', className: 'VoucherPayment', row: 4 },
 ] as const
 
 const paymentNode = (p: { id: string; label: string; className: string; row: number }, skin?: PatternId): NodeDef => ({
@@ -35,11 +35,11 @@ const paymentNode = (p: { id: string; label: string; className: string; row: num
   skin,
 })
 
-const toBarista = (id: string): WireDef => ({ from: id, to: 'preparar', port: 'out', dep: 'concrete' })
+const toBarista = (id: string): WireDef => ({ from: id, to: 'prepare', port: 'out', dep: 'concrete' })
 
 const order = (at: number, payment: string, label: string) => ({
   at,
-  from: 'cliente',
+  from: 'customer',
   tags: [payment],
   data: { payment },
   label,
@@ -48,7 +48,7 @@ const order = (at: number, payment: string, label: string) => ({
 export default defineLevel({
   id: 'strategy',
   order: 1,
-  chapter: 'mostrador',
+  chapter: 'counter',
   title: '¿Efectivo o tarjeta?',
   targetPattern: 'strategy',
   brief: {
@@ -57,30 +57,30 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      { id: 'cliente', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
-      { id: 'tomar', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
+      { id: 'customer', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
+      { id: 'take', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
       {
-        id: 'cobrar',
+        id: 'charge',
         label: 'Cobrar',
         className: 'Cashier',
         at: [7, 2],
         behavior: { type: 'branch', cases: { cash: 'out', card: 'out' }, else: 'drop' },
         codeRef: 'Cashier#charge',
       },
-      { id: 'preparar', label: 'Preparar', className: 'Barista', at: [13, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
-      { id: 'entregar', label: 'Entregar', className: 'Counter', at: [16, 2], behavior: { type: 'sink' }, codeRef: 'Counter#hand_over' },
+      { id: 'prepare', label: 'Preparar', className: 'Barista', at: [13, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
+      { id: 'handOver', label: 'Entregar', className: 'Counter', at: [16, 2], behavior: { type: 'sink' }, codeRef: 'Counter#hand_over' },
     ],
     wires: [
-      { from: 'cliente', to: 'tomar' },
-      { from: 'tomar', to: 'cobrar' },
-      { from: 'cobrar', to: 'preparar' },
-      { from: 'preparar', to: 'entregar' },
+      { from: 'customer', to: 'take' },
+      { from: 'take', to: 'charge' },
+      { from: 'charge', to: 'prepare' },
+      { from: 'prepare', to: 'handOver' },
     ],
   },
   sockets: [
     {
-      id: 'metodo-de-pago',
-      at: 'cobrar',
+      id: 'payment-method',
+      at: 'charge',
       label: 'Método de pago',
       inventory: ['strategy', 'observer', 'decorator'],
       options: {
@@ -92,12 +92,12 @@ export default defineLevel({
             body: 'Cada forma de cobrar vive en su propio cartucho con la misma interfaz. Cobrar solo delega; agregar un método es agregar un cartucho.',
           },
           patch: {
-            update: [{ id: 'cobrar', behavior: { type: 'slot' }, skin: 'strategy' }],
-            removeWires: ['cobrar->preparar'],
+            update: [{ id: 'charge', behavior: { type: 'slot' }, skin: 'strategy' }],
+            removeWires: ['charge->prepare'],
             add: {
               nodes: PAYMENTS.map((p) => paymentNode(p, 'strategy')),
               wires: PAYMENTS.flatMap((p) => [
-                { from: 'cobrar', to: p.id, key: p.key, dep: 'abstract' as const },
+                { from: 'charge', to: p.id, key: p.key, dep: 'abstract' as const },
                 toBarista(p.id),
               ]),
             },
@@ -111,11 +111,11 @@ export default defineLevel({
             body: 'Observer difunde un evento a cada suscriptor. Aquí cada método de pago cobró el mismo pedido: el problema pedía elegir uno, no avisar a todos.',
           },
           patch: {
-            update: [{ id: 'cobrar', behavior: { type: 'broadcast' }, skin: 'observer' }],
-            removeWires: ['cobrar->preparar'],
+            update: [{ id: 'charge', behavior: { type: 'broadcast' }, skin: 'observer' }],
+            removeWires: ['charge->prepare'],
             add: {
               nodes: PAYMENTS.map((p) => paymentNode(p, 'observer')),
-              wires: PAYMENTS.flatMap((p) => [{ from: 'cobrar', to: p.id, dep: 'abstract' as const }, toBarista(p.id)]),
+              wires: PAYMENTS.flatMap((p) => [{ from: 'charge', to: p.id, dep: 'abstract' as const }, toBarista(p.id)]),
             },
           },
         },
@@ -127,11 +127,11 @@ export default defineLevel({
             body: 'Decorator envuelve un objeto para sumarle comportamiento. El pedido llegó envuelto… al mismo árbol de if, y el vale se perdió igual.',
           },
           patch: {
-            removeWires: ['tomar->cobrar'],
+            removeWires: ['take->charge'],
             add: {
               nodes: [
                 {
-                  id: 'envoltura',
+                  id: 'wrapper',
                   label: 'Envoltura',
                   className: 'TrackedOrder',
                   kind: 'class',
@@ -142,8 +142,8 @@ export default defineLevel({
                 },
               ],
               wires: [
-                { from: 'tomar', to: 'envoltura', port: 'out', dep: 'concrete' },
-                { from: 'envoltura', to: 'cobrar', port: 'out', dep: 'concrete' },
+                { from: 'take', to: 'wrapper', port: 'out', dep: 'concrete' },
+                { from: 'wrapper', to: 'charge', port: 'out', dep: 'concrete' },
               ],
             },
           },
@@ -154,22 +154,22 @@ export default defineLevel({
   scenarios: [
     { id: 'main', pulses: [order(0, 'cash', 'Efectivo'), order(45, 'card', 'Tarjeta'), order(90, 'voucher', 'Vale')] },
     {
-      id: 'con-app',
+      id: 'with-app',
       pulses: [order(0, 'cash', 'Efectivo'), order(45, 'card', 'Tarjeta'), order(90, 'voucher', 'Vale'), order(135, 'app', 'App')],
     },
   ],
   changeTickets: [
     {
-      id: 'pago-app',
+      id: 'app-payment',
       text: 'Ahora también aceptamos pago con app.',
-      scenario: 'con-app',
+      scenario: 'with-app',
       without: {
-        update: [{ id: 'cobrar', behavior: { type: 'branch', cases: { cash: 'out', card: 'out', app: 'out' }, else: 'drop' } }],
+        update: [{ id: 'charge', behavior: { type: 'branch', cases: { cash: 'out', card: 'out', app: 'out' }, else: 'drop' } }],
       },
       with: {
         add: {
-          nodes: [paymentNode({ id: 'pagoApp', label: 'App', className: 'AppPayment', row: 6 }, 'strategy')],
-          wires: [{ from: 'cobrar', to: 'pagoApp', key: 'app', dep: 'abstract' }, toBarista('pagoApp')],
+          nodes: [paymentNode({ id: 'appPayment', label: 'App', className: 'AppPayment', row: 6 }, 'strategy')],
+          wires: [{ from: 'charge', to: 'appPayment', key: 'app', dep: 'abstract' }, toBarista('appPayment')],
         },
       },
       code: { without: 'base_app', with: 'strategy_app' },

@@ -20,8 +20,8 @@ describe('GameSession · nivel 0', () => {
     expect(s.result?.won).toBe(false)
     expect(s.failedRuns).toBe(1)
 
-    expect(s.connect('cliente', 'entregar')).toBe('wrong')
-    expect(s.connect('preparar', 'entregar')).toBe('repaired')
+    expect(s.connect('customer', 'handOver')).toBe('wrong')
+    expect(s.connect('prepare', 'handOver')).toBe('repaired')
     expect(s.codeFile.text).toContain('@counter.hand_over(order)')
     runOut(s)
     expect(s.flow.stage).toBe('complete')
@@ -67,7 +67,7 @@ describe('GameSession · nivel 1 (Strategy)', () => {
     expect(s.comparison?.with.metrics.nodesTouched).toBe(0)
 
     s.showSide('without')
-    expect(s.touched).toEqual(['cobrar'])
+    expect(s.touched).toEqual(['charge'])
     s.finishLevel()
     expect(s.flow.stage).toBe('complete')
     expect(store.load()).toMatchObject({ completed: ['strategy'], notes: ['strategy:observer', 'strategy:strategy'] })
@@ -107,19 +107,19 @@ describe('GameSession · detalles', () => {
   })
 
   it('conectar un nodo consigo mismo no cuenta como intento', () => {
-    expect(session('tutorial').connect('cobrar', 'cobrar')).toBe('none')
+    expect(session('tutorial').connect('charge', 'charge')).toBe('none')
   })
 
   it('reiniciar borra el resultado; reconstruir conserva velocidad y nodo inspeccionado', () => {
     const s = inChoose('strategy')
     expect(s.result).toBeDefined()
     s.setSpeed(2)
-    s.inspect('cobrar')
+    s.inspect('charge')
     s.reset()
     expect(s.result).toBeUndefined()
     s.plug('strategy')
     expect(s.playback.speed).toBe(2)
-    expect(s.playback.inspected).toBe('cobrar')
+    expect(s.playback.inspected).toBe('charge')
   })
 
   it('la calificación de la corrida coincide con evaluar la variante desde cero', () => {

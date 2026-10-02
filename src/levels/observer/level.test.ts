@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const socket = (pattern: 'observer' | 'strategy' | 'chain-of-responsibility') => ({ id: 'avisos', pattern })
+const socket = (pattern: 'observer' | 'strategy' | 'chain-of-responsibility') => ({ id: 'notices', pattern })
 
 describe('L10 · Observer', () => {
   it('sin patrón: Lealtad nunca se entera', () => {
@@ -10,12 +10,12 @@ describe('L10 · Observer', () => {
   })
 
   it('sin patrón + cocina: hay que abrir el pedido', () => {
-    expect(evaluate(level, { ticket: 'cocina' }).touched).toEqual(['listo'])
+    expect(evaluate(level, { ticket: 'kitchen' }).touched).toEqual(['ready'])
   })
 
   it('Observer: todos se enteran y la cocina se suscribe sin tocar nada', () => {
     expect(evaluate(level, { sockets: [socket('observer')] }).metrics.delivered).toBe(9)
-    expect(evaluate(level, { sockets: [socket('observer')], ticket: 'cocina' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
+    expect(evaluate(level, { sockets: [socket('observer')], ticket: 'kitchen' }).metrics).toMatchObject({ delivered: 12, nodesTouched: 0 })
   })
 
   it.each(['strategy', 'chain-of-responsibility'] as const)('%s: solo uno se entera', (p) => {

@@ -23,7 +23,7 @@ class PagoFacilAdapter implements PaymentGateway {
   constructor(private sdk: PagoFacil.SDK) {}
 
   charge(total: number) {
-    this.sdk.cobrarEnCentavos({ montoCentavos: Math.round(total * 100), referencia: crypto.randomUUID() })
+    this.sdk.chargeInCents({ amountCents: Math.round(total * 100), reference: crypto.randomUUID() })
   }
 }
 // endregion

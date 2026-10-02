@@ -18,7 +18,7 @@ const PIECES = 5 // avisar a la cocina no necesita piezas nuevas: basta un cable
 export default defineLevel({
   id: 'single-listener',
   order: 25,
-  chapter: 'criterio',
+  chapter: 'judgment',
   title: 'Un solo interesado',
   targetPattern: 'keep-simple',
   brief: {
@@ -27,18 +27,18 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('cliente', 'Cliente', [0, 2]),
-      node('tomar', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
-      node('cobrar', 'Cobrar', 'Cashier', [6, 2], { type: 'pass' }, { codeRef: 'Cashier#charge' }),
-      node('cocina', 'Cocina', 'Kitchen', [10, 2], { type: 'pass' }, { codeRef: 'Kitchen#start' }),
-      node('entregar', 'Entregar', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', 'Cliente', [0, 2]),
+      node('take', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
+      node('charge', 'Cobrar', 'Cashier', [6, 2], { type: 'pass' }, { codeRef: 'Cashier#charge' }),
+      node('kitchen', 'Cocina', 'Kitchen', [10, 2], { type: 'pass' }, { codeRef: 'Kitchen#start' }),
+      node('handOver', 'Entregar', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
-    wires: [...chain('cliente', 'tomar', 'cobrar'), wire('cocina', 'entregar')],
+    wires: [...chain('customer', 'take', 'charge'), wire('kitchen', 'handOver')],
   },
   sockets: [
     {
-      id: 'aviso',
-      at: 'cobrar',
+      id: 'notice',
+      at: 'charge',
       label: 'Aviso a la cocina',
       inventory: ['event-bus', 'command', 'keep-simple'],
       options: {
@@ -49,7 +49,7 @@ export default defineLevel({
             title: 'Una llamada directa se lee de corrido',
             body: 'Con un solo interesado, Cashier llama a la cocina y el flujo queda escrito en el código de principio a fin. Un bus o una lista de suscriptores tendrán sentido cuando aparezcan más interesados.',
           },
-          patch: { update: [{ id: 'cobrar', skin: 'keep-simple' }], add: { wires: [wire('cobrar', 'cocina', { dep: 'concrete' })] } },
+          patch: { update: [{ id: 'charge', skin: 'keep-simple' }], add: { wires: [wire('charge', 'kitchen', { dep: 'concrete' })] } },
         },
         'event-bus': {
           outcome: 'misfit',
@@ -61,7 +61,7 @@ export default defineLevel({
           patch: {
             add: {
               nodes: [skinned('event-bus', node('bus', 'Bus de eventos', 'EventBus', [8, 0], { type: 'broadcast' }, { codeRef: 'EventBus#publish' }))],
-              wires: [wire('cobrar', 'bus', { dep: 'concrete' }), abstract('bus', 'cocina')],
+              wires: [wire('charge', 'bus', { dep: 'concrete' }), abstract('bus', 'kitchen')],
             },
           },
         },
@@ -74,8 +74,8 @@ export default defineLevel({
           },
           patch: {
             add: {
-              nodes: [skinned('command', node('orden', 'Orden a cocina', 'StartOrder', [8, 0], { type: 'pass' }, { codeRef: 'StartOrder#call' }))],
-              wires: [wire('cobrar', 'orden', { dep: 'concrete' }), wire('orden', 'cocina', { dep: 'concrete' })],
+              nodes: [skinned('command', node('startOrder', 'Orden a cocina', 'StartOrder', [8, 0], { type: 'pass' }, { codeRef: 'StartOrder#call' }))],
+              wires: [wire('charge', 'startOrder', { dep: 'concrete' }), wire('startOrder', 'kitchen', { dep: 'concrete' })],
             },
           },
         },

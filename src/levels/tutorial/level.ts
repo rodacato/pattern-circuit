@@ -7,7 +7,7 @@ import tsRepaired from './ts/repaired.ts?raw'
 export default defineLevel({
   id: 'tutorial',
   order: 0,
-  chapter: 'apertura',
+  chapter: 'opening',
   title: 'Abre la cafetería',
   brief: {
     problem: 'Los pedidos llegan al barista… y ahí se quedan. Falta una conexión.',
@@ -15,23 +15,23 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      { id: 'cliente', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
-      { id: 'tomar', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
-      { id: 'cobrar', label: 'Cobrar', className: 'Cashier', at: [6, 2], behavior: { type: 'pass' }, codeRef: 'Cashier#charge' },
-      { id: 'preparar', label: 'Preparar', className: 'Barista', at: [9, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
-      { id: 'entregar', label: 'Entregar', className: 'Counter', at: [12, 2], behavior: { type: 'sink' }, codeRef: 'Counter#hand_over' },
+      { id: 'customer', label: 'Cliente', kind: 'actor', at: [0, 2], behavior: { type: 'source' } },
+      { id: 'take', label: 'Tomar pedido', className: 'OrderTaker', at: [3, 2], behavior: { type: 'pass' }, codeRef: 'OrderTaker#take' },
+      { id: 'charge', label: 'Cobrar', className: 'Cashier', at: [6, 2], behavior: { type: 'pass' }, codeRef: 'Cashier#charge' },
+      { id: 'prepare', label: 'Preparar', className: 'Barista', at: [9, 2], behavior: { type: 'pass' }, codeRef: 'Barista#prepare' },
+      { id: 'handOver', label: 'Entregar', className: 'Counter', at: [12, 2], behavior: { type: 'sink' }, codeRef: 'Counter#hand_over' },
     ],
     wires: [
-      { from: 'cliente', to: 'tomar' },
-      { from: 'tomar', to: 'cobrar' },
-      { from: 'cobrar', to: 'preparar' },
+      { from: 'customer', to: 'take' },
+      { from: 'take', to: 'charge' },
+      { from: 'charge', to: 'prepare' },
     ],
   },
   repairs: [
     {
-      id: 'conectar-entrega',
+      id: 'connect-handover',
       prompt: 'Arrastra desde el puerto de salida de Preparar hasta Entregar.',
-      patch: { add: { wires: [{ from: 'preparar', to: 'entregar' }] } },
+      patch: { add: { wires: [{ from: 'prepare', to: 'handOver' }] } },
       code: 'repaired',
     },
   ],
@@ -39,9 +39,9 @@ export default defineLevel({
     {
       id: 'main',
       pulses: [
-        { at: 0, from: 'cliente', tags: ['espresso'], label: 'Espresso' },
-        { at: 50, from: 'cliente', tags: ['latte'], label: 'Latte' },
-        { at: 100, from: 'cliente', tags: ['espresso'], label: 'Espresso' },
+        { at: 0, from: 'customer', tags: ['espresso'], label: 'Espresso' },
+        { at: 50, from: 'customer', tags: ['latte'], label: 'Latte' },
+        { at: 100, from: 'customer', tags: ['espresso'], label: 'Espresso' },
       ],
     },
   ],

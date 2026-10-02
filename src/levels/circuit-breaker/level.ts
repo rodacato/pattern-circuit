@@ -16,12 +16,12 @@ const codeTs = withCommon(tsCommon)
 const orders = Array.from({ length: 8 }, (_, i) => pulse(i * 90, `Pedido ${i + 1}`))
 const offline = node('offline', 'Pago offline', 'OfflinePayments', [8, 4.5], { type: 'pass' }, { cost: 6, codeRef: 'OfflinePayments#charge' })
 const timeoutMark = (id: string, codeRef: string) =>
-  node(id, 'Timeout', 'Timeout::Error', [6.5, 0], { type: 'transform', addTags: ['fallo', 'timeout'] }, { cost: 4, codeRef })
+  node(id, 'Timeout', 'Timeout::Error', [6.5, 0], { type: 'transform', addTags: ['failure', 'timeout'] }, { cost: 4, codeRef })
 
 export default defineLevel({
   id: 'circuit-breaker',
   order: 22,
-  chapter: 'resiliencia',
+  chapter: 'resilience',
   title: 'El proveedor se cayó',
   targetPattern: 'circuit-breaker',
   brief: {
@@ -30,22 +30,22 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('cliente', 'Cliente', [0, 2]),
-      node('cobrar', 'Cobrar', 'Cashier', [2.5, 2], { type: 'pass' }, { cost: 4, codeRef: 'Cashier#charge' }),
-      node('pasarela', 'Proveedor (caído)', 'PaymentGateway', [9, 2], { type: 'guard', require: { hasTag: 'proveedor-arriba' }, onFail: 'drop' }, {
+      actor('customer', 'Cliente', [0, 2]),
+      node('charge', 'Cobrar', 'Cashier', [2.5, 2], { type: 'pass' }, { cost: 4, codeRef: 'Cashier#charge' }),
+      node('gateway', 'Proveedor (caído)', 'PaymentGateway', [9, 2], { type: 'guard', require: { hasTag: 'provider-up' }, onFail: 'drop' }, {
         kind: 'external',
         cost: 40,
         codeRef: 'PaymentGateway#charge',
       }),
-      node('preparar', 'Preparar', 'Barista', [12, 2], { type: 'pass' }, { cost: 6, codeRef: 'Barista#prepare' }),
-      node('entregar', 'Entregar', 'Counter', [15, 2], { type: 'sink', expects: { not: { hasTag: 'timeout' } } }, { codeRef: 'Counter#hand_over' }),
+      node('prepare', 'Preparar', 'Barista', [12, 2], { type: 'pass' }, { cost: 6, codeRef: 'Barista#prepare' }),
+      node('handOver', 'Entregar', 'Counter', [15, 2], { type: 'sink', expects: { not: { hasTag: 'timeout' } } }, { codeRef: 'Counter#hand_over' }),
     ],
-    wires: chain('cliente', 'cobrar', 'pasarela', 'preparar', 'entregar'),
+    wires: chain('customer', 'charge', 'gateway', 'prepare', 'handOver'),
   },
   sockets: [
     {
-      id: 'proveedor',
-      at: 'cobrar',
+      id: 'provider',
+      at: 'charge',
       label: 'Proveedor',
       inventory: ['circuit-breaker', 'chain-of-responsibility', 'proxy'],
       options: {
@@ -57,21 +57,21 @@ export default defineLevel({
             body: 'El interruptor cuenta los fallos. Tras dos seguidos se abre: los siguientes cobros van directo al respaldo, sin esperar el timeout. Pasado un tiempo probaría una llamada ("medio abierto") para ver si el proveedor volvió.',
           },
           patch: {
-            removeWires: ['cobrar->pasarela'],
-            update: [{ id: 'pasarela', behavior: { type: 'guard', require: { hasTag: 'proveedor-arriba' }, onFail: 'fallo' } }],
+            removeWires: ['charge->gateway'],
+            update: [{ id: 'gateway', behavior: { type: 'guard', require: { hasTag: 'provider-up' }, onFail: 'failure' } }],
             add: {
               nodes: [
-                skinned('circuit-breaker', node('breaker', 'Interruptor', 'CircuitBreaker', [5, 2], { type: 'breaker', threshold: 2, failTag: 'fallo' }, { cost: 4, codeRef: 'CircuitBreaker#charge' })),
-                timeoutMark('marcar', 'Timeout::Error'),
+                skinned('circuit-breaker', node('breaker', 'Interruptor', 'CircuitBreaker', [5, 2], { type: 'breaker', threshold: 2, failTag: 'failure' }, { cost: 4, codeRef: 'CircuitBreaker#charge' })),
+                timeoutMark('markTimeout', 'Timeout::Error'),
                 offline,
               ],
               wires: [
-                wire('cobrar', 'breaker'),
-                wire('breaker', 'pasarela', { port: 'call' }),
-                wire('pasarela', 'marcar', { port: 'fallo' }),
-                wire('marcar', 'breaker'),
+                wire('charge', 'breaker'),
+                wire('breaker', 'gateway', { port: 'call' }),
+                wire('gateway', 'markTimeout', { port: 'failure' }),
+                wire('markTimeout', 'breaker'),
                 wire('breaker', 'offline', { port: 'fallback' }),
-                wire('offline', 'preparar'),
+                wire('offline', 'prepare'),
               ],
             },
           },
@@ -84,10 +84,10 @@ export default defineLevel({
             body: 'Pasar al pago offline cuando el proveedor falla salva los pedidos, pero cada cliente espera el timeout completo: la cadena nunca aprende que el proveedor está caído. El interruptor sí lo recuerda.',
           },
           patch: {
-            update: [{ id: 'pasarela', behavior: { type: 'guard', require: { hasTag: 'proveedor-arriba' }, onFail: 'fallo' }, skin: 'chain-of-responsibility' }],
+            update: [{ id: 'gateway', behavior: { type: 'guard', require: { hasTag: 'provider-up' }, onFail: 'failure' }, skin: 'chain-of-responsibility' }],
             add: {
-              nodes: [timeoutMark('marcar', 'FallbackChain#charge'), offline],
-              wires: [wire('pasarela', 'marcar', { port: 'fallo' }), wire('marcar', 'offline'), wire('offline', 'preparar')],
+              nodes: [timeoutMark('markTimeout', 'FallbackChain#charge'), offline],
+              wires: [wire('gateway', 'markTimeout', { port: 'failure' }), wire('markTimeout', 'offline'), wire('offline', 'prepare')],
             },
           },
         },
@@ -95,7 +95,7 @@ export default defineLevel({
           outcome: 'misfit',
           code: 'proxy',
           note: { title: 'Un proxy que solo reenvía no protege', body: 'Este proxy le pasa cada cobro al proveedor caído y espera el mismo timeout. Un Circuit Breaker es, de hecho, un proxy con memoria de fallos.' },
-          patch: { update: [{ id: 'pasarela', skin: 'proxy' }] },
+          patch: { update: [{ id: 'gateway', skin: 'proxy' }] },
         },
       },
     },

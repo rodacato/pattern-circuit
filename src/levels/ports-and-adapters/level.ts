@@ -23,7 +23,7 @@ const adapterNode = (id: string, label: string, className: string, at: [number, 
 export default defineLevel({
   id: 'ports-and-adapters',
   order: 18,
-  chapter: 'arquitectura',
+  chapter: 'architecture',
   title: 'El núcleo y el mundo',
   targetPattern: 'ports-and-adapters',
   brief: {
@@ -33,17 +33,17 @@ export default defineLevel({
   circuit: {
     nodes: [
       actor('web', 'App web', [0, 2]),
-      node('nucleo', 'Núcleo: pedidos', 'OrderService', [3, 2], { type: 'pass' }, { codeRef: 'OrderService#place' }),
+      node('core', 'Núcleo: pedidos', 'OrderService', [3, 2], { type: 'pass' }, { codeRef: 'OrderService#place' }),
       external('postgres', 'Postgres', 'PG', [7, 2], 'Postgres'),
       external('stripe', 'Stripe', 'Stripe', [11, 2], 'Stripe'),
-      node('confirmar', 'Confirmar', 'Receipt', [16, 2], { type: 'sink' }, { codeRef: 'Receipt#confirm' }),
+      node('confirm', 'Confirmar', 'Receipt', [16, 2], { type: 'sink' }, { codeRef: 'Receipt#confirm' }),
     ],
-    wires: chain('web', 'nucleo', 'postgres', 'stripe', 'confirmar'),
+    wires: chain('web', 'core', 'postgres', 'stripe', 'confirm'),
   },
   sockets: [
     {
-      id: 'dependencias',
-      at: 'nucleo',
+      id: 'dependencies',
+      at: 'core',
       label: 'Dependencias',
       inventory: ['ports-and-adapters', 'adapter', 'facade', 'singleton'],
       options: {
@@ -56,7 +56,7 @@ export default defineLevel({
           },
           patch: {
             remove: ['postgres', 'stripe'],
-            update: [{ id: 'nucleo', skin: 'ports-and-adapters' }],
+            update: [{ id: 'core', skin: 'ports-and-adapters' }],
             add: {
               nodes: [
                 skinned('ports-and-adapters', node('repoPort', 'Puerto: pedidos', 'Port::Repository', [6, 2], { type: 'slot' }, { codeRef: 'Port::Repository' })),
@@ -67,15 +67,15 @@ export default defineLevel({
                 adapterNode('stripePay', 'Stripe', 'StripePayments', [13.5, 3.5], { kind: 'external' }),
               ],
               wires: [
-                abstract('nucleo', 'repoPort'),
+                abstract('core', 'repoPort'),
                 abstract('repoPort', 'memRepo', 'env:test'),
                 abstract('repoPort', 'pgRepo', 'env:prod'),
                 wire('memRepo', 'payPort'),
                 wire('pgRepo', 'payPort'),
                 abstract('payPort', 'fakePay', 'env:test'),
                 abstract('payPort', 'stripePay', 'env:prod'),
-                wire('fakePay', 'confirmar'),
-                wire('stripePay', 'confirmar'),
+                wire('fakePay', 'confirm'),
+                wire('stripePay', 'confirm'),
               ],
             },
           },
@@ -90,8 +90,8 @@ export default defineLevel({
           patch: {
             removeWires: ['postgres->stripe'],
             add: {
-              nodes: [skinned('adapter', node('adaptadorStripe', 'Adaptador', 'StripeAdapter', [9, 0.5], { type: 'pass' }, { codeRef: 'StripeAdapter' }))],
-              wires: chain('postgres', 'adaptadorStripe', 'stripe'),
+              nodes: [skinned('adapter', node('stripeAdapter', 'Adaptador', 'StripeAdapter', [9, 0.5], { type: 'pass' }, { codeRef: 'StripeAdapter' }))],
+              wires: chain('postgres', 'stripeAdapter', 'stripe'),
             },
           },
         },
@@ -100,10 +100,10 @@ export default defineLevel({
           code: 'facade',
           note: { title: 'Facade esconde, no desacopla', body: 'Agrupar la infraestructura detrás de una fachada no cambia que el núcleo termine llamando a la base de datos real.' },
           patch: {
-            removeWires: ['nucleo->postgres'],
+            removeWires: ['core->postgres'],
             add: {
               nodes: [skinned('facade', node('infra', 'Infraestructura', 'Infrastructure', [5, 0.5], { type: 'pass' }, { codeRef: 'Infrastructure' }))],
-              wires: chain('nucleo', 'infra', 'postgres'),
+              wires: chain('core', 'infra', 'postgres'),
             },
           },
         },

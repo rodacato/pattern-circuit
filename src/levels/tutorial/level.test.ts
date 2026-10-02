@@ -12,7 +12,7 @@ describe('L00 · Abre la cafetería', () => {
   })
 
   it('con el cable reparado, se gana', () => {
-    const r = evaluate(l, { repairs: ['conectar-entrega'] })
+    const r = evaluate(l, { repairs: ['connect-handover'] })
     expect(r.metrics).toMatchObject({ delivered: 3, dropped: 0 })
     expect(r.won).toBe(true)
   })

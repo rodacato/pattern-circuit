@@ -25,7 +25,7 @@ export const abstract = (from: string, to: string, key?: string): WireInput => (
 
 export const chain = (...ids: string[]): WireInput[] => ids.slice(1).map((id, i) => wire(ids[i], id))
 
-export const pulse = (at: number, label: string, tags: string[] = [], data: Record<string, unknown> = {}, from = 'cliente') => ({
+export const pulse = (at: number, label: string, tags: string[] = [], data: Record<string, unknown> = {}, from = 'customer') => ({
   at,
   from,
   tags,

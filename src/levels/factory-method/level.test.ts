@@ -4,21 +4,21 @@ import level from './level'
 
 describe('L02 · Factory Method', () => {
   const l = level
-  const socket = (pattern: 'factory-method' | 'singleton' | 'builder') => ({ id: 'crear-bebida', pattern })
+  const socket = (pattern: 'factory-method' | 'singleton' | 'builder') => ({ id: 'create-drink', pattern })
 
   it('sin patrón: Montaña recibe un latte', () => {
     expect(evaluate(l, {}).metrics).toMatchObject({ delivered: 3, invalidAtSink: 1 })
   })
 
   it('sin patrón + sucursal Puerto: hay que abrir el flujo compartido', () => {
-    const r = evaluate(l, { ticket: 'sucursal-puerto' })
-    expect(r.touched).toEqual(['crear'])
+    const r = evaluate(l, { ticket: 'harbor-branch' })
+    expect(r.touched).toEqual(['create'])
     expect(r.metrics.invalidAtSink).toBe(1)
   })
 
   it('Factory Method resuelve y Puerto no toca nodos existentes', () => {
     expect(evaluate(l, { sockets: [socket('factory-method')] }).won).toBe(true)
-    const r = evaluate(l, { sockets: [socket('factory-method')], ticket: 'sucursal-puerto' })
+    const r = evaluate(l, { sockets: [socket('factory-method')], ticket: 'harbor-branch' })
     expect(r.metrics).toMatchObject({ delivered: 4, invalidAtSink: 0, nodesTouched: 0 })
     expect(r.won).toBe(true)
   })

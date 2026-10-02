@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import level from './level'
 
-const factory = { id: 'crear-bebida', pattern: 'factory-method' as const }
-const strategy = { id: 'metodo-de-pago', pattern: 'strategy' as const }
+const factory = { id: 'create-drink', pattern: 'factory-method' as const }
+const strategy = { id: 'payment-method', pattern: 'strategy' as const }
 
 describe('L15 · Factory Method + Strategy', () => {
   it('sin patrones: bebida equivocada y vale perdido', () => {

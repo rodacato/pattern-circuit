@@ -12,20 +12,20 @@ class Branch
   def create_drink = raise(NotImplementedError)
 end
 
-class CentroBranch < Branch
-  # region: CentroBranch#create_drink
+class DowntownBranch < Branch
+  # region: DowntownBranch#create_drink
   def create_drink = Latte.new
   # endregion
 end
 
-class PlayaBranch < Branch
-  # region: PlayaBranch#create_drink
+class BeachBranch < Branch
+  # region: BeachBranch#create_drink
   def create_drink = Frappe.new
   # endregion
 end
 
-class MontanaBranch < Branch
-  # region: MontanaBranch#create_drink
+class MountainBranch < Branch
+  # region: MountainBranch#create_drink
   def create_drink = HotChocolate.new
   # endregion
 end

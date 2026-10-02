@@ -92,14 +92,39 @@ export const LEGACY_LEVEL_IDS: Record<string, string> = {
   'L24-cafeteria-completa': 'full-cafe',
 }
 
+// Socket ids from earlier versions: review cards are keyed `level/socket`, so they need the same translation.
+export const LEGACY_SOCKET_IDS: Record<string, string> = {
+  'aprobacion': 'approval',
+  'aviso': 'notice',
+  'avisos': 'notices',
+  'cobro': 'charging',
+  'contador': 'ticketCounter',
+  'crear-bebida': 'create-drink',
+  'crear-pedido': 'create-order',
+  'dependencias': 'dependencies',
+  'estados': 'states',
+  'eventos': 'events',
+  'inventario': 'inventory',
+  'metodo-de-pago': 'payment-method',
+  'modelo': 'model',
+  'pasarela': 'gateway',
+  'pasos': 'steps',
+  'pedidos': 'orders',
+  'proveedor': 'provider',
+  'receta': 'recipe',
+  'tarjeta': 'card',
+  'cocina': 'kitchen',
+}
+
 export function migrateLevelIds(p: Progress): Progress {
   const id = (levelId: string) => LEGACY_LEVEL_IDS[levelId] ?? levelId
   const key = (k: string) => k.replace(/^[^:/]+/, (levelId) => id(levelId)) // `level:pattern` and `level/socket`
+  const reviewKey = (k: string) => key(k).replace(/\/(.+)$/, (_, socket: string) => `/${LEGACY_SOCKET_IDS[socket] ?? socket}`)
   return {
     ...p,
     completed: p.completed.map(id),
     notes: p.notes.map(key),
-    review: Object.fromEntries(Object.entries(p.review).map(([k, v]) => [key(k), v])),
+    review: Object.fromEntries(Object.entries(p.review).map(([k, v]) => [reviewKey(k), v])),
   }
 }
 

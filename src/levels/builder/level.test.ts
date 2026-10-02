@@ -4,7 +4,7 @@ import level from './level'
 
 describe('L03 · Builder', () => {
   const l = level
-  const socket = (pattern: 'builder' | 'factory-method' | 'decorator') => ({ id: 'crear-pedido', pattern })
+  const socket = (pattern: 'builder' | 'factory-method' | 'decorator') => ({ id: 'create-order', pattern })
 
   it('sin patrón: argumentos cruzados y un pedido imposible que explota en cocina', () => {
     expect(evaluate(l, {}).metrics).toMatchObject({ invalidAtSink: 1, dropped: 1 })

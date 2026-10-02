@@ -8,7 +8,7 @@ describe('L09 · Proxy', () => {
   })
 
   it('Proxy: solo lo nuevo viaja al almacén', () => {
-    const r = evaluate(level, { sockets: [{ id: 'inventario', pattern: 'proxy' }] })
+    const r = evaluate(level, { sockets: [{ id: 'inventory', pattern: 'proxy' }] })
     expect(r.metrics).toMatchObject({ delivered: 6 })
     expect(r.metrics.maxLoad).toBe(2)
   })

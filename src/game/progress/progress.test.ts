@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LEVELS } from '../../levels'
-import { emptyProgress, firstUnfinished, KeyValueProgressStore, LEGACY_LEVEL_IDS, migrateLevelIds, noteKey, parseNoteKey, withCompleted, withNote, withNotes, withPrediction } from './progress'
+import { emptyProgress, firstUnfinished, KeyValueProgressStore, LEGACY_LEVEL_IDS, LEGACY_SOCKET_IDS, migrateLevelIds, noteKey, parseNoteKey, withCompleted, withNote, withNotes, withPrediction } from './progress'
 
 const fakeStorage = (initial: Record<string, string> = {}) => {
   const data = { ...initial }
@@ -100,5 +100,15 @@ describe('progreso: ids renombrados', () => {
     const current = new Set(LEVELS.map((l) => l.id))
     expect(Object.values(LEGACY_LEVEL_IDS).every((id) => current.has(id))).toBe(true)
     expect(LEVELS.filter((l) => !Object.values(LEGACY_LEVEL_IDS).includes(l.id)).map((l) => l.id)).toEqual([])
+  })
+
+  it('las tarjetas de repaso guardadas con el id anterior del socket siguen valiendo', () => {
+    const p = migrateLevelIds({ ...emptyProgress(), review: { 'L01-strategy/metodo-de-pago': { box: 3, due: 7 }, 'L15-sucursales-y-pagos/crear-bebida': { box: 1, due: 0 } } })
+    expect(p.review).toEqual({ 'strategy/payment-method': { box: 3, due: 7 }, 'branches-and-payments/create-drink': { box: 1, due: 0 } })
+  })
+
+  it('cada id de socket anterior apunta a un socket que existe', () => {
+    const current = new Set(LEVELS.flatMap((l) => l.sockets.map((s) => s.id)))
+    expect(Object.values(LEGACY_SOCKET_IDS).filter((id) => !current.has(id))).toEqual([])
   })
 })

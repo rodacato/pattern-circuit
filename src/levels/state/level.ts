@@ -15,26 +15,28 @@ const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
 
 const STATES = ['pendiente', 'pagado', 'preparando', 'entregado', 'cancelado']
-const TARGET: Record<string, string> = { pagar: 'pagado', preparar: 'preparando', entregar: 'entregado', cancelar: 'cancelado' }
-const VALID: Record<string, string[]> = { pendiente: ['pagar', 'cancelar'], pagado: ['preparar', 'cancelar'], preparando: ['entregar'], entregado: [], cancelado: [] }
+// Events are identified in English; the Spanish name is the text the player reads on the pulse.
+export const EVENT_LABELS: Record<string, string> = { pay: 'pagar', prepare: 'preparar', deliver: 'entregar', cancel: 'cancelar' }
+const TARGET: Record<string, string> = { pay: 'pagado', prepare: 'preparando', deliver: 'entregado', cancel: 'cancelado' }
+const VALID: Record<string, string[]> = { pendiente: ['pay', 'cancel'], pagado: ['prepare', 'cancel'], preparando: ['deliver'], entregado: [], cancelado: [] }
 
 // Sin patrón: todo evento cambia el status; los que no tenían sentido quedan marcados.
 export const permissive = Object.fromEntries(
   STATES.map((s) => [
     s,
-    Object.fromEntries(Object.entries(TARGET).map(([event, to]) => [event, VALID[s].includes(event) ? { to } : { to, addTags: ['fuera-de-orden'] }])),
+    Object.fromEntries(Object.entries(TARGET).map(([event, to]) => [event, VALID[s].includes(event) ? { to } : { to, addTags: ['out-of-order'] }])),
   ]),
 )
 
 // Con State: cada estado solo conoce sus transiciones válidas.
 export const strict = Object.fromEntries(STATES.map((s) => [s, Object.fromEntries(VALID[s].map((event) => [event, { to: TARGET[event] }]))]))
 
-const events = ['pagar', 'entregar', 'preparar', 'entregar', 'cancelar'].map((e, i) => pulse(i * 40, e, [e], {}, 'eventos'))
+const events = ['pay', 'deliver', 'prepare', 'deliver', 'cancel'].map((e, i) => pulse(i * 40, EVENT_LABELS[e], [e], {}, 'events'))
 
 export default defineLevel({
   id: 'state',
   order: 11,
-  chapter: 'hora-pico',
+  chapter: 'rush-hour',
   title: 'La vida de un pedido',
   targetPattern: 'state',
   brief: {
@@ -43,16 +45,16 @@ export default defineLevel({
   },
   circuit: {
     nodes: [
-      actor('eventos', 'Eventos', [0, 2]),
-      node('pedido', 'Pedido', 'Order', [4, 2], { type: 'machine', initial: 'pendiente', states: permissive }, { codeRef: 'Order#handle' }),
-      node('historial', 'Historial', 'History', [8, 2], { type: 'sink', expects: { not: { hasTag: 'fuera-de-orden' } } }, { codeRef: 'History#record' }),
+      actor('events', 'Eventos', [0, 2]),
+      node('order', 'Pedido', 'Order', [4, 2], { type: 'machine', initial: 'pendiente', states: permissive }, { codeRef: 'Order#handle' }),
+      node('history', 'Historial', 'History', [8, 2], { type: 'sink', expects: { not: { hasTag: 'out-of-order' } } }, { codeRef: 'History#record' }),
     ],
-    wires: chain('eventos', 'pedido', 'historial'),
+    wires: chain('events', 'order', 'history'),
   },
   sockets: [
     {
-      id: 'estados',
-      at: 'pedido',
+      id: 'states',
+      at: 'order',
       label: 'Estados',
       inventory: ['state', 'strategy', 'command'],
       options: {
@@ -64,10 +66,10 @@ export default defineLevel({
             body: 'Cada estado es un objeto que sabe qué eventos acepta y a qué estado lleva. El pedido delega en su estado actual: lo que no tiene sentido se rechaza sin un solo if repartido.',
           },
           patch: {
-            update: [{ id: 'pedido', behavior: { type: 'machine', initial: 'pendiente', states: strict, else: 'rechazo' }, skin: 'state' }],
+            update: [{ id: 'order', behavior: { type: 'machine', initial: 'pendiente', states: strict, else: 'reject' }, skin: 'state' }],
             add: {
-              nodes: [node('rechazo', 'Rechazar evento', 'History', [8, 4], { type: 'sink', message: '✋ evento rechazado' }, { codeRef: 'History#reject' })],
-              wires: [wire('pedido', 'rechazo', { port: 'rechazo' })],
+              nodes: [node('reject', 'Rechazar evento', 'History', [8, 4], { type: 'sink', message: '✋ evento rechazado' }, { codeRef: 'History#reject' })],
+              wires: [wire('order', 'reject', { port: 'reject' })],
             },
           },
         },
@@ -78,7 +80,7 @@ export default defineLevel({
             title: 'Strategy la elige quien llama; en State decide el estado actual',
             body: 'Una estrategia por evento reparte el código, pero la elige quien llama y ninguna sabe en qué estado está el pedido: cada una aplica su cambio igual. En State decide el estado actual, y normalmente él mismo indica el siguiente.',
           },
-          patch: { update: [{ id: 'pedido', skin: 'strategy', codeRef: 'EventHandlers' }] },
+          patch: { update: [{ id: 'order', skin: 'strategy', codeRef: 'EventHandlers' }] },
         },
         command: {
           outcome: 'misfit',
@@ -88,10 +90,10 @@ export default defineLevel({
             body: 'Convertir los eventos en comandos encolados permite postergarlos o deshacerlos, pero la cola los ejecuta igual: el pedido sigue sin saber qué eventos tienen sentido.',
           },
           patch: {
-            removeWires: ['eventos->pedido'],
+            removeWires: ['events->order'],
             add: {
-              nodes: [skinned('command', node('cola', 'Cola de eventos', 'EventQueue', [2, 0], { type: 'buffer', cancelTag: 'deshacer', match: 'evento' }, { cost: 6 }))],
-              wires: [wire('eventos', 'cola'), wire('cola', 'pedido')],
+              nodes: [skinned('command', node('queue', 'Cola de eventos', 'EventQueue', [2, 0], { type: 'buffer', cancelTag: 'undo', match: 'event' }, { cost: 6 }))],
+              wires: [wire('events', 'queue'), wire('queue', 'order')],
             },
           },
         },

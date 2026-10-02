@@ -4,10 +4,10 @@ class CoffeeMenu {
   // region: CoffeeMenu#drink_for
   drinkFor(extras: string[]): Product {
     // region: CoffeeMenu#drink_for:avena
-    if (extras.includes('avena')) { return new LatteConAvena()
+    if (extras.includes('avena')) { return new OatMilkLatte()
     // endregion
     // region: CoffeeMenu#drink_for:shot
-    } else if (extras.includes('shot')) { return new LatteConShot()
+    } else if (extras.includes('shot')) { return new ShotLatte()
     // endregion
     // region: CoffeeMenu#drink_for:else
     } else { throw new Error('¿Qué subclase le toca?')
@@ -17,10 +17,10 @@ class CoffeeMenu {
   // endregion
 }
 
-// region: LatteConAvena
-class LatteConAvena extends Product {}
+// region: OatMilkLatte
+class OatMilkLatte extends Product {}
 // endregion
 
-// region: LatteConShot
-class LatteConShot extends Product {}
+// region: ShotLatte
+class ShotLatte extends Product {}
 // endregion
