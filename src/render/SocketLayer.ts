@@ -45,7 +45,7 @@ export class SocketLayer {
       const color = FAMILY_COLORS[PATTERNS[plug.pattern].family]
       this.fx.ring(at, color, 110)
       this.fx.burst(at, color, 34, 3.2)
-      this.fx.float(at, msg('{pattern} enchufado', { pattern: PATTERNS[plug.pattern].name }), color)
+      this.fx.float(at, msg('render.socket.plugged', { pattern: PATTERNS[plug.pattern].name }), color)
     }
   }
 
@@ -74,7 +74,7 @@ export class SocketLayer {
         d.moveTo(at.x - 5, at.y).lineTo(at.x + 5, at.y).moveTo(at.x, at.y - 5).lineTo(at.x, at.y + 5).stroke({ width: 2, color })
         gl.circle(at.x, at.y, r + 10 + beat * 8).stroke({ width: 2, color, alpha: 0.3 * (1 - beat) })
       }
-      text.text = this.t(plugged ? PATTERNS[plugged].name : hovered ? N('suéltalo aquí') : socket.label)
+      text.text = this.t(plugged ? PATTERNS[plugged].name : hovered ? N('render.socket.dropHere') : socket.label)
       text.style.fill = color
       text.position.set(at.x, at.y - r - 6)
       text.visible = true

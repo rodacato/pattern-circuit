@@ -67,7 +67,9 @@ export function state(): Skin {
 }
 
 const STATE_COLORS = [C.amber, C.cyan, C.violet, C.green, C.red]
-export const stateColor = (name: string) => STATE_COLORS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % STATE_COLORS.length]
+// States keep the colors they had when their ids were Spanish words (the color used to come from hashing the name).
+const KNOWN_STATE_COLORS: Record<string, number> = { pending: C.cyan, paid: C.amber, preparing: C.green, delivered: C.green, cancelled: C.violet, closed: C.cyan, open: C.violet }
+export const stateColor = (name: string) => KNOWN_STATE_COLORS[name] ?? STATE_COLORS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % STATE_COLORS.length]
 
 // Command: a tray with the waiting cards; undo flips them.
 export function command(): Skin {
@@ -88,7 +90,7 @@ export function command(): Skin {
     onEvent({ fx }, _node, at, e) {
       if (e.type === 'pulse.cancel') {
         fx.ring(at, C.violet, 70)
-        fx.float(at, '↶ deshecho', C.violet)
+        fx.float(at, N('render.skin.behavioral.undone'), C.violet)
       }
     },
   }
@@ -109,7 +111,7 @@ export function chainOfResponsibility(): Skin {
     },
     onEvent({ fx }, node, at, e) {
       if (e.type === 'pulse.enter') scans.set(node.id, 1)
-      if (e.type === 'pulse.exit') fx.float(at, e.wireId.includes('.next') ? N('no me toca → siguiente') : N('✓ lo atiendo'), e.wireId.includes('.next') ? C.muted : C.green)
+      if (e.type === 'pulse.exit') fx.float(at, e.wireId.includes('.next') ? N('render.skin.behavioral.notMine') : N('render.skin.behavioral.handled'), e.wireId.includes('.next') ? C.muted : C.green)
     },
   }
 }

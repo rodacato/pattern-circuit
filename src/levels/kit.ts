@@ -1,14 +1,15 @@
 // Helpers to write levels with less noise. They only build data: validation is done by defineLevel.
-import type { BehaviorInput, NodeInput, PatternId, WireInput } from '../engine'
+import type { BehaviorInput, LevelInput, NodeInput, PatternId, WireInput } from '../engine'
 
 type At = [number, number]
+type ScenarioPulseInput = NonNullable<LevelInput['scenarios']>[number]['pulses'][number]
 type NodeExtra = Partial<Omit<NodeInput, 'id' | 'label' | 'at' | 'behavior'>>
 
-export const actor = (id: string, label: string, at: At): NodeInput => ({ id, label, kind: 'actor', at, behavior: { type: 'source' } })
+// Texts are never written here: a node's label is `node.<id>` in the level's catalog.
+export const actor = (id: string, at: At): NodeInput => ({ id, kind: 'actor', at, behavior: { type: 'source' } })
 
-export const node = (id: string, label: string, className: string, at: At, behavior: BehaviorInput = { type: 'pass' }, extra: NodeExtra = {}): NodeInput => ({
+export const node = (id: string, className: string, at: At, behavior: BehaviorInput = { type: 'pass' }, extra: NodeExtra = {}): NodeInput => ({
   id,
-  label,
   className,
   at,
   behavior,
@@ -25,13 +26,8 @@ export const abstract = (from: string, to: string, key?: string): WireInput => (
 
 export const chain = (...ids: string[]): WireInput[] => ids.slice(1).map((id, i) => wire(ids[i], id))
 
-export const pulse = (at: number, label: string, tags: string[] = [], data: Record<string, unknown> = {}, from = 'customer') => ({
-  at,
-  from,
-  tags,
-  data,
-  label,
-})
+// A pulse's label is `scenario.<scenario id>.<position>` in the level's catalog.
+export const pulse = (at: number, tags: string[] = [], data: Record<string, unknown> = {}, from = 'customer'): ScenarioPulseInput => ({ at, from, tags, data, label: '' })
 
 // Common code goes before the wiring block, so the classes exist when they are instantiated.
 export const withCommon = (common: string) => (code: string) => {

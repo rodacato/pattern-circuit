@@ -21,33 +21,28 @@ import tsExtrasSingleton from './ts/extras_singleton.ts?raw'
 
 const EXTRAS = ['oat', 'shot']
 const extrasApplied: Predicate = { all: EXTRAS.map((e) => ({ any: [{ not: { hasTag: e } }, { hasTag: `+${e}` }] })) }
-const leaf = (id: string, label: string, at: [number, number]) => skinned('composite', node(id, label, 'Product', at, { type: 'pass' }, { codeRef: 'Product#make' }))
-const wrapper = (id: string, label: string, className: string, y: number, extra: string) =>
-  skinned('decorator', node(id, label, className, [11, y], { type: 'transform', when: { hasTag: extra }, addTags: [`+${extra}`] }))
+const leaf = (id: string, at: [number, number]) => skinned('composite', node(id, 'Product', at, { type: 'pass' }, { codeRef: 'Product#make' }))
+const wrapper = (id: string, className: string, y: number, extra: string) =>
+  skinned('decorator', node(id, className, [11, y], { type: 'transform', when: { hasTag: extra }, addTags: [`+${extra}`] }))
 
 export default defineLevel({
   id: 'combos-with-extras',
   order: 16,
   chapter: 'all-together',
-  title: 'Combos con extras',
-  brief: {
-    problem: 'El Desayuno trae un café con extras, pan y un mini combo. La cocina no sabe desarmar el combo anidado, y el menú del café solo conoce una subclase por extra: avena y shot a la vez no existe.',
-    goal: 'Que el combo completo llegue a la bandeja con todos los extras del café aplicados.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('kitchen', 'Cocina', 'Kitchen', [3, 2], { type: 'branch', cases: { product: 'direct', combo: 'combo' } }, { codeRef: 'Kitchen#prepare' }),
-      node('unpack', 'Desayuno', 'Combo', [6, 2], { type: 'broadcast' }, { codeRef: 'Combo#items' }),
-      node('coffee', 'Café', 'CoffeeMenu', [9, 0], { type: 'branch', cases: { oat: 'a', shot: 's' } }, { codeRef: 'CoffeeMenu#drink_for' }),
-      node('withOat', 'Con avena', 'OatMilkLatte', [11, -1], { type: 'transform', addTags: ['+oat'] }),
-      node('withShot', 'Con shot', 'ShotLatte', [11, 1], { type: 'transform', addTags: ['+shot'] }),
-      node('coffeeReady', 'Café listo', 'Product', [13.5, 0], { type: 'pass' }, { codeRef: 'Product#make' }),
-      node('bread', 'Pan', 'Product', [9, 2], { type: 'pass' }, { codeRef: 'Product#make' }),
-      node('mini', 'Mini combo', 'Combo', [9, 4], { type: 'branch', cases: {} }, { codeRef: 'Combo' }),
-      node('tray', 'Juntar', 'Tray', [16, 2], { type: 'join' }, { codeRef: 'Tray#collect' }),
-      node('serve', 'Servir', 'Tray', [18.5, 2], { type: 'pass' }, { codeRef: 'Tray#serve' }),
-      node('handOver', 'Entregar', 'Counter', [21, 2], { type: 'sink', expects: extrasApplied }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('kitchen', 'Kitchen', [3, 2], { type: 'branch', cases: { product: 'direct', combo: 'combo' } }, { codeRef: 'Kitchen#prepare' }),
+      node('unpack', 'Combo', [6, 2], { type: 'broadcast' }, { codeRef: 'Combo#items' }),
+      node('coffee', 'CoffeeMenu', [9, 0], { type: 'branch', cases: { oat: 'a', shot: 's' } }, { codeRef: 'CoffeeMenu#drink_for' }),
+      node('withOat', 'OatMilkLatte', [11, -1], { type: 'transform', addTags: ['+oat'] }),
+      node('withShot', 'ShotLatte', [11, 1], { type: 'transform', addTags: ['+shot'] }),
+      node('coffeeReady', 'Product', [13.5, 0], { type: 'pass' }, { codeRef: 'Product#make' }),
+      node('bread', 'Product', [9, 2], { type: 'pass' }, { codeRef: 'Product#make' }),
+      node('mini', 'Combo', [9, 4], { type: 'branch', cases: {} }, { codeRef: 'Combo' }),
+      node('tray', 'Tray', [16, 2], { type: 'join' }, { codeRef: 'Tray#collect' }),
+      node('serve', 'Tray', [18.5, 2], { type: 'pass' }, { codeRef: 'Tray#serve' }),
+      node('handOver', 'Counter', [21, 2], { type: 'sink', expects: extrasApplied }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [
       wire('customer', 'kitchen'),
@@ -70,17 +65,12 @@ export default defineLevel({
     {
       id: 'combo',
       at: 'unpack',
-      label: 'Combos',
       code: 'combo_base',
       inventory: ['composite', 'strategy', 'facade'],
       options: {
         composite: {
           outcome: 'solves',
           code: 'combo_composite',
-          note: {
-            title: 'Composite recorre el árbol',
-            body: 'El combo trata igual a sus partes, sean productos u otros combos. Que una de esas partes sea un café decorado no le importa: sigue respondiendo al mismo mensaje.',
-          },
           patch: {
             removeWires: ['mini->tray'],
             update: [
@@ -89,7 +79,7 @@ export default defineLevel({
               { id: 'bread', skin: 'composite' },
             ],
             add: {
-              nodes: [leaf('juice', 'Jugo', [11, 4]), leaf('fruit', 'Fruta', [11, 6]), skinned('composite', node('joinMini', 'Juntar', 'Tray', [13.5, 5], { type: 'join' }, { codeRef: 'Tray#collect' }))],
+              nodes: [leaf('juice', [11, 4]), leaf('fruit', [11, 6]), skinned('composite', node('joinMini', 'Tray', [13.5, 5], { type: 'join' }, { codeRef: 'Tray#collect' }))],
               wires: [wire('mini', 'juice'), wire('mini', 'fruit'), wire('juice', 'joinMini'), wire('fruit', 'joinMini'), wire('joinMini', 'tray')],
             },
           },
@@ -97,17 +87,15 @@ export default defineLevel({
         strategy: {
           outcome: 'misfit',
           code: 'combo_strategy',
-          note: { title: 'Strategy no recursa', body: 'Una estrategia por tipo de ítem sigue sin saber qué hacer con un combo dentro de otro.' },
           patch: { update: [{ id: 'mini', behavior: { type: 'slot' }, codeRef: 'ComboStrategy', skin: 'strategy' }] },
         },
         facade: {
           outcome: 'misfit',
           code: 'combo_facade',
-          note: { title: 'Facade no cambia lo que hay detrás', body: 'Una ventanilla única para pedir combos simplifica la entrada, pero la cocina de atrás sigue sin desarmar el combo anidado.' },
           patch: {
             removeWires: ['kitchen.combo->unpack'],
             add: {
-              nodes: [skinned('facade', node('desk', 'Ventanilla', 'ComboDesk', [4.5, 4.5], { type: 'pass' }, { codeRef: 'ComboDesk' }))],
+              nodes: [skinned('facade', node('desk', 'ComboDesk', [4.5, 4.5], { type: 'pass' }, { codeRef: 'ComboDesk' }))],
               wires: [wire('kitchen', 'desk', { port: 'combo' }), wire('desk', 'unpack')],
             },
           },
@@ -117,22 +105,17 @@ export default defineLevel({
     {
       id: 'extras',
       at: 'coffee',
-      label: 'Extras',
       code: 'extras_base',
       inventory: ['decorator', 'adapter', 'singleton'],
       options: {
         decorator: {
           outcome: 'solves',
           code: 'extras_decorator',
-          note: {
-            title: 'Decorator apila los extras',
-            body: 'El café se envuelve con cada extra y sigue siendo una hoja más del combo. Composite organiza el árbol; Decorator enriquece una hoja sin que el árbol se entere.',
-          },
           patch: {
             remove: ['withOat', 'withShot'],
             update: [{ id: 'coffee', behavior: { type: 'pass' }, className: 'Latte', skin: 'composite' }],
             add: {
-              nodes: [wrapper('wOat', 'Con avena', 'WithOatMilk', -1, 'oat'), wrapper('wShot', 'Con shot', 'WithShot', 1, 'shot')],
+              nodes: [wrapper('wOat', 'WithOatMilk', -1, 'oat'), wrapper('wShot', 'WithShot', 1, 'shot')],
               wires: [abstract('coffee', 'wOat'), abstract('wOat', 'wShot'), abstract('wShot', 'coffeeReady')],
             },
           },
@@ -140,13 +123,11 @@ export default defineLevel({
         adapter: {
           outcome: 'misfit',
           code: 'extras_adapter',
-          note: { title: 'Adapter traduce, no compone', body: 'Adaptar el pedido al punto de venta viejo no hace que exista la combinación de dos extras.' },
           patch: { update: [{ id: 'coffee', skin: 'adapter' }] },
         },
         singleton: {
           outcome: 'misfit',
           code: 'extras_singleton',
-          note: { title: 'Singleton comparte, no combina', body: 'Un único menú compartido sigue eligiendo una sola subclase por café.' },
           patch: { update: [{ id: 'coffee', skin: 'singleton' }] },
         },
       },
@@ -155,7 +136,7 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Café suelto', ['product']), pulse(40, 'Desayuno (café con avena)', ['combo', 'oat']), pulse(80, 'Desayuno (avena + shot)', ['combo', 'oat', 'shot'])],
+      pulses: [pulse(0, ['product']), pulse(40, ['combo', 'oat']), pulse(80, ['combo', 'oat', 'shot'])],
     },
   ],
   winWhen: [

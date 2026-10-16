@@ -170,7 +170,7 @@ describe('primitives with memory', () => {
     const s = Scenario.parse({ id: 's', pulses: [0, 150, 300, 450].map((at) => ({ at, from: 'src' })) })
     const { sim } = runToEnd(createSim(c, s))
     expect(sim.state.metrics).toMatchObject({ delivered: 4, dropped: 0 })
-    expect(sim.state.nodeState.b).toBe('abierto')
+    expect(sim.state.nodeState.b).toBe('open')
     expect(sim.state.pulses.map((p) => p.trail.includes('svc'))).toEqual([true, true, false, false])
   })
 })

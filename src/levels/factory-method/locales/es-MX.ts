@@ -1,0 +1,35 @@
+import type en from './en'
+
+const texts: Record<keyof typeof en, string> = {
+  title: 'Dos sucursales, dos menús',
+  'brief.problem': 'El flujo de pedidos que comparten todas las sucursales decide con if qué bebida crear. Abrimos Montaña y le llegan lattes en vez de chocolate.',
+  'brief.goal': 'Que cada sucursal reciba su bebida y que abrir otra no obligue a tocar el flujo compartido.',
+  'node.create': 'Crear bebida',
+  'node.frappe': 'Frappé',
+  'node.latte': 'Latte',
+  'socket.create-drink': 'Crear bebida',
+  'option.create-drink.factory-method.title': 'Factory Method: cada subclase decide qué crear',
+  'option.create-drink.factory-method.body': 'El flujo de tomar pedidos es uno solo y llama a create_drink. Cada sucursal es una subclase con su propio molde: el flujo compartido ya no conoce ninguna bebida concreta.',
+  'option.create-drink.singleton.title': 'Singleton: una sola instancia para todos',
+  'option.create-drink.singleton.body': 'Singleton solo garantiza que exista una única fábrica; no aporta nada a este problema. Lo que tenía que variar por sucursal era qué se crea, y la fábrica única sigue decidiendo igual para todas.',
+  'option.create-drink.builder.title': 'Builder arma, no elige la clase',
+  'option.create-drink.builder.body': 'Builder sirve para armar un objeto con muchas partes. Aquí el problema no era cuántas piezas tiene la bebida sino qué bebida crear: el if del flujo compartido sigue decidiendo mal.',
+  'ticket.harbor-branch': 'Abre la sucursal Puerto: solo vende té helado.',
+  'scenario.main.0': 'Centro',
+  'scenario.main.1': 'Playa',
+  'scenario.main.2': 'Montaña',
+  'scenario.with-harbor.0': 'Centro',
+  'scenario.with-harbor.1': 'Playa',
+  'scenario.with-harbor.2': 'Montaña',
+  'scenario.with-harbor.3': 'Puerto',
+  'node.downtownBranch': 'Centro',
+  'node.beachBranch': 'Playa',
+  'node.mountainBranch': 'Montaña',
+  'option.create-drink.factory-method.label.create': 'Sucursal',
+  'option.create-drink.singleton.label.create': 'Fábrica única',
+  'node.bTemp': 'Temperatura',
+  'node.tea': 'Té helado',
+  'node.harborBranch': 'Puerto',
+}
+
+export default texts

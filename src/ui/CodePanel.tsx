@@ -15,12 +15,12 @@ export function CodePanel({ session }: { session: GameSession }) {
   return (
     <aside className="code-panel">
       {comparing && (
-        <div className="code-tabs" role="tablist" aria-label={t('Vista del código')}>
+        <div className="code-tabs" role="tablist" aria-label={t('ui.code.view')}>
           <button role="tab" aria-selected={!showDiff} className={showDiff ? '' : 'on'} onClick={() => setView('code')}>
-            {t('Código')}
+            {t('ui.code.tabCode')}
           </button>
           <button role="tab" aria-selected={showDiff} className={showDiff ? 'on' : ''} onClick={() => setView('diff')}>
-            {t('Cambios')}
+            {t('ui.code.tabChanges')}
           </button>
         </div>
       )}
@@ -43,12 +43,12 @@ function CodeDiff({ session }: { session: GameSession }) {
           <b className="add">+{change.added}</b> <b className="del">−{change.removed}</b>
         </span>
       </div>
-      <div className="code-body diff" tabIndex={0} aria-label={t(msg('{title}: {added} líneas agregadas, {removed} quitadas', { title: t(change.title), added: change.added, removed: change.removed }))}>
+      <div className="code-body diff" tabIndex={0} aria-label={t(msg('ui.code.diffLabel', { title: t(change.title), added: change.added, removed: change.removed }))}>
         {collapse(change.lines).map((c, i) =>
           c.kind === 'skip' ? (
             <div key={i} className="line skip">
               <span className="ln">⋯</span>
-              <span>{t(msg('{count} líneas sin cambios', { count: c.count }))}</span>
+              <span>{t(msg('ui.code.unchanged', { count: c.count }))}</span>
             </div>
           ) : (
             <div key={i} className={`line ${c.kind}`}>
@@ -58,7 +58,7 @@ function CodeDiff({ session }: { session: GameSession }) {
           ),
         )}
       </div>
-      <div className="code-foot">{t('Verde: líneas nuevas. Rojo: líneas que hubo que quitar o cambiar. Mira en qué clases caen.')}</div>
+      <div className="code-foot">{t('ui.code.diffFoot')}</div>
     </>
   )
 }
@@ -90,7 +90,7 @@ function CodeView({ session }: { session: GameSession }) {
     body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
   }, [region?.start, file.text])
 
-  const source = followed !== undefined && activeRef ? t(msg('pulso #{id}', { id: followed })) : inspected ? t(msg('nodo · {label}', { label: inspected })) : undefined
+  const source = followed !== undefined && activeRef ? t(msg('ui.code.pulse', { id: followed })) : inspected ? t(msg('ui.code.node', { label: inspected })) : undefined
 
   return (
     <>
@@ -104,7 +104,7 @@ function CodeView({ session }: { session: GameSession }) {
           </span>
         )}
       </div>
-      <div className="code-body" ref={body} tabIndex={0} aria-label={t(lang === 'rb' ? 'Código Ruby del circuito' : 'Código TypeScript del circuito')}>
+      <div className="code-body" ref={body} tabIndex={0} aria-label={t(lang === 'rb' ? 'ui.code.labelRuby' : 'ui.code.labelTypeScript')}>
         {tokens.map((line, i) => {
           const on = !!region && i + 1 >= region.start && i + 1 <= region.end
           return (
@@ -123,7 +123,7 @@ function CodeView({ session }: { session: GameSession }) {
           )
         })}
       </div>
-      <div className="code-foot">{t('Haz clic en un nodo o en un pulso para seguir su código.')}</div>
+      <div className="code-foot">{t('ui.code.footHint')}</div>
     </>
   )
 }
@@ -137,7 +137,7 @@ function LangSwitch({ session }: { session: GameSession }) {
   const langs = session.availableCodeLangs
   if (langs.length < 2) return null
   return (
-    <span className="lang-switch" role="group" aria-label={t('Lenguaje del código')}>
+    <span className="lang-switch" role="group" aria-label={t('ui.code.language')}>
       {langs.map((lang) => (
         <button key={lang} className={lang === shown ? 'on' : ''} aria-pressed={lang === shown} onClick={() => session.setCodeLang(lang)}>
           {LANG_NAME[lang]}

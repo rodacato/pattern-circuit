@@ -44,25 +44,25 @@ export function Review({ session, levels, onClose }: { session: GameSession; lev
       <aside className="notebook review card" role="dialog" aria-modal="true" aria-labelledby="review-title" onClick={(e) => e.stopPropagation()}>
         <header>
           <div>
-            <span className="eyebrow">{t('Repaso')}</span>
-            <h2 id="review-title">{done ? t('Ronda terminada') : t(msg('Pregunta {i} de {n}', { i: index + 1, n: round.length }))}</h2>
+            <span className="eyebrow">{t('ui.review.eyebrow')}</span>
+            <h2 id="review-title">{done ? t('ui.review.done') : t(msg('ui.review.question', { i: index + 1, n: round.length }))}</h2>
           </div>
-          <button ref={closeButton} className="close" onClick={onClose} aria-label={t('Cerrar repaso')}>
+          <button ref={closeButton} className="close" onClick={onClose} aria-label={t('ui.review.close')}>
             ×
           </button>
         </header>
-        {round.length === 0 && <p className="muted">{t('Nada pendiente. Los problemas de los niveles que completes vuelven aquí para repasarlos cada vez más espaciados.')}</p>}
+        {round.length === 0 && <p className="muted">{t('ui.review.empty')}</p>}
         {done && round.length > 0 && (
-          <p>{t(msg('Acertaste {right} de {n}. Los que fallaste vuelven en la próxima ronda; los que acertaste, dentro de unos días.', { right, n: round.length }))}</p>
+          <p>{t(msg('ui.review.summary', { right, n: round.length }))}</p>
         )}
         {q && <QuestionView question={q} picked={picked} onPick={pick} />}
         <div className="actions">
           {q && picked && (
             <button className="primary" onClick={next}>
-              {t(index + 1 < round.length ? 'Siguiente →' : 'Ver resultado')}
+              {t(index + 1 < round.length ? 'ui.review.next' : 'ui.review.result')}
             </button>
           )}
-          {(done || round.length === 0) && <button onClick={onClose}>{t('Volver al juego')}</button>}
+          {(done || round.length === 0) && <button onClick={onClose}>{t('ui.review.back')}</button>}
         </div>
       </aside>
     </div>
@@ -75,11 +75,11 @@ function QuestionView({ question: { item, choices }, picked, onPick }: { questio
   return (
     <section className="review-question" aria-live="polite">
       <span className="where">
-        {t(msg('Nivel {n} · {title}', { n: item.level.order, title: item.level.title }))}
-        {item.multiSocket && ` · socket "${t(item.socket.label)}"`}
+        {t(msg('ui.common.levelTitle', { n: item.level.order, title: item.level.title }))}
+        {item.multiSocket && ` · ${t(msg('ui.review.socket', { label: item.socket.label }))}`}
       </span>
       <p className="problem">{t(item.level.brief.problem)}</p>
-      <p className="muted">{t('¿Qué patrón enchufarías?')}</p>
+      <p className="muted">{t('ui.review.prompt')}</p>
       <div className="choices">
         {choices.map((p) => (
           <button
@@ -95,7 +95,7 @@ function QuestionView({ question: { item, choices }, picked, onPick }: { questio
       </div>
       {option && (
         <article className={`note ${option.outcome}`}>
-          <span className="where">{picked === item.answer ? `✓ ${t('Correcto')}` : `✗ ${t(msg('La respuesta era {pattern}', { pattern: PATTERNS[item.answer].name }))}`}</span>
+          <span className="where">{picked === item.answer ? `✓ ${t('ui.review.correct')}` : `✗ ${t(msg('ui.review.answer', { pattern: PATTERNS[item.answer].name }))}`}</span>
           <strong>{t(option.note.title)}</strong>
           <p>{t(option.note.body)}</p>
         </article>

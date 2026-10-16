@@ -1,0 +1,36 @@
+import type en from './en'
+
+const texts: Record<keyof typeof en, string> = {
+  title: 'Mil pantallas, un mostrador',
+  'brief.problem': 'Las pantallas de la cafetería preguntan sin parar por los pedidos, y el mostrador registra pedidos nuevos. Todos usan el mismo modelo, que atiende de a uno: las lecturas hacen fila con las escrituras.',
+  'brief.goal': 'Que leer no bloquee a escribir: que la fila en cualquier nodo no pase de tres.',
+  'node.displays': 'Pantallas',
+  'node.store': 'Modelo de pedidos',
+  'node.board': 'Tablero',
+  'node.board.message': '📺 tablero actualizado',
+  'node.registered': 'Registrado',
+  'node.registered.message': '✔ registrado',
+  'socket.model': 'Modelo',
+  'option.model.cqrs.title': 'CQRS: escribir y leer por caminos separados',
+  'option.model.cqrs.body': 'El lado de escritura valida y guarda, de a uno. Cada cambio actualiza una proyección: una vista ya lista para leer. Las pantallas consultan esa vista, que responde rápido y sin fila. A cambio, la vista puede ir un instante detrás de la escritura.',
+  'option.model.singleton.title': 'Una instancia, la misma fila',
+  'option.model.singleton.body': 'Compartir una única instancia del modelo no cambia que lecturas y escrituras esperen en la misma fila.',
+  'option.model.facade.title': 'Facade no separa caminos',
+  'option.model.facade.body': 'Una ventanilla única delante del modelo es otra puerta hacia la misma fila.',
+  'scenario.main.0': 'Ver pedidos',
+  'scenario.main.1': 'Ver pedidos',
+  'scenario.main.2': 'Ver pedidos',
+  'scenario.main.3': 'Ver pedidos',
+  'scenario.main.4': 'Ver pedidos',
+  'scenario.main.5': 'Ver pedidos',
+  'scenario.main.6': 'Ver pedidos',
+  'scenario.main.7': 'Ver pedidos',
+  'scenario.main.8': 'Pedido nuevo 1',
+  'scenario.main.9': 'Pedido nuevo 2',
+  'scenario.main.10': 'Pedido nuevo 3',
+  'node.commands': 'Escritura',
+  'node.projection': 'Proyección',
+  'node.view': 'Vista de lectura',
+}
+
+export default texts

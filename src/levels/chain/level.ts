@@ -17,34 +17,29 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const handler = (id: string, label: string, className: string, at: [number, number], amount: string): NodeInput =>
-  skinned('chain-of-responsibility', node(id, label, className, at, { type: 'guard', require: { hasTag: `amount:${amount}` }, onFail: 'next' }, { codeRef: `${className}#handle` }))
+const handler = (id: string, className: string, at: [number, number], amount: string): NodeInput =>
+  skinned('chain-of-responsibility', node(id, className, at, { type: 'guard', require: { hasTag: `amount:${amount}` }, onFail: 'next' }, { codeRef: `${className}#handle` }))
 const next = (from: string, to: string) => ({ ...abstract(from, to), port: 'next' })
 
 const requests = [
-  pulse(0, '$50', ['amount:low']),
-  pulse(40, '$300', ['amount:medium']),
-  pulse(80, '$1500', ['amount:high']),
-  pulse(120, '$9000', ['amount:huge']),
+  pulse(0, ['amount:low']),
+  pulse(40, ['amount:medium']),
+  pulse(80, ['amount:high']),
+  pulse(120, ['amount:huge']),
 ]
 
 export default defineLevel({
   id: 'chain',
   order: 12,
   chapter: 'rush-hour',
-  title: 'Reembolsos',
   targetPattern: 'chain-of-responsibility',
-  brief: {
-    problem: 'El cajero decide con ifs quién aprueba cada reembolso: él, el gerente o el dueño. Nadie previó los montos enormes y esos pedidos se pierden sin respuesta.',
-    goal: 'Que cada reembolso lo atienda quien pueda (o se rechace con aviso) y que sumar un aprobador no obligue a tocar al cajero.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('cashier', 'Cajero', 'Cashier', [3, 2], { type: 'branch', cases: { 'amount:low': 'ok', 'amount:medium': 'manager', 'amount:high': 'owner' } }, { codeRef: 'Cashier#refund' }),
-      node('manager', 'Gerente', 'Manager', [6, 2], { type: 'pass' }, { codeRef: 'Manager#approve' }),
-      node('owner', 'Dueño', 'Owner', [10, 2], { type: 'pass' }, { codeRef: 'Owner#approve' }),
-      node('refund', 'Reembolsar', 'Refunds', [8, 5], { type: 'sink', message: '💸 reembolsado' }, { codeRef: 'Refunds#pay' }),
+      actor('customer', [0, 2]),
+      node('cashier', 'Cashier', [3, 2], { type: 'branch', cases: { 'amount:low': 'ok', 'amount:medium': 'manager', 'amount:high': 'owner' } }, { codeRef: 'Cashier#refund' }),
+      node('manager', 'Manager', [6, 2], { type: 'pass' }, { codeRef: 'Manager#approve' }),
+      node('owner', 'Owner', [10, 2], { type: 'pass' }, { codeRef: 'Owner#approve' }),
+      node('refund', 'Refunds', [8, 5], { type: 'sink', message: '' }, { codeRef: 'Refunds#pay' }),
     ],
     wires: [
       wire('customer', 'cashier'),
@@ -59,24 +54,19 @@ export default defineLevel({
     {
       id: 'approval',
       at: 'cashier',
-      label: 'Aprobación',
       inventory: ['chain-of-responsibility', 'strategy', 'observer'],
       options: {
         'chain-of-responsibility': {
           outcome: 'solves',
           code: 'chain',
-          note: {
-            title: 'Chain of Responsibility: de mano en mano',
-            body: 'Cada eslabón revisa la petición: si puede, la atiende; si no, la pasa al siguiente. El cajero ya no conoce a todos los aprobadores, y lo que nadie puede atender llega al final de la cadena y se rechaza con aviso.',
-          },
           patch: {
             remove: ['cashier', 'manager', 'owner'],
             add: {
               nodes: [
-                handler('cashier', 'Cajero', 'Cashier', [3, 2], 'low'),
-                handler('manager', 'Gerente', 'Manager', [6, 2], 'medium'),
-                handler('owner', 'Dueño', 'Owner', [10, 2], 'high'),
-                node('declined', 'No procede', 'Refunds', [13, 2], { type: 'sink', message: '✋ rechazado con aviso' }, { codeRef: 'Refunds#decline' }),
+                handler('cashier', 'Cashier', [3, 2], 'low'),
+                handler('manager', 'Manager', [6, 2], 'medium'),
+                handler('owner', 'Owner', [10, 2], 'high'),
+                node('declined', 'Refunds', [13, 2], { type: 'sink', message: '' }, { codeRef: 'Refunds#decline' }),
               ],
               wires: [
                 wire('customer', 'cashier'),
@@ -93,10 +83,6 @@ export default defineLevel({
         strategy: {
           outcome: 'partial',
           code: 'strategy',
-          note: {
-            title: 'Strategy funciona si conoces todas las categorías',
-            body: 'Elegir el aprobador por categoría reparte bien los casos conocidos, pero exige saber de antemano quién decide cada uno. En la cadena, cada eslabón decide si lo toma, y siempre hay un final que responde.',
-          },
           patch: {
             removeWires: ['cashier.ok->refund', 'cashier.manager->manager', 'cashier.owner->owner'],
             update: [{ id: 'cashier', behavior: { type: 'slot' }, skin: 'strategy' }],
@@ -106,10 +92,6 @@ export default defineLevel({
         observer: {
           outcome: 'misfit',
           code: 'observer',
-          note: {
-            title: 'Observer avisa a todos: todos aprueban',
-            body: 'Si el cajero difunde la petición a todos los aprobadores, cada uno la aprueba por su lado y el reembolso se paga varias veces.',
-          },
           patch: {
             removeWires: ['cashier.ok->refund', 'cashier.manager->manager', 'cashier.owner->owner'],
             update: [{ id: 'cashier', behavior: { type: 'broadcast' }, skin: 'observer' }],
@@ -121,24 +103,23 @@ export default defineLevel({
   ],
   scenarios: [
     { id: 'main', pulses: requests },
-    { id: 'with-supervisor', pulses: [...requests, pulse(160, '$800', ['amount:medium-high'])] },
+    { id: 'with-supervisor', pulses: [...requests, pulse(160, ['amount:medium-high'])] },
   ],
   changeTickets: [
     {
       id: 'supervisor',
-      text: 'Nuevo rol: un supervisor aprueba los reembolsos medianos-altos.',
       scenario: 'with-supervisor',
       without: {
         update: [{ id: 'cashier', behavior: { type: 'branch', cases: { 'amount:low': 'ok', 'amount:medium': 'manager', 'amount:medium-high': 'supervisor', 'amount:high': 'owner' } } }],
         add: {
-          nodes: [node('supervisor', 'Supervisor', 'Supervisor', [8, 0], { type: 'pass' }, { codeRef: 'Supervisor#approve' })],
+          nodes: [node('supervisor', 'Supervisor', [8, 0], { type: 'pass' }, { codeRef: 'Supervisor#approve' })],
           wires: [wire('cashier', 'supervisor', { port: 'supervisor' }), wire('supervisor', 'refund')],
         },
       },
       with: {
         removeWires: ['manager.next->owner'],
         add: {
-          nodes: [handler('supervisor', 'Supervisor', 'Supervisor', [8, 0], 'medium-high')],
+          nodes: [handler('supervisor', 'Supervisor', [8, 0], 'medium-high')],
           wires: [next('manager', 'supervisor'), next('supervisor', 'owner'), wire('supervisor', 'refund')],
         },
       },

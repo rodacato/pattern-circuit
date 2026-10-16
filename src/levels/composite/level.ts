@@ -13,29 +13,24 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const leaf = (id: string, label: string, at: [number, number]) => skinned('composite', node(id, label, 'Product', at, { type: 'pass' }, { codeRef: 'Product#make' }))
+const leaf = (id: string, at: [number, number]) => skinned('composite', node(id, 'Product', at, { type: 'pass' }, { codeRef: 'Product#make' }))
 
 export default defineLevel({
   id: 'composite',
   order: 7,
   chapter: 'bar',
-  title: 'Combos dentro de combos',
   targetPattern: 'composite',
-  brief: {
-    problem: 'El Desayuno trae café, pan y un Mini combo (jugo + fruta). La cocina pregunta "¿es producto o combo?" y solo sabe desarmar un nivel: el mini combo se pierde y la bandeja nunca se completa.',
-    goal: 'Que la cocina prepare igual un producto suelto que un combo, tenga los niveles que tenga.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('kitchen', 'Cocina', 'Kitchen', [3, 2], { type: 'branch', cases: { product: 'direct', combo: 'combo' } }, { codeRef: 'Kitchen#prepare' }),
-      node('unpack', 'Desayuno', 'Combo', [6, 2], { type: 'broadcast' }, { codeRef: 'Combo#items' }),
-      node('coffee', 'Café', 'Product', [9, 0], { type: 'pass' }, { codeRef: 'Product#make' }),
-      node('bread', 'Pan', 'Product', [9, 2], { type: 'pass' }, { codeRef: 'Product#make' }),
-      node('mini', 'Mini combo', 'Combo', [9, 4], { type: 'branch', cases: {} }, { codeRef: 'Combo' }),
-      node('tray', 'Juntar', 'Tray', [13, 2], { type: 'join' }, { codeRef: 'Tray#collect' }),
-      node('serve', 'Servir', 'Tray', [16, 2], { type: 'pass' }, { codeRef: 'Tray#serve' }),
-      node('handOver', 'Entregar', 'Counter', [19, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('kitchen', 'Kitchen', [3, 2], { type: 'branch', cases: { product: 'direct', combo: 'combo' } }, { codeRef: 'Kitchen#prepare' }),
+      node('unpack', 'Combo', [6, 2], { type: 'broadcast' }, { codeRef: 'Combo#items' }),
+      node('coffee', 'Product', [9, 0], { type: 'pass' }, { codeRef: 'Product#make' }),
+      node('bread', 'Product', [9, 2], { type: 'pass' }, { codeRef: 'Product#make' }),
+      node('mini', 'Combo', [9, 4], { type: 'branch', cases: {} }, { codeRef: 'Combo' }),
+      node('tray', 'Tray', [13, 2], { type: 'join' }, { codeRef: 'Tray#collect' }),
+      node('serve', 'Tray', [16, 2], { type: 'pass' }, { codeRef: 'Tray#serve' }),
+      node('handOver', 'Counter', [19, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [
       wire('customer', 'kitchen'),
@@ -55,16 +50,11 @@ export default defineLevel({
     {
       id: 'combo',
       at: 'unpack',
-      label: 'Combos',
       inventory: ['composite', 'decorator', 'strategy'],
       options: {
         composite: {
           outcome: 'solves',
           code: 'composite',
-          note: {
-            title: 'Composite: la hoja y el grupo se tratan igual',
-            body: 'Producto y Combo responden al mismo mensaje. Un combo reparte el trabajo entre sus partes y junta lo que le devuelven, sin importar si esas partes son productos u otros combos.',
-          },
           patch: {
             removeWires: ['mini->tray'],
             update: [
@@ -75,9 +65,9 @@ export default defineLevel({
             ],
             add: {
               nodes: [
-                leaf('juice', 'Jugo', [11, 4]),
-                leaf('fruit', 'Fruta', [11, 6]),
-                skinned('composite', node('joinMini', 'Juntar', 'Tray', [13, 5], { type: 'join' }, { codeRef: 'Tray#collect' })),
+                leaf('juice', [11, 4]),
+                leaf('fruit', [11, 6]),
+                skinned('composite', node('joinMini', 'Tray', [13, 5], { type: 'join' }, { codeRef: 'Tray#collect' })),
               ],
               wires: [wire('mini', 'juice'), wire('mini', 'fruit'), wire('juice', 'joinMini'), wire('fruit', 'joinMini'), wire('joinMini', 'tray')],
             },
@@ -86,14 +76,10 @@ export default defineLevel({
         decorator: {
           outcome: 'misfit',
           code: 'decorator',
-          note: {
-            title: 'Decorator envuelve, no desarma',
-            body: 'Envolver el mini combo le añade algo por fuera, pero la cocina sigue sin saber qué hacer con un combo dentro de otro.',
-          },
           patch: {
             removeWires: ['unpack->mini'],
             add: {
-              nodes: [skinned('decorator', node('wrapped', 'Envuelto', 'GiftWrapped', [7, 5], { type: 'transform', addTags: ['wrapped'] }))],
+              nodes: [skinned('decorator', node('wrapped', 'GiftWrapped', [7, 5], { type: 'transform', addTags: ['wrapped'] }))],
               wires: [wire('unpack', 'wrapped'), wire('wrapped', 'mini')],
             },
           },
@@ -101,16 +87,12 @@ export default defineLevel({
         strategy: {
           outcome: 'misfit',
           code: 'strategy',
-          note: {
-            title: 'Strategy elige cómo, pero no recursa',
-            body: 'Una estrategia por tipo de ítem sigue siendo un "si es combo, haz esto". Ninguna estrategia sabe que un combo puede traer otro adentro.',
-          },
           patch: { update: [{ id: 'mini', behavior: { type: 'slot' }, codeRef: 'ComboStrategy', skin: 'strategy' }] },
         },
       },
     },
   ],
-  scenarios: [{ id: 'main', pulses: [pulse(0, 'Café suelto', ['product']), pulse(40, 'Desayuno', ['combo'])] }],
+  scenarios: [{ id: 'main', pulses: [pulse(0, ['product']), pulse(40, ['combo'])] }],
   winWhen: [
     { metric: 'delivered', op: '==', value: 2 },
     { metric: 'dropped', op: '==', value: 0 },

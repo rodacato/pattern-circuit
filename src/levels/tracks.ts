@@ -1,23 +1,16 @@
 // A track is its own path: its chapters, in order, and its levels numbered from 0.
 // Today there is one. A new track that can be told as a circuit (e.g. whole systems with CQRS,
 // events or microservices) is just content: its chapters here and its levels in `levels/`.
+// `name` and the chapter values are text keys (see `locales/` next to this file).
 export type Track = { id: string; name: string; chapters: Record<string, string> }
+
+const chapter = (id: string) => `levels.shared.chapter.${id}`
 
 export const TRACKS: Track[] = [
   {
     id: 'patterns',
-    name: 'Patrones de diseño',
-    chapters: {
-      opening: 'Apertura',
-      counter: 'El mostrador',
-      bar: 'La barra crece',
-      'rush-hour': 'Hora pico',
-      'all-together': 'Todo junto',
-      architecture: 'Arquitectura',
-      resilience: 'Resiliencia',
-      judgment: 'Criterio: cuándo no',
-      final: 'La cafetería completa',
-    },
+    name: 'levels.shared.track.patterns',
+    chapters: Object.fromEntries(['opening', 'counter', 'bar', 'rush-hour', 'all-together', 'architecture', 'resilience', 'judgment', 'final'].map((id) => [id, chapter(id)])),
   },
 ]
 

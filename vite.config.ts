@@ -21,6 +21,7 @@ export default defineConfig({
       // can be computed lives in layout.ts and motion.ts, which are measured) and the entry points.
       exclude: [
         'src/levels/*/**',
+        'src/i18n/locales/**',
         'src/render/{NeonStage,PulseLayer,SocketLayer,draw,fx,theme}.ts',
         'src/render/skins/**',
         'src/debug/**',

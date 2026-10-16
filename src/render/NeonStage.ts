@@ -1,5 +1,5 @@
 import { Application, BlurFilter, Container, FederatedPointerEvent, Graphics, Rectangle, Text } from 'pixi.js'
-import { initialNodeState, pointAt, timesDelivered, wirePath, type NodeDef, type PatternId, type Point, type SimEvent } from '../engine'
+import { initialNodeState, pointAt, stateTextKey, timesDelivered, wirePath, type NodeDef, type PatternId, type Point, type SimEvent } from '../engine'
 import type { GameSession } from '../game/session/GameSession'
 import { msg, N, type Translate } from '../i18n'
 import { dashed, drawBranchGlyph, label } from './draw'
@@ -169,7 +169,7 @@ export class NeonStage {
     const title = label(this.t(n.label), 13, C.text, FONT_UI, '600')
     title.anchor.set(0.5, 1)
     title.y = 3
-    const sub = label(n.className ?? (n.kind === 'actor' ? this.t('actor') : ''), 10, C.muted, FONT_MONO, '400')
+    const sub = label(n.className ?? (n.kind === 'actor' ? this.t('render.node.actor') : ''), 10, C.muted, FONT_MONO, '400')
     sub.anchor.set(0.5, 0)
     sub.y = 6
     box.addChild(title, sub)
@@ -273,10 +273,10 @@ export class NeonStage {
     const at = nodeCenter(target)
     if (result === 'repaired') {
       this.fx.burst(at, C.green, 30, 3)
-      this.fx.float(at, '¡conectado!', C.green)
+      this.fx.float(at, N('render.fx.connected'), C.green)
     } else if (result === 'wrong') {
       this.fx.burst(drag.to, C.red, 16, 2.4)
-      this.fx.float(at, 'ese cable no resuelve nada aquí', C.red)
+      this.fx.float(at, N('render.fx.uselessWire'), C.red)
     }
   }
 
@@ -299,14 +299,14 @@ export class NeonStage {
       case 'pulse.drop':
         this.fx.burst(at, C.red, 28, 3.4)
         this.motion.shake(e.nodeId, 1)
-        this.fx.float(at, msg('¡pedido perdido! · {reason}', { reason: DROP_TEXT[e.reason] }), C.red)
+        this.fx.float(at, msg('render.fx.orderLost', { reason: DROP_TEXT[e.reason] }), C.red)
         this.pulses.forget(e.pulseId)
         break
       case 'pulse.deliver': {
         const dup = timesDelivered(state, e.nodeId, pulse!.originId) > 1
         const tone = !e.valid ? C.red : dup ? C.amber : C.green
         const message = node.behavior.type === 'sink' ? node.behavior.message : undefined
-        const text = !e.valid ? INVALID_TEXT : dup ? N('¡cobrado otra vez!') : (message ?? msg('☕ {label} entregado', { label: pulse?.label ?? N('pedido') }))
+        const text = !e.valid ? INVALID_TEXT : dup ? N('render.fx.chargedAgain') : (message ?? msg('render.fx.delivered', { label: pulse?.label ?? N('render.pulse.order') }))
         this.fx.burst(at, tone, 20, 2.4)
         this.fx.float(at, text, tone)
         if (!e.valid) this.motion.shake(e.nodeId, 0.7)
@@ -406,7 +406,7 @@ export class NeonStage {
     if (!text) return
     const current = this.session.playback.timeline.current.state.nodeState[n.id] ?? initialNodeState(n.behavior)!
     const color = stateColor(current)
-    text.text = this.t(current)
+    text.text = this.t(stateTextKey(this.session.level.id, current))
     const w = text.width + 16
     d.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color })
     gl.roundRect(p.x - w / 2, p.y + h / 2 + 4, w, 18, 9).fill({ color, alpha: 0.5 })

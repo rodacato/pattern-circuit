@@ -78,7 +78,7 @@ describe('stateful primitives', () => {
 
   it('initial state: the machine starts at `initial` and the breaker closed', () => {
     expect(initialNodeState({ type: 'machine', initial: 'nuevo', states: {}, else: 'drop' })).toBe('nuevo')
-    expect(initialNodeState({ type: 'breaker', threshold: 1, failTag: 'x' })).toBe('cerrado')
+    expect(initialNodeState({ type: 'breaker', threshold: 1, failTag: 'x' })).toBe('closed')
     expect(initialNodeState({ type: 'pass' })).toBeUndefined()
   })
 })

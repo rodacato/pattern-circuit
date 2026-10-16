@@ -1,0 +1,21 @@
+// Level proxy: English texts, by key (the source of the typed keys).
+export default {
+  title: 'The warehouse is far away',
+  'brief.problem': 'Every order asks the remote warehouse whether there\'s stock. The warehouse is slow and serves one at a time: a huge line builds up, even though we almost always ask the same thing.',
+  'brief.goal': 'Keep the line at the warehouse to two queries at most, without changing whoever asks.',
+  'node.warehouse': 'Remote warehouse',
+  'socket.inventory': 'Inventory',
+  'option.inventory.proxy.title': 'Proxy: a stand-in that controls access',
+  'option.inventory.proxy.body': 'The proxy has the same interface as the warehouse, so whoever asks doesn\'t notice the change. It only goes to the warehouse when it doesn\'t know the answer; everything else bounces off the proxy without joining the line. The cost: the stored answer can go stale, so a real proxy gives it an expiration.',
+  'option.inventory.singleton.title': 'Singleton doesn\'t save trips',
+  'option.inventory.singleton.body': 'Having a single instance of the remote client doesn\'t change how many times the warehouse is queried. The line is just as long.',
+  'option.inventory.facade.title': 'Facade simplifies, it doesn\'t avoid the work',
+  'option.inventory.facade.body': 'Putting a single window in front of the warehouse doesn\'t reduce the queries: every order still reaches the warehouse.',
+  'scenario.main.0': 'coffee',
+  'scenario.main.1': 'milk',
+  'scenario.main.2': 'coffee',
+  'scenario.main.3': 'coffee',
+  'scenario.main.4': 'milk',
+  'scenario.main.5': 'coffee',
+  'node.proxy': 'Proxy',
+} as const

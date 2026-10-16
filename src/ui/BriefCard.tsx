@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { chapterName } from '../levels'
 import { stagesFor, type Stage } from '../game/flow/levelFlow'
 import type { GameSession } from '../game/session/GameSession'
-import { msg } from '../i18n'
+import { msg, N } from '../i18n'
+import type { AppKey } from '../i18n/keys'
 import { useT } from './i18nContext'
 import { useSession } from './useSession'
 
-// i18n
-const STAGE_LABEL: Record<Exclude<Stage, 'complete'>, string> = {
-  observe: 'Observar',
-  choose: 'Elegir patrón',
-  change: 'Cambio',
-  compare: 'Comparar',
+const STAGE_LABEL: Record<Exclude<Stage, 'complete'>, AppKey> = {
+  observe: N('ui.brief.stage.observe'),
+  choose: N('ui.brief.stage.choose'),
+  change: N('ui.brief.stage.change'),
+  compare: N('ui.brief.stage.compare'),
 }
 
 export function BriefCard({ session }: { session: GameSession }) {
@@ -28,7 +28,7 @@ export function BriefCard({ session }: { session: GameSession }) {
     <div className={`brief card${open ? '' : ' closed'}`}>
       <button className="brief-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="eyebrow">
-          {t(msg('Nivel {n} · {chapter}', { n: level.order, chapter: chapterName(level.chapter) }))}
+          {t(msg('ui.brief.eyebrow', { n: level.order, chapter: chapterName(level.chapter) }))}
         </span>
         <span className="title">{t(level.title)}</span>
         {level.checklist.length > 0 && (
@@ -41,7 +41,7 @@ export function BriefCard({ session }: { session: GameSession }) {
         <>
           <p className="problem">{t(level.brief.problem)}</p>
           <p className="goal">
-            <strong>{t('Objetivo')}</strong> {t(level.brief.goal)}
+            <strong>{t('ui.brief.goal')}</strong> {t(level.brief.goal)}
           </p>
           {level.checklist.length > 0 && (
             <ul className="checklist">

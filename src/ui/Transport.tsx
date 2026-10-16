@@ -11,22 +11,22 @@ export function Transport({ session }: { session: GameSession }) {
   const tick = useSession(session, (s) => s.playback.timeline.tick)
 
   return (
-    <div className="transport" role="toolbar" aria-label={t('Reproducción')}>
-      <button title={t('Reiniciar (R)')} aria-label={t('Reiniciar')} onClick={() => session.reset()}>
+    <div className="transport" role="toolbar" aria-label={t('ui.transport.label')}>
+      <button title={t('ui.transport.restart.title')} aria-label={t('ui.transport.restart.label')} onClick={() => session.reset()}>
         ↺
       </button>
-      <button title={t('Paso atrás (←)')} aria-label={t('Paso atrás')} onClick={() => session.back()} disabled={tick === 0}>
+      <button title={t('ui.transport.back.title')} aria-label={t('ui.transport.back.label')} onClick={() => session.back()} disabled={tick === 0}>
         ◀︎
       </button>
-      <button className="play" title={t('Reproducir / pausa (espacio)')} aria-label={t(playing ? 'Pausa' : 'Reproducir')} onClick={() => session.toggle()}>
+      <button className="play" title={t('ui.transport.play.title')} aria-label={t(playing ? 'ui.transport.pause' : 'ui.transport.play')} onClick={() => session.toggle()}>
         {playing ? '❚❚' : '▶︎'}
       </button>
-      <button title={t('Paso adelante (→)')} aria-label={t('Paso adelante')} onClick={() => session.step()}>
+      <button title={t('ui.transport.forward.title')} aria-label={t('ui.transport.forward.label')} onClick={() => session.step()}>
         ▶︎|
       </button>
       <span className="sep" />
       {SPEEDS.map((s) => (
-        <button key={s} className={`speed${s === speed ? ' on' : ''}`} aria-pressed={s === speed} aria-label={t(msg('Velocidad {s}×', { s }))} onClick={() => session.setSpeed(s)}>
+        <button key={s} className={`speed${s === speed ? ' on' : ''}`} aria-pressed={s === speed} aria-label={t(msg('ui.transport.speed', { s }))} onClick={() => session.setSpeed(s)}>
           {s}×
         </button>
       ))}

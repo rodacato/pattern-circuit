@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
-import { identity } from '../../i18n'
+import { createTranslator } from '../../i18n'
+import { APP_CATALOGS } from '../../i18n/registry'
 import { LEVELS } from '../../levels'
 import { emptyProgress, MemoryProgressStore } from '../progress/progress'
 import { GameSession } from './GameSession'
+
+const es = createTranslator([APP_CATALOGS['es-MX']])
 
 const session = (id: string, store = new MemoryProgressStore()) => new GameSession(LEVELS.find((l) => l.id === id)!, store)
 
@@ -215,12 +218,12 @@ describe('GameSession · code changes', () => {
     s.showSide('without')
     const added = s.codeChange!.lines.filter((l) => l.kind === 'add').map((l) => l.text.trim())
     expect(added.some((l) => l.startsWith('elsif order.payment == :app'))).toBe(true) // a new branch inside Cashier
-    expect(identity(s.codeChange!.title)).toContain('sin patrón')
+    expect(es(s.codeChange!.title)).toContain('sin patrón')
   })
 
   it('without a ticket it compares the code without pattern against the code with pattern', () => {
     const s = toCompare('builder')
-    expect(identity(s.codeChange!.title)).toContain('Builder')
+    expect(es(s.codeChange!.title)).toContain('Builder')
     expect(s.codeChange!.added + s.codeChange!.removed).toBeGreaterThan(0)
   })
 

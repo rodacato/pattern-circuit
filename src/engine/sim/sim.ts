@@ -49,8 +49,8 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
   }
 }
 
-export const BREAKER_OPEN = 'abierto'
-const BREAKER_CLOSED = 'cerrado'
+export const BREAKER_OPEN = 'open'
+const BREAKER_CLOSED = 'closed'
 
 // State a stateful node (machine or breaker) starts with, before receiving pulses.
 export function initialNodeState(behavior: Behavior): string | undefined {

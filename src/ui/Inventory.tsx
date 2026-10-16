@@ -3,18 +3,17 @@ import { FAMILY_NAMES, PATTERNS, type PatternId } from '../engine'
 import { noteKey } from '../game/progress/progress'
 import type { GameSession } from '../game/session/GameSession'
 import type { NeonStage } from '../render/NeonStage'
-import { msg } from '../i18n'
+import { msg, N } from '../i18n'
 import { useT } from './i18nContext'
 import { useSession } from './useSession'
 
 type Ghost = { pattern: PatternId; x: number; y: number; startX: number; startY: number; moved: boolean; over: boolean }
 
 const OUTCOME_MARK = { solves: '✓', partial: '≈', misfit: '✗' } as const
-// i18n
 const OUTCOME_TEXT = {
-  solves: 'resuelve',
-  partial: 'parcial',
-  misfit: 'no encaja',
+  solves: N('ui.inventory.outcome.solves'),
+  partial: N('ui.inventory.outcome.partial'),
+  misfit: N('ui.inventory.outcome.misfit'),
 } as const
 const DRAG_THRESHOLD = 6
 
@@ -76,18 +75,18 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
     if (!ghost) return
     dragged.current = ghost.moved
     const socketId = ghost.moved ? stage?.socketAtClient(e.clientX, e.clientY) : undefined
-    if (socketId && !session.plug(ghost.pattern, socketId)) warn(t(msg('{pattern} no va en ese socket', { pattern: PATTERNS[ghost.pattern].name })))
+    if (socketId && !session.plug(ghost.pattern, socketId)) warn(t(msg('ui.inventory.wrongSocket', { pattern: PATTERNS[ghost.pattern].name })))
     stage?.setDropHover(undefined)
     setGhost(undefined)
   }
 
   return (
     <>
-      <div className="inventory card" role="group" aria-label={t('Inventario de patrones')}>
+      <div className="inventory card" role="group" aria-label={t('ui.inventory.groupLabel')}>
         <div className="inventory-head">
-          <span className="eyebrow">{t('Inventario')}</span>
+          <span className="eyebrow">{t('ui.inventory.title')}</span>
           <span className={`hint${warning ? ' warning' : ''}`} role="status">
-            {warning ?? t(sockets.length > 1 ? 'Arrastra cada patrón a su socket ⬡' : 'Arrastra un patrón al socket ⬡')}
+            {warning ?? t(sockets.length > 1 ? 'ui.inventory.hintMany' : 'ui.inventory.hintOne')}
           </span>
         </div>
         <div className="cartridges">
@@ -105,7 +104,7 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
                 onPointerUp={onUp}
                 onClick={(e) => onClick(id, e.detail === 0)}
                 aria-pressed={plugged}
-                aria-label={`${t(info.name)}, ${t(FAMILY_NAMES[info.family])}${outcome ? `, ${t(msg('probado: {outcome}', { outcome: OUTCOME_TEXT[outcome] }))}` : ''}`}
+                aria-label={`${t(info.name)}, ${t(FAMILY_NAMES[info.family])}${outcome ? `, ${t(msg('ui.inventory.tried', { outcome: OUTCOME_TEXT[outcome] }))}` : ''}`}
                 title={t(info.gist)}
               >
                 <span className="stripe" />

@@ -1,3 +1,4 @@
+import { N } from '../../i18n'
 import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'
@@ -61,7 +62,7 @@ export function proxy(): Skin {
     onEvent({ fx }, _node, at, e) {
       if (e.type !== 'pulse.cache') return
       fx.ring(at, e.hit ? C.green : C.amber, e.hit ? 60 : 30)
-      if (e.hit) fx.float(at, '↩ desde el proxy', C.green)
+      if (e.hit) fx.float(at, N('render.skin.structural.fromProxy'), C.green)
     },
   }
 }

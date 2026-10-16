@@ -12,6 +12,7 @@ import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
 import { Review } from './Review'
 import { msg } from '../i18n'
+import { LOCALE_META, LOCALES, nextLocale } from '../i18n/registry'
 import { useLocale, useT } from './i18nContext'
 import { isShortcut, SHORTCUTS } from './shortcuts'
 import { Transport } from './Transport'
@@ -57,6 +58,7 @@ export default function GameApp() {
     }
   }, [codeLang])
   const { t, locale, setLocale } = useLocale()
+  const upcoming = nextLocale(locale)
   const host = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<NeonStage>()
   const [notebookOpen, setNotebookOpen] = useState(false)
@@ -104,18 +106,20 @@ export default function GameApp() {
           Pattern Circuit
         </div>
         <div className="topbar-actions">
-          <button className="notebook-button locale" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('Cambiar idioma')} lang={locale === 'es' ? 'en' : 'es'}>
-            {locale === 'es' ? 'EN' : 'ES'}
-          </button>
+          {LOCALES.length > 1 && (
+            <button className="notebook-button locale" onClick={() => setLocale(upcoming)} aria-label={t('ui.header.language')} lang={upcoming}>
+              {LOCALE_META[upcoming]?.short}
+            </button>
+          )}
           {reviewable > 0 && (
-            <button className="notebook-button" onClick={() => setReviewOpen(true)} aria-haspopup="dialog" title={t('Repasa problemas de niveles ya completados')}>
-              🧠 {t('Repasar')} <span aria-label={t(msg('{n} pendientes', { n: due }))}>{due}</span>
+            <button className="notebook-button" onClick={() => setReviewOpen(true)} aria-haspopup="dialog" title={t('ui.header.reviewHint')}>
+              🧠 {t('ui.header.review')} <span aria-label={t(msg('ui.header.reviewDue', { n: due }))}>{due}</span>
             </button>
           )}
           <button className="notebook-button" onClick={() => setNotebookOpen(true)} aria-haspopup="dialog">
-            📓 {t('Cuaderno')} <span aria-label={t(msg('{n} notas', { n: progress.notes.length }))}>{progress.notes.length}</span>
+            📓 {t('ui.header.notebook')} <span aria-label={t(msg('ui.header.notes', { n: progress.notes.length }))}>{progress.notes.length}</span>
           </button>
-          <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label={t('Nivel')}>
+          <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label={t('ui.header.level')}>
             {[...new Set(LEVELS.map((l) => l.chapter))].map((chapter) => (
               <optgroup key={chapter} label={TRACKS.length > 1 ? `${t(trackOf(chapter)?.name ?? '')} · ${t(chapterName(chapter))}` : t(chapterName(chapter))}>
                 {LEVELS.filter((l) => l.chapter === chapter).map((l) => (
@@ -132,7 +136,7 @@ export default function GameApp() {
 
       <main>
         <section className={`stage-wrap${inventoryOpen ? ' inventory-open' : ''}`}>
-          <div className="stage" ref={host} role="img" aria-label={t(msg('Circuito del nivel {n}: {title}', { n: session.level.order, title: session.level.title }))} />
+          <div className="stage" ref={host} role="img" aria-label={t(msg('ui.stage.circuit', { n: session.level.order, title: session.level.title }))} />
           <BriefCard key={session.level.id} session={session} />
           <StageCard key={`card-${session.level.id}`} session={session} onNext={next ? () => setLevelId(next.id) : undefined} />
           <Inventory session={session} stage={stage} />
@@ -144,7 +148,7 @@ export default function GameApp() {
 
       {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
       {reviewOpen && <Review session={session} levels={LEVELS} onClose={closeReview} />}
-      <p className="desktop-only">{t('Pattern Circuit necesita una pantalla más ancha: ábrelo en una tablet, una computadora o gira el teléfono.')}</p>
+      <p className="desktop-only">{t('ui.app.desktopOnly')}</p>
     </div>
   )
 }
@@ -154,16 +158,16 @@ function Legend() {
   return (
     <div className="legend">
       <span>
-        <i className="pulse" /> {t('pedido')}
+        <i className="pulse" /> {t('ui.legend.order')}
       </span>
       <span>
-        <i className="solid" /> {t('depende de una clase concreta')}
+        <i className="solid" /> {t('ui.legend.concrete')}
       </span>
       <span>
-        <i className="dashed" /> {t('depende de una interfaz')}
+        <i className="dashed" /> {t('ui.legend.interface')}
       </span>
-      <span className="camera mouse">{t('rueda: zoom · arrastrar el fondo: mover · doble clic: encuadrar · espacio, ←, →, R: reproducción')}</span>
-      <span className="camera touch">{t('pellizca: zoom · arrastra el fondo: mover · doble toque: encuadrar')}</span>
+      <span className="camera mouse">{t('ui.legend.cameraMouse')}</span>
+      <span className="camera touch">{t('ui.legend.cameraTouch')}</span>
     </div>
   )
 }

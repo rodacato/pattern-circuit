@@ -1,4 +1,5 @@
 import { parseCode, resolveRegion, type CodeFile } from '../code/regions'
+import { qualifyTexts } from './texts'
 import { compile } from '../circuit/compile'
 import { buildCircuit, codeKey, scenarioFor, solvesAll, type Plug, type Variant } from './variants'
 import { CODE_LANGS, LevelDef, type CodeLang, type LevelInput } from '../schema'
@@ -29,7 +30,7 @@ export function reachableVariants(level: LevelDef): Variant[] {
 
 // Validates the schema, and that every reachable variant compiles and has a scenario and code.
 export function defineLevel(input: LevelInput): Level {
-  const level = LevelDef.parse(input)
+  const level = qualifyTexts(JSON.parse(JSON.stringify(LevelDef.parse(input)))) // breaks objects shared in the source: each field gets its own key
   const errors: string[] = []
   const codeFiles = Object.fromEntries(CODE_LANGS.map((lang) => [lang, {}])) as Level['codeFiles']
   const langs = CODE_LANGS.filter((lang) => level.code[lang])
