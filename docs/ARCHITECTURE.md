@@ -110,6 +110,7 @@ render/
 | Application | `game/**/*.test.ts` | session, flow and progress with an in-memory adapter |
 | Ruby code | `levels/ruby.test.ts` | `ruby -wc` over every file the player sees (skipped without ruby) |
 | TypeScript code | `levels/typescript.test.ts` | syntax of every TS snippet and that no level is missing |
+| Code that runs | `levels/verification.test.ts` | every file a variant can show is executed (Ruby with `ruby`, TypeScript transpiled and run in `node:vm`) against a stubbed outside world, and both languages must print the same (skipped without ruby; in CI it is Ruby 3.0.1, the version Dojo runs) |
 | Translations | `i18n/catalogs.test.ts`, `i18n/sources.test.ts`, `i18n/scaffold.test.ts` | the same keys and holes in every locale, no prose in code, adding a language is files only |
 | Render | `render/layout.test.ts`, `render/motion.test.ts` | pure geometry and animations |
 | UI | `ui/ui.test.tsx` | components with Testing Library (jsdom) over a real session |

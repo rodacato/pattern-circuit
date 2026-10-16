@@ -5,7 +5,7 @@ Thanks for your interest! This document explains how to set up the environment, 
 ## Environment
 
 - Node 22 or later.
-- Ruby (optional): if it is installed, `npm test` runs `ruby -wc` on every Ruby file the player sees.
+- Ruby (optional): if it is installed, `npm test` checks the syntax of every Ruby file the player sees and also runs them (and their TypeScript twins) with the outside world stubbed. CI uses Ruby 3.0.1, the version the hub runs, so keep snippets valid there: for example `def call(request) = raise("…")` needs the parentheses.
 
 ```bash
 npm install

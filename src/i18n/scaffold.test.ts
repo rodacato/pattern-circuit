@@ -19,7 +19,7 @@ describe('adding a language', () => {
     const copy = (from: string) => cpSync(from, join(root, from), { recursive: true })
     copy('src/i18n/locales')
     copy('src/levels/locales')
-    for (const dir of readdirSync('src/levels', { withFileTypes: true })) if (dir.isDirectory() && dir.name !== 'locales') copy(join('src/levels', dir.name, 'locales'))
+    for (const dir of readdirSync('src/levels', { withFileTypes: true })) if (dir.isDirectory() && existsSync(join('src/levels', dir.name, 'locales'))) copy(join('src/levels', dir.name, 'locales'))
 
     const { scaffold } = (await import(pathToFileURL(resolve('scripts/i18n-scaffold.mjs')).href)) as { scaffold: (code: string, name: string, short: string, root: string) => { areas: string[]; levels: number } }
     const result = scaffold('xx', 'Test language', 'XX', root)

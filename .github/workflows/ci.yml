@@ -21,6 +21,10 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      # The runtime Dojo runs Ruby on: the code the player sees is executed with it.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0.1'
       - run: npm ci
       - name: Types
         run: npm run typecheck
