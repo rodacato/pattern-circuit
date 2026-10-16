@@ -189,7 +189,7 @@ describe('GameSession · predictions', () => {
     s.continue()
     expect(s.prediction).toMatchObject({ kind: 'touched', answer: '0' })
     s.predict('0')
-    expect(s.flow.ticketApplied).toBe(true)
+    expect(s.flow.ticket).not.toBe('open')
     runOut(s)
     expect(s.touched).toEqual([])
   })

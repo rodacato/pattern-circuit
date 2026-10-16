@@ -13,7 +13,7 @@ export type CompiledCircuit = {
 
 export function compile(circuit: Circuit): CompiledCircuit {
   const errors = circuitErrors(circuit)
-  if (errors.length) throw new Error(`Circuito inválido:\n${errors.join('\n')}`)
+  if (errors.length) throw new Error(`Invalid circuit:\n${errors.join('\n')}`)
 
   const nodes = new Map(circuit.nodes.map((n) => [n.id, n]))
   const wires = new Map<string, CompiledWire>()

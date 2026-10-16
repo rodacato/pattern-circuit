@@ -37,7 +37,7 @@ describe('patches: edge cases', () => {
   })
 
   it('circuitErrors detects duplicates and nonexistent endpoints', () => {
-    const broken = { nodes: [...base.nodes, base.nodes[0]], wires: [...base.wires, base.wires[0], { ...base.wires[0], to: 'nadie' }] }
-    expect(circuitErrors(broken)).toEqual(['nodo duplicado: src', 'cable duplicado: src->a', 'cable src->nadie: destino inexistente nadie'])
+    const broken = { nodes: [...base.nodes, base.nodes[0]], wires: [...base.wires, base.wires[0], { ...base.wires[0], to: 'nobody' }] }
+    expect(circuitErrors(broken)).toEqual(['duplicate node: src', 'duplicate wire: src->a', 'wire src->nobody: unknown target nobody'])
   })
 })

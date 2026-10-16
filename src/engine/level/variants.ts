@@ -18,12 +18,12 @@ const plugsOf = (v: Variant): Plug[] => v.sockets ?? []
 export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef; option: SocketOption }[] {
   const plugs = plugsOf(v)
   for (const p of plugs) {
-    if (!level.sockets.some((s) => s.id === p.id)) throw new Error(`${level.id}: socket inexistente ${p.id}`)
+    if (!level.sockets.some((s) => s.id === p.id)) throw new Error(`${level.id}: unknown socket ${p.id}`)
   }
   return level.sockets.flatMap((socket) => {
     const plug = plugs.find((p) => p.id === socket.id)
     const option = plug && socket.options[plug.pattern]
-    if (plug && !option) throw new Error(`${level.id}: ${plug.pattern} no es opción de ${socket.id}`)
+    if (plug && !option) throw new Error(`${level.id}: ${plug.pattern} is not an option of ${socket.id}`)
     return option ? [{ socket, option }] : []
   })
 }
@@ -38,7 +38,7 @@ function beforeTicket(level: LevelDef, v: Variant): Circuit {
   let c = level.circuit
   for (const id of v.repairs ?? []) {
     const repair = level.repairs.find((r) => r.id === id)
-    if (!repair) throw new Error(`${level.id}: reparación inexistente ${id}`)
+    if (!repair) throw new Error(`${level.id}: unknown repair ${id}`)
     c = applyPatch(c, repair.patch)
   }
   for (const { option } of pluggedOptions(level, v)) c = applyPatch(c, option.patch)
@@ -49,9 +49,9 @@ export function buildCircuit(level: LevelDef, v: Variant): { circuit: Circuit; t
   const before = beforeTicket(level, v)
   if (!v.ticket) return { circuit: before, touched: [] }
   const ticket = level.changeTickets.find((t) => t.id === v.ticket)
-  if (!ticket) throw new Error(`${level.id}: ticket inexistente ${v.ticket}`)
+  if (!ticket) throw new Error(`${level.id}: unknown ticket ${v.ticket}`)
   const plugged = plugsOf(v).length > 0
-  if (plugged && !solvesAll(level, v)) throw new Error(`${level.id}: el ticket ${ticket.id} requiere una solución`)
+  if (plugged && !solvesAll(level, v)) throw new Error(`${level.id}: ticket ${ticket.id} requires a solution`)
   const after = applyPatch(before, plugged ? ticket.with : ticket.without)
   return { circuit: after, touched: nodesTouched(before, after) }
 }
@@ -59,7 +59,7 @@ export function buildCircuit(level: LevelDef, v: Variant): { circuit: Circuit; t
 export function scenarioFor(level: LevelDef, v: Variant): Scenario {
   const id = v.ticket ? level.changeTickets.find((t) => t.id === v.ticket)?.scenario : level.scenarios[0].id
   const scenario = level.scenarios.find((s) => s.id === id)
-  if (!scenario) throw new Error(`${level.id}: escenario inexistente ${id}`)
+  if (!scenario) throw new Error(`${level.id}: unknown scenario ${id}`)
   return scenario
 }
 

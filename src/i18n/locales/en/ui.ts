@@ -48,6 +48,8 @@ export const ui = {
   'ui.notebook.close': 'Close notebook',
   'ui.notebook.empty': 'Still empty. Every pattern you try in a socket leaves here what you learned.',
   'ui.notebook.reset': 'Erase progress',
+  'ui.notebook.resetYes': 'Yes, erase it all',
+  'ui.notebook.resetNo': 'Cancel',
   'ui.notebook.outcome.solves': 'Solves it',
   'ui.notebook.outcome.partial': 'Partial',
   'ui.notebook.outcome.misfit': "Doesn't fit",

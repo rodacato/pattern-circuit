@@ -50,8 +50,8 @@ describe('stateful primitives', () => {
       [
         node('src', 0, { type: 'source' }),
         node('n', 1, { type: 'counter', key: 'breaker:b', field: 'k' }),
-        node('b', 2, { type: 'breaker', threshold: 5, failTag: 'fallo' }),
-        node('svc', 4, { type: 'transform', addTags: ['fallo'] }),
+        node('b', 2, { type: 'breaker', threshold: 5, failTag: 'failure' }),
+        node('svc', 4, { type: 'transform', addTags: ['failure'] }),
         node('backup', 6, { type: 'sink' }, 2),
       ],
       [{ from: 'src', to: 'n' }, { from: 'n', to: 'b' }, { from: 'b', port: 'call', to: 'svc' }, { from: 'svc', to: 'b' }, { from: 'b', port: 'fallback', to: 'backup' }],
@@ -77,7 +77,7 @@ describe('stateful primitives', () => {
   })
 
   it('initial state: the machine starts at `initial` and the breaker closed', () => {
-    expect(initialNodeState({ type: 'machine', initial: 'nuevo', states: {}, else: 'drop' })).toBe('nuevo')
+    expect(initialNodeState({ type: 'machine', initial: 'new', states: {}, else: 'drop' })).toBe('new')
     expect(initialNodeState({ type: 'breaker', threshold: 1, failTag: 'x' })).toBe('closed')
     expect(initialNodeState({ type: 'pass' })).toBeUndefined()
   })
@@ -86,7 +86,7 @@ describe('stateful primitives', () => {
 describe('simulation limits', () => {
   it('rejects scenarios that start at a nonexistent node', () => {
     const c = line({ src: { type: 'source' }, out: { type: 'sink' } })
-    expect(() => createSim(c, { id: 's', pulses: [{ at: 0, from: 'nadie', tags: [], shape: 'circle', data: {} }] })).toThrow(/nadie/)
+    expect(() => createSim(c, { id: 's', pulses: [{ at: 0, from: 'nobody', tags: [], shape: 'circle', data: {} }] })).toThrow(/nobody/)
   })
 
   it('runToEnd cuts off a circuit that never ends', () => {

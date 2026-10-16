@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FAMILY_NAMES, PATTERNS, type Level, type PatternId, type SocketOption } from '../engine'
 import { parseNoteKey } from '../game/progress/progress'
 import { msg, N } from '../i18n'
@@ -35,9 +36,8 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
   const total = [...byPattern.values()].reduce((n, list) => n + list.length, 0)
   const closeButton = useDialog<HTMLButtonElement>(onClose)
 
-  const reset = () => {
-    if (window.confirm(t('ui.notebook.confirmReset'))) onReset()
-  }
+  // A native confirm() is blocked inside a sandboxed iframe, so the question is part of the dialog.
+  const [confirming, setConfirming] = useState(false)
 
   return (
     <div className="notebook-backdrop" onClick={onClose}>
@@ -77,9 +77,21 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
           </section>
         ))}
         <footer className="notebook-foot">
-          <button className="link danger" onClick={reset}>
-            {t('ui.notebook.reset')}
-          </button>
+          {confirming ? (
+            <div role="alert" className="confirm">
+              <p>{t('ui.notebook.confirmReset')}</p>
+              <button className="link danger" onClick={onReset}>
+                {t('ui.notebook.resetYes')}
+              </button>
+              <button className="link" onClick={() => setConfirming(false)}>
+                {t('ui.notebook.resetNo')}
+              </button>
+            </div>
+          ) : (
+            <button className="link danger" onClick={() => setConfirming(true)}>
+              {t('ui.notebook.reset')}
+            </button>
+          )}
         </footer>
       </aside>
     </div>

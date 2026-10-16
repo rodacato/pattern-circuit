@@ -48,16 +48,16 @@ export function circuitErrors(c: Circuit): string[] {
   const errors: string[] = []
   const ids = new Set<string>()
   for (const n of c.nodes) {
-    if (ids.has(n.id)) errors.push(`nodo duplicado: ${n.id}`)
+    if (ids.has(n.id)) errors.push(`duplicate node: ${n.id}`)
     ids.add(n.id)
   }
   const wireIds = new Set<string>()
   for (const w of c.wires) {
     const id = wireId(w)
-    if (wireIds.has(id)) errors.push(`cable duplicado: ${id}`)
+    if (wireIds.has(id)) errors.push(`duplicate wire: ${id}`)
     wireIds.add(id)
-    if (!ids.has(w.from)) errors.push(`cable ${id}: origen inexistente ${w.from}`)
-    if (!ids.has(w.to)) errors.push(`cable ${id}: destino inexistente ${w.to}`)
+    if (!ids.has(w.from)) errors.push(`wire ${id}: unknown source ${w.from}`)
+    if (!ids.has(w.to)) errors.push(`wire ${id}: unknown target ${w.to}`)
   }
   return errors
 }

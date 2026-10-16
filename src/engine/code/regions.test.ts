@@ -11,6 +11,6 @@ describe('code with regions', () => {
   })
 
   it('rejects unclosed regions', () => {
-    expect(() => parseCode('# region: X\nfoo')).toThrow(/sin cerrar/)
+    expect(() => parseCode('# region: X\nfoo')).toThrow(/unclosed region/)
   })
 })

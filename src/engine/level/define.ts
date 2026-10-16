@@ -41,19 +41,19 @@ export function defineLevel(input: LevelInput): Level {
       try {
         codeFiles[lang][key] = parseCode(source)
       } catch (e) {
-        errors.push(`código ${lang}/${key}: ${(e as Error).message}`)
+        errors.push(`code ${lang}/${key}: ${(e as Error).message}`)
       }
     }
     // Another language tells the same story: the same fragments as in Ruby.
-    for (const key of Object.keys(level.code.rb)) if (!(key in sources)) errors.push(`código ${lang}: falta ${key}`)
+    for (const key of Object.keys(level.code.rb)) if (!(key in sources)) errors.push(`code ${lang}: missing ${key}`)
   }
   for (const socket of level.sockets) {
     for (const pattern of socket.inventory) {
-      if (!socket.options[pattern]) errors.push(`socket ${socket.id}: ${pattern} en inventario sin opción`)
+      if (!socket.options[pattern]) errors.push(`socket ${socket.id}: ${pattern} is in the inventory without an option`)
     }
   }
   const fail = () => {
-    throw new Error(`Nivel ${level.id} inválido:\n- ${[...new Set(errors)].join('\n- ')}`)
+    throw new Error(`Invalid level ${level.id}:\n- ${[...new Set(errors)].join('\n- ')}`)
   }
   if (errors.length) fail() // without a coherent inventory the variants cannot be walked
 
@@ -70,11 +70,11 @@ export function defineLevel(input: LevelInput): Level {
         const file = files[key]
         const where = lang === 'rb' ? key : `${lang}/${key}`
         if (!file) {
-          errors.push(`${label}: falta el código ${where}`)
+          errors.push(`${label}: missing code ${where}`)
           continue
         }
         for (const n of circuit.nodes) {
-          if (n.codeRef && !resolveRegion(file, n.codeRef)) errors.push(`${label}: ${n.id} apunta a ${n.codeRef}, que no está en ${where}`)
+          if (n.codeRef && !resolveRegion(file, n.codeRef)) errors.push(`${label}: ${n.id} points at ${n.codeRef}, which is not in ${where}`)
         }
       }
     } catch (e) {

@@ -328,7 +328,7 @@ export class GameSession {
 
   // Nodes the ticket would touch with what is plugged now: the answer to the change prediction.
   private ticketTouched(): number {
-    return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticketApplied: true }, this.repairs)).touched.length
+    return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticket: 'applied' }, this.repairs)).touched.length
   }
 
   private compare(): Comparison {

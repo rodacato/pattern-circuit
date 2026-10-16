@@ -218,8 +218,8 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
 
 function TicketCard({ session }: { session: GameSession }) {
   const t = useT()
-  const applied = useSession(session, (s) => s.flow.ticketApplied)
-  const done = useSession(session, (s) => s.flow.ticketDone)
+  const applied = useSession(session, (s) => s.flow.ticket !== 'open')
+  const done = useSession(session, (s) => s.flow.ticket === 'met')
   const touched = useSession(session, (s) => s.touched.length)
   const running = useSession(session, (s) => s.playback.playing)
   const prediction = session.prediction?.kind === 'touched' ? session.prediction : undefined

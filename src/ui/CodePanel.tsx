@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { collapse, resolveRegion, type CodeLang } from '../engine'
+import { collapse, regionLabel, resolveRegion, type CodeLang } from '../engine'
 import { highlight, plainTokens, type Token } from './code/highlight'
 import type { GameSession } from '../game/session/GameSession'
 import { prefersReducedMotion } from '../render/motion'
@@ -100,7 +100,7 @@ function CodeView({ session }: { session: GameSession }) {
         {activeRef && (
           <span className="ref">
             {source && <em>{source}</em>}
-            <code>{activeRef}</code>
+            <code>{regionLabel(activeRef, lang)}</code>
           </span>
         )}
       </div>

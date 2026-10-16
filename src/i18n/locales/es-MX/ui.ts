@@ -49,6 +49,8 @@ export const ui: Record<keyof typeof source, string> = {
   'ui.notebook.close': 'Cerrar cuaderno',
   'ui.notebook.empty': 'Todavía vacío. Cada patrón que pruebes en un socket deja aquí lo que aprendiste.',
   'ui.notebook.reset': 'Borrar progreso',
+  'ui.notebook.resetYes': 'Sí, borrar todo',
+  'ui.notebook.resetNo': 'Cancelar',
   'ui.notebook.outcome.solves': 'Resuelve',
   'ui.notebook.outcome.partial': 'Parcial',
   'ui.notebook.outcome.misfit': 'No encaja',
