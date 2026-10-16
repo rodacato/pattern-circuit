@@ -101,11 +101,13 @@ export const HostMessage = z.discriminatedUnion('type', [
 export type HostMessage = z.infer<typeof HostMessage>
 
 export type CourseEvent =
+  | { type: 'ready' }
   | { type: 'unit.started'; unitId: string }
   | { type: 'unit.completed'; unitId: string; detail?: Record<string, number | string | boolean> }
   | { type: 'completed' }
   | { type: 'progress'; rev: number; progress: Progress }
   | { type: 'preference.requested'; locale?: string; codeLanguage?: string }
+  | { type: 'resize'; height: number }
   | { type: 'error'; code: string; message: string }
 
 export type HostCommand =

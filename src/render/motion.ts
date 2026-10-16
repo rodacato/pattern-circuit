@@ -53,4 +53,8 @@ export function easeOutBack(t: number) {
   return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2)
 }
 
-export const prefersReducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+// A host can ask for reduced motion even when the system does not.
+let forced = false
+export const forceReducedMotion = (value: boolean) => void (forced = value)
+
+export const prefersReducedMotion = () => forced || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)

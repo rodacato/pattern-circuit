@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { dueItems, reviewItems } from '../game/learning/review'
-import { initialCodeLanguage } from '../course/startCourse'
+import { fromHostLanguage } from '../course/codeLanguages'
 import { firstUnfinished } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { chapterName, LEVELS, nextLevel, TRACKS, trackOf } from '../levels'
 import { NeonStage } from '../render/NeonStage'
+import { forceReducedMotion } from '../render/motion'
 import { BriefCard } from './BriefCard'
 import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
@@ -12,7 +13,7 @@ import { Inventory } from './Inventory'
 import { Notebook } from './Notebook'
 import { Review } from './Review'
 import { msg } from '../i18n'
-import { LOCALE_META, LOCALES, nextLocale } from '../i18n/registry'
+import { LOCALE_META, LOCALES, matchLocale, nextLocale } from '../i18n/registry'
 import { useCourse } from './courseContext'
 import { useLocale, useT } from './i18nContext'
 import { isShortcut, SHORTCUTS } from './shortcuts'
@@ -21,19 +22,58 @@ import { useSession } from './useSession'
 import './game.css'
 
 export default function GameApp() {
-  const { bridge, init, storage } = useCourse()
-  const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, storage.progress.load()).id)
+  const { bridge, init, storage, hostUnavailable, flush } = useCourse()
+  const [levelId, setLevelId] = useState(() => LEVELS.find((l) => l.id === init.unitId)?.id ?? firstUnfinished(LEVELS, storage.progress.load()).id)
+  const [epoch, setEpoch] = useState(0) // bumps when the host replaces the progress: the session starts again from it
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = nextLevel(LEVELS[index])
   const session = useMemo(() => {
     const units = { started: (unitId: string) => bridge.emit({ type: 'unit.started', unitId }), completed: (unitId: string) => bridge.emit({ type: 'unit.completed', unitId }) }
     const s = new GameSession(LEVELS[index], storage.progress, units)
-    s.codeLang = initialCodeLanguage(init)
+    s.codeLang = storage.codeLanguage.load() === 'ts' ? 'ts' : 'rb' // the preference outlives the level
     return s
-  }, [index, bridge, init, storage])
+  }, [index, bridge, storage, epoch])
   const codeLang = useSession(session, (s) => s.codeLang)
-  useEffect(() => storage.codeLanguage.save(codeLang), [codeLang, storage])
+  useEffect(() => {
+    storage.codeLanguage.save(codeLang)
+  }, [codeLang, storage])
   const { t, locale, setLocale } = useLocale()
+
+  // What the host can ask of the course: the language, the code language, to pause, to open a level, new progress.
+  useEffect(() => {
+    forceReducedMotion(init.reducedMotion === true)
+    return bridge.onCommand((command) => {
+      if (command.type === 'locale') {
+        const match = matchLocale(command.value)
+        if (match) {
+          storage.locale.acknowledge(match)
+          setLocale(match)
+        }
+      } else if (command.type === 'codeLanguage') {
+        const lang = fromHostLanguage(command.value)
+        if (lang) {
+          storage.codeLanguage.acknowledge(lang)
+          session.setCodeLang(lang)
+        }
+      } else if (command.type === 'visibility') {
+        if (!command.visible) session.pause()
+      } else if (command.type === 'navigate') {
+        if (LEVELS.some((l) => l.id === command.unitId)) setLevelId(command.unitId)
+      } else if (command.type === 'progress') {
+        setEpoch((e) => e + 1)
+      }
+    })
+  }, [bridge, init, session, setLocale, storage])
+
+  useEffect(() => {
+    bridge.emit({ type: 'ready' })
+  }, [bridge])
+  useEffect(() => {
+    if (!flush) return
+    window.addEventListener('pagehide', flush)
+    return () => window.removeEventListener('pagehide', flush)
+  }, [flush])
+
   const upcoming = nextLocale(locale)
   const host = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<NeonStage>()
@@ -75,7 +115,7 @@ export default function GameApp() {
   }, [session, dialogOpen])
 
   return (
-    <div className="game">
+    <div className={`game${init.reducedMotion ? ' reduce-motion' : ''}`}>
       <header className="topbar">
         <div className="logo">
           <span className="dot" />
@@ -110,6 +150,11 @@ export default function GameApp() {
         </div>
       </header>
 
+      {hostUnavailable && (
+        <p className="host-notice" role="status">
+          {t('ui.host.unavailable')}
+        </p>
+      )}
       <main>
         <section className={`stage-wrap${inventoryOpen ? ' inventory-open' : ''}`}>
           <div className="stage" ref={host} role="img" aria-label={t(msg('ui.stage.circuit', { n: session.level.order, title: session.level.title }))} />

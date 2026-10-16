@@ -1268,3 +1268,24 @@
   margin: 0;
   text-align: left;
 }
+
+.game.reduce-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.host-notice {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  z-index: 30;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 6px 12px;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: 12px;
+}

@@ -4,11 +4,10 @@ import { KeyValueProgressStore, MemoryProgressStore, type KeyValueStorage, type 
 // (private modes, a sandboxed iframe) never throws: the game just does not remember.
 const KEYS = { locale: 'pattern-circuit:locale', codeLanguage: 'pattern-circuit:code' }
 
-export type BrowserStorage = {
-  progress: ProgressStore
-  locale: { load(): string | null; save(value: string): void }
-  codeLanguage: { load(): string | null; save(value: string): void }
-}
+// A preference the player can change. `acknowledge` records a value the host imposed so it is not sent back.
+export type Preference = { load(): string | null; save(value: string): void; acknowledge(value: string): void }
+
+export type BrowserStorage = { progress: ProgressStore; locale: Preference; codeLanguage: Preference }
 
 function available(): KeyValueStorage | undefined {
   try {
@@ -19,7 +18,7 @@ function available(): KeyValueStorage | undefined {
 }
 
 export function createBrowserStorage(storage: KeyValueStorage | undefined = available()): BrowserStorage {
-  const preference = (key: string) => ({
+  const preference = (key: string): Preference => ({
     load: () => {
       try {
         return storage?.getItem(key) ?? null
@@ -34,6 +33,7 @@ export function createBrowserStorage(storage: KeyValueStorage | undefined = avai
         // without storage the change lasts this session
       }
     },
+    acknowledge: () => {},
   })
   return {
     progress: storage ? new KeyValueProgressStore(storage) : new MemoryProgressStore(),
