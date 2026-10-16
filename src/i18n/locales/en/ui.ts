@@ -74,7 +74,7 @@ export const ui = {
   'ui.review.socket': 'socket "{label}"',
 
   // seen in
-  'ui.seenIn.label': 'In Ruby: {example}.',
+  'ui.seenIn.label': 'In {language}: {example}.',
   'ui.seenIn.source': 'See source ↗',
 
   // transport
@@ -101,6 +101,7 @@ export const ui = {
   'ui.code.node': 'node · {label}',
   'ui.code.labelRuby': 'Ruby code for the circuit',
   'ui.code.labelTypeScript': 'TypeScript code for the circuit',
+  'ui.code.labelPython': 'Python code for the circuit',
   'ui.code.language': 'Code language',
   'ui.code.footHint': 'Click a node or a pulse to follow its code.',
 } as const

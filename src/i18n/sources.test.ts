@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 // Components, render and game code never contain prose: every visible text is a catalog key.
 const DIRS = ['src/ui', 'src/ui/cards', 'src/render', 'src/render/skins', 'src/game/learning', 'src/game/session', 'src/game/flow', 'src/game/playback']
-const FILES = ['src/engine/patterns.ts', 'src/engine/seenIn.ts']
+const FILES = ['src/engine/patterns.ts', 'src/engine/seenIn.ts', 'src/engine/seenInPython.ts']
 const sources = [
   ...DIRS.flatMap((d) => readdirSync(d).filter((f) => /\.tsx?$/.test(f) && !f.includes('.test.')).map((f) => join(d, f))),
   ...FILES,

@@ -6,6 +6,14 @@ import baseCaramel from './base_caramel.rb?raw'
 import common from './common.rb?raw'
 import decorator from './decorator.rb?raw'
 import decoratorCaramel from './decorator_caramel.rb?raw'
+import pyAdapter from './py/adapter.py?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseCaramel from './py/base_caramel.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyDecorator from './py/decorator.py?raw'
+import pyDecoratorCaramel from './py/decorator_caramel.py?raw'
+import pyStrategy from './py/strategy.py?raw'
+import pySubclasses from './py/subclasses.py?raw'
 import strategy from './strategy.rb?raw'
 import subclasses from './subclasses.rb?raw'
 import tsAdapter from './ts/adapter.ts?raw'
@@ -19,6 +27,7 @@ import tsSubclasses from './ts/subclasses.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const EXTRAS = ['oat', 'shot', 'cinnamon', 'caramel']
 
 // Each requested extra must be applied (+extra) to the delivered drink.
@@ -168,6 +177,14 @@ export default defineLevel({
       decorator_caramel: codeTs(tsDecoratorCaramel),
       strategy: codeTs(tsStrategy),
       adapter: codeTs(`${tsSubclasses}\n${tsAdapter}`),
+    },
+    py: {
+      base: codePy(`${pySubclasses}\n${pyBase}`),
+      base_caramel: codePy(pyBaseCaramel),
+      decorator: codePy(pyDecorator),
+      decorator_caramel: codePy(pyDecoratorCaramel),
+      strategy: codePy(pyStrategy),
+      adapter: codePy(`${pySubclasses}\n${pyAdapter}`),
     },
   },
 })

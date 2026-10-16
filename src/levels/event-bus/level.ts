@@ -7,6 +7,13 @@ import busAnalytics from './bus_analytics.rb?raw'
 import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import observer from './observer.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseAnalytics from './py/base_analytics.py?raw'
+import pyBus from './py/bus.py?raw'
+import pyBusAnalytics from './py/bus_analytics.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFacade from './py/facade.py?raw'
+import pyObserver from './py/observer.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseAnalytics from './ts/base_analytics.ts?raw'
 import tsBus from './ts/bus.ts?raw'
@@ -17,6 +24,7 @@ import tsObserver from './ts/observer.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const consumer = (id: string, className: string, y: number) =>
   node(id, className, [9, y], { type: 'sink', message: '' }, { codeRef: `${className}#on_event` })
 
@@ -108,5 +116,5 @@ export default defineLevel({
     { metric: 'delivered', op: '>=', value: 9 },
     { metric: 'nodesTouched', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), base_analytics: code(baseAnalytics), bus: code(bus), bus_analytics: code(busAnalytics), observer: code(observer), facade: code(facade) }, ts: { base: codeTs(tsBase), base_analytics: codeTs(tsBaseAnalytics), bus: codeTs(tsBus), bus_analytics: codeTs(tsBusAnalytics), observer: codeTs(tsObserver), facade: codeTs(tsFacade) } },
+  code: { rb: { base: code(base), base_analytics: code(baseAnalytics), bus: code(bus), bus_analytics: code(busAnalytics), observer: code(observer), facade: code(facade) }, ts: { base: codeTs(tsBase), base_analytics: codeTs(tsBaseAnalytics), bus: codeTs(tsBus), bus_analytics: codeTs(tsBusAnalytics), observer: codeTs(tsObserver), facade: codeTs(tsFacade) }, py: { base: codePy(pyBase), base_analytics: codePy(pyBaseAnalytics), bus: codePy(pyBus), bus_analytics: codePy(pyBusAnalytics), observer: codePy(pyObserver), facade: codePy(pyFacade) } },
 })

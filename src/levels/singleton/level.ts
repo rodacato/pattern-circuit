@@ -5,6 +5,11 @@ import common from './common.rb?raw'
 import factory from './factory.rb?raw'
 import singleton from './singleton.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFactory from './py/factory.py?raw'
+import pySingleton from './py/singleton.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsFactory from './ts/factory.ts?raw'
@@ -13,6 +18,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const counter = (id: string, at: [number, number], key: string, fresh = false, codeRef = 'TicketCounter#next') =>
   node(id, 'TicketCounter', at, { type: 'counter', key, field: 'ticket', fresh }, { codeRef })
 
@@ -93,5 +99,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), singleton: code(singleton), factory: code(factory), strategy: code(strategy) },
     ts: { base: codeTs(tsBase), singleton: codeTs(tsSingleton), factory: codeTs(tsFactory), strategy: codeTs(tsStrategy) },
+    py: { base: codePy(pyBase), singleton: codePy(pySingleton), factory: codePy(pyFactory), strategy: codePy(pyStrategy) },
   },
 })

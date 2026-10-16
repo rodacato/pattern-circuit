@@ -22,6 +22,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **The course can be embedded** in a hub (such as Dojo) through an iframe, with the same game on its own: a manifest (`course.json`), a typed, versioned `postMessage` protocol with strict origin checks, progress and preferences kept by the host when embedded, and a test host (`npm run host:test`). See `docs/ARCHITECTURE.md`.
 - The code panel shows each region's name the way the language spells it (`Counter#hand_over` in Ruby, `Counter#handOver` in TypeScript); a test checks that both languages tell the story with the same regions.
 - `npm run i18n:scaffold` to start a new language from the English catalogs.
+- **Python as a third code language** for all 27 levels, with the same regions and the same output as Ruby, a Python example of each pattern in "Where you've seen it" (standard library, Django, Celery… each checked against its docs) and Python in the language list a host receives.
+- **The code players see is executed, not only parsed**: every file a variant can show runs against stubbed collaborators in Ruby, TypeScript and Python, and all must print the same. CI runs it on Ruby 3.0.1 and Python 3.10, the versions Dojo executes; two command snippets were adjusted to be valid there (`raise(…)` in an endless method).
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.
 
 ## [1.1.0] - 2026-09-24

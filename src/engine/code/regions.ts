@@ -1,5 +1,5 @@
 // Code fragments with `# region: Class#method` / `# endregion` markers (nestable).
-// The marker is a comment of the language: `#` in Ruby, `//` in TypeScript.
+// The marker is a comment of the language: `#` in Ruby and Python, `//` in TypeScript.
 import type { CodeLang } from '../schema'
 
 export type CodeRegion = { start: number; end: number } // 1-based lines, inclusive
@@ -38,8 +38,9 @@ export function resolveRegion(file: CodeFile, ref: string | undefined): CodeRegi
 }
 
 // Region ids follow Ruby's method names (`Counter#hand_over`, `Order#complete!`); each language shows the name
-// the way its own code spells it.
+// the way its own code spells it (Python keeps snake_case but has no `!` or `?`).
 export function regionLabel(ref: string, lang: CodeLang): string {
-  if (lang !== 'ts') return ref
-  return ref.replace(/#([A-Za-z0-9_]+)[!?]?/, (_, method: string) => `#${method.replace(/_([a-z0-9])/g, (_m, c: string) => c.toUpperCase())}`)
+  if (lang === 'rb') return ref
+  const spell = (method: string) => (lang === 'ts' ? method.replace(/_([a-z0-9])/g, (_m, c: string) => c.toUpperCase()) : method)
+  return ref.replace(/#([A-Za-z0-9_]+)[!?]?/, (_, method: string) => `#${spell(method)}`)
 }

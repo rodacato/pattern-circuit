@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FAMILY_NAMES, PATTERNS, type Level, type PatternId, type SocketOption } from '../engine'
+import { FAMILY_NAMES, PATTERNS, type CodeLang, type Level, type PatternId, type SocketOption } from '../engine'
 import { parseNoteKey } from '../game/progress/progress'
 import { msg, N } from '../i18n'
 import { useT } from './i18nContext'
@@ -28,9 +28,10 @@ function entriesFor(levels: Level[], notes: string[]): Map<PatternId, Entry[]> {
 }
 
 // Pattern notebook: each pattern tried leaves a note, also the ones that did not fit.
-type Props = { levels: Level[]; notes: string[]; predictions?: { right: number; total: number }; onClose: () => void; onReset: () => void }
+// `lang` is the code language being read: the example of each pattern comes from that ecosystem when there is one.
+type Props = { levels: Level[]; notes: string[]; predictions?: { right: number; total: number }; lang?: CodeLang; onClose: () => void; onReset: () => void }
 
-export function Notebook({ levels, notes, predictions, onClose, onReset }: Props) {
+export function Notebook({ levels, notes, predictions, lang = 'rb', onClose, onReset }: Props) {
   const t = useT()
   const byPattern = entriesFor(levels, notes)
   const total = [...byPattern.values()].reduce((n, list) => n + list.length, 0)
@@ -64,7 +65,7 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
               {t(PATTERNS[pattern].name)} <small>{t(FAMILY_NAMES[PATTERNS[pattern].family])}</small>
             </h3>
             <p className="gist">{t(PATTERNS[pattern].gist)}</p>
-            <SeenIn info={PATTERNS[pattern].seenIn} />
+            <SeenIn pattern={pattern} lang={lang} />
             {list.map(({ level, option }) => (
               <article key={`${level.id}:${option.note.title}`} className={`note ${option.outcome}`}>
                 <span className="where">

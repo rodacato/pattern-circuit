@@ -16,6 +16,6 @@ end
 
 # region: Undo#call
 class Undo
-  def call(request) = raise "Undo what? The coffee is already being made"
+  def call(request) = raise("Undo what? The coffee is already being made")
 end
 # endregion

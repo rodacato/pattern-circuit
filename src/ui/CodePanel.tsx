@@ -106,7 +106,7 @@ function CodeView({ session }: { session: GameSession }) {
           </span>
         )}
       </div>
-      <div className="code-body" ref={body} tabIndex={0} aria-label={t(lang === 'rb' ? 'ui.code.labelRuby' : 'ui.code.labelTypeScript')}>
+      <div className="code-body" ref={body} tabIndex={0} aria-label={t(CODE_LABEL[lang])}>
         {tokens.map((line, i) => {
           const on = !!region && i + 1 >= region.start && i + 1 <= region.end
           return (
@@ -130,7 +130,8 @@ function CodeView({ session }: { session: GameSession }) {
   )
 }
 
-const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript' }
+const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript', py: 'Python' }
+const CODE_LABEL = { rb: 'ui.code.labelRuby', ts: 'ui.code.labelTypeScript', py: 'ui.code.labelPython' } as const
 
 // The same circuit told in another language: GameApp stores the preference for the following levels.
 function LangSwitch({ session }: { session: GameSession }) {

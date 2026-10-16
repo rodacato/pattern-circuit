@@ -5,6 +5,11 @@ import base from './base.rb?raw'
 import common from './common.rb?raw'
 import decorator from './decorator.rb?raw'
 import facade from './facade.rb?raw'
+import pyAdapter from './py/adapter.py?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyDecorator from './py/decorator.py?raw'
+import pyFacade from './py/facade.py?raw'
 import tsAdapter from './ts/adapter.ts?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsFacade from './ts/facade.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 
 export default defineLevel({
   id: 'adapter',
@@ -83,5 +89,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), adapter: code(adapter), decorator: code(decorator), facade: code(facade) },
     ts: { base: codeTs(tsBase), adapter: codeTs(tsAdapter), decorator: codeTs(tsDecorator), facade: codeTs(tsFacade) },
+    py: { base: codePy(pyBase), adapter: codePy(pyAdapter), decorator: codePy(pyDecorator), facade: codePy(pyFacade) },
   },
 })

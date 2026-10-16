@@ -5,6 +5,11 @@ import breaker from './breaker.rb?raw'
 import chainCode from './chain.rb?raw'
 import common from './common.rb?raw'
 import proxy from './proxy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBreaker from './py/breaker.py?raw'
+import pyChain from './py/chain.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyProxy from './py/proxy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBreaker from './ts/breaker.ts?raw'
 import tsChain from './ts/chain.ts?raw'
@@ -13,6 +18,7 @@ import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const orders = Array.from({ length: 8 }, (_, i) => pulse(i * 90))
 const offline = node('offline', 'OfflinePayments', [8, 4.5], { type: 'pass' }, { cost: 6, codeRef: 'OfflinePayments#charge' })
 const timeoutMark = (id: string, codeRef: string) =>
@@ -90,5 +96,5 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0 },
     { metric: 'invalidAtSink', op: '<=', value: 3, label: '' },
   ],
-  code: { rb: { base: code(base), breaker: code(breaker), chain: code(chainCode), proxy: code(base + proxy) }, ts: { base: codeTs(tsBase), breaker: codeTs(tsBreaker), chain: codeTs(tsChain), proxy: codeTs(tsBase + tsProxy) } },
+  code: { rb: { base: code(base), breaker: code(breaker), chain: code(chainCode), proxy: code(base + proxy) }, ts: { base: codeTs(tsBase), breaker: codeTs(tsBreaker), chain: codeTs(tsChain), proxy: codeTs(tsBase + tsProxy) }, py: { base: codePy(pyBase), breaker: codePy(pyBreaker), chain: codePy(pyChain), proxy: codePy(pyBase + pyProxy) } },
 })

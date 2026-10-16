@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { dueItems, reviewItems } from '../game/learning/review'
-import { fromHostLanguage } from '../course/codeLanguages'
+import { fromHostLanguage, storedLanguage } from '../course/codeLanguages'
 import { firstUnfinished } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { chapterName, LEVELS, nextLevel, TRACKS, trackOf } from '../levels'
@@ -34,7 +34,7 @@ export default function GameApp() {
     void epoch // a new epoch means the host replaced the progress: start again from it
     const units = { started: (unitId: string) => bridge.emit({ type: 'unit.started', unitId }), completed: (unitId: string) => bridge.emit({ type: 'unit.completed', unitId }) }
     const s = new GameSession(LEVELS[index], storage.progress, units)
-    s.codeLang = storage.codeLanguage.load() === 'ts' ? 'ts' : 'rb' // the preference outlives the level
+    s.codeLang = storedLanguage(storage.codeLanguage.load()) // the preference outlives the level
     return s
   }, [index, bridge, storage, epoch])
   const codeLang = useSession(session, (s) => s.codeLang)
@@ -174,7 +174,7 @@ export default function GameApp() {
           <CodePanel key={session.level.id} session={session} />
         </main>
 
-        {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
+        {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} lang={codeLang} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
         {reviewOpen && <Review session={session} levels={LEVELS} onClose={closeReview} />}
         <p className="desktop-only">{t('ui.app.desktopOnly')}</p>
       </div>

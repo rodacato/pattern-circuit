@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { emptyProgress } from '../game/progress/progress'
 import { createBrowserStorage } from './browserStorage'
-import { fromHostLanguage, toHostLanguage } from './codeLanguages'
+import { fromHostLanguage, storedLanguage, toHostLanguage } from './codeLanguages'
 import { startCourse } from './startCourse'
 
 const fakeStorage = (initial: Record<string, string> = {}) => {
@@ -35,7 +35,11 @@ describe('code languages', () => {
   it('map between the code panel and the ids of the hub', () => {
     expect(toHostLanguage('rb')).toBe('ruby')
     expect(fromHostLanguage('typescript')).toBe('ts')
-    expect(fromHostLanguage('python')).toBeUndefined()
+    expect(toHostLanguage('py')).toBe('python')
+    expect(fromHostLanguage('python')).toBe('py')
+    expect(storedLanguage('py')).toBe('py')
+    expect(storedLanguage('cobol')).toBe('rb')
+    expect(fromHostLanguage('cobol')).toBeUndefined()
   })
 })
 

@@ -6,6 +6,12 @@ import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import ports from './ports.rb?raw'
 import singleton from './singleton.rb?raw'
+import pyAdapter from './py/adapter.py?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFacade from './py/facade.py?raw'
+import pyPorts from './py/ports.py?raw'
+import pySingleton from './py/singleton.py?raw'
 import tsAdapter from './ts/adapter.ts?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -15,6 +21,7 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const external = (id: string, className: string, at: [number, number], codeRef: string): NodeInput =>
   node(id, className, at, { type: 'guard', require: { hasTag: 'env:prod' }, onFail: 'drop' }, { kind: 'external', codeRef })
 const adapterNode = (id: string, className: string, at: [number, number], extra: Partial<NodeInput> = {}) =>
@@ -110,5 +117,5 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 3 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base: code(base), ports: code(ports), adapter: code(base + adapter), facade: code(base + facade), singleton: code(base + singleton) }, ts: { base: codeTs(tsBase), ports: codeTs(tsPorts), adapter: codeTs(tsBase + tsAdapter), facade: codeTs(tsBase + tsFacade), singleton: codeTs(tsBase + tsSingleton) } },
+  code: { rb: { base: code(base), ports: code(ports), adapter: code(base + adapter), facade: code(base + facade), singleton: code(base + singleton) }, ts: { base: codeTs(tsBase), ports: codeTs(tsPorts), adapter: codeTs(tsBase + tsAdapter), facade: codeTs(tsBase + tsFacade), singleton: codeTs(tsBase + tsSingleton) }, py: { base: codePy(pyBase), ports: codePy(pyPorts), adapter: codePy(pyBase + pyAdapter), facade: codePy(pyBase + pyFacade), singleton: codePy(pyBase + pySingleton) } },
 })

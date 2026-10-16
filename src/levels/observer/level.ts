@@ -7,6 +7,13 @@ import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import observerKitchen from './observer_kitchen.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseKitchen from './py/base_kitchen.py?raw'
+import pyChain from './py/chain.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyObserver from './py/observer.py?raw'
+import pyObserverKitchen from './py/observer_kitchen.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseKitchen from './ts/base_kitchen.ts?raw'
 import tsChain from './ts/chain.ts?raw'
@@ -17,6 +24,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const subscriber = (id: string, className: string, y: number) =>
   node(id, className, [10, y], { type: 'sink', message: '' }, { codeRef: `${className}#update` })
 
@@ -101,6 +109,14 @@ export default defineLevel({
       observer_kitchen: codeTs(tsObserverKitchen),
       strategy: codeTs(tsStrategy),
       chain: codeTs(tsChain),
+    },
+    py: {
+      base: codePy(pyBase),
+      base_kitchen: codePy(pyBaseKitchen),
+      observer: codePy(pyObserver),
+      observer_kitchen: codePy(pyObserverKitchen),
+      strategy: codePy(pyStrategy),
+      chain: codePy(pyChain),
     },
   },
 })

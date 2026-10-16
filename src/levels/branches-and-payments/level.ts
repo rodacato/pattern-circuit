@@ -10,6 +10,15 @@ import createBuilder from '../factory-method/builder.rb?raw'
 import common from '../factory-method/common.rb?raw'
 import createFactory from '../factory-method/factory.rb?raw'
 import createSingleton from '../factory-method/singleton.rb?raw'
+import pyChargeBase from '../strategy/py/base.py?raw'
+import pyChargeDecorator from '../strategy/py/decorator.py?raw'
+import pyChargeObserver from '../strategy/py/observer.py?raw'
+import pyChargeStrategy from '../strategy/py/strategy.py?raw'
+import pyCreateBase from '../factory-method/py/base.py?raw'
+import pyCreateBuilder from '../factory-method/py/builder.py?raw'
+import pyCommon from '../factory-method/py/common.py?raw'
+import pyCreateFactory from '../factory-method/py/factory.py?raw'
+import pyCreateSingleton from '../factory-method/py/singleton.py?raw'
 import tsChargeBase from '../strategy/ts/base.ts?raw'
 import tsChargeDecorator from '../strategy/ts/decorator.ts?raw'
 import tsChargeObserver from '../strategy/ts/observer.ts?raw'
@@ -183,6 +192,17 @@ export default defineLevel({
       charge_strategy: tsChargeStrategy,
       charge_observer: tsChargeObserver,
       charge_decorator: tsChargeDecorator,
+    },
+    py: {
+      base: pyCommon,
+      create_base: pyCreateBase,
+      create_factory: pyCreateFactory,
+      create_singleton: pyCreateSingleton,
+      create_builder: pyCreateBuilder,
+      charge_base: pyChargeBase,
+      charge_strategy: pyChargeStrategy,
+      charge_observer: pyChargeObserver,
+      charge_decorator: pyChargeDecorator,
     },
   },
 })

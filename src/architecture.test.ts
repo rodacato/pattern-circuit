@@ -19,7 +19,7 @@ const RULES: Record<Layer, { layers: Layer[]; packages: string[] }> = {
 }
 
 // Tests may also load real levels and use vitest/node.
-const TEST_EXTRA = { layers: ['levels', 'engine'] as Layer[], packages: ['vitest', 'node:fs', 'node:path', 'node:url', 'node:child_process', '@testing-library/react', 'typescript'] }
+const TEST_EXTRA = { layers: ['levels', 'engine'] as Layer[], packages: ['vitest', 'node:fs', 'node:path', 'node:url', 'node:vm', 'node:child_process', '@testing-library/react', 'typescript'] }
 
 const SRC = resolve(import.meta.dirname)
 const files = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

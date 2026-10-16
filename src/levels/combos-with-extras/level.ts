@@ -9,6 +9,15 @@ import extrasAdapter from './extras_adapter.rb?raw'
 import extrasBase from './extras_base.rb?raw'
 import extrasDecorator from './extras_decorator.rb?raw'
 import extrasSingleton from './extras_singleton.rb?raw'
+import pyComboBase from '../composite/py/base.py?raw'
+import pyCommon from '../composite/py/common.py?raw'
+import pyComboComposite from '../composite/py/composite.py?raw'
+import pyComboStrategy from '../composite/py/strategy.py?raw'
+import pyComboFacade from './py/combo_facade.py?raw'
+import pyExtrasAdapter from './py/extras_adapter.py?raw'
+import pyExtrasBase from './py/extras_base.py?raw'
+import pyExtrasDecorator from './py/extras_decorator.py?raw'
+import pyExtrasSingleton from './py/extras_singleton.py?raw'
 import tsComboBase from '../composite/ts/base.ts?raw'
 import tsCommon from '../composite/ts/common.ts?raw'
 import tsComboComposite from '../composite/ts/composite.ts?raw'
@@ -166,6 +175,17 @@ export default defineLevel({
       extras_decorator: tsExtrasDecorator,
       extras_adapter: tsExtrasBase + tsExtrasAdapter,
       extras_singleton: tsExtrasBase + tsExtrasSingleton,
+    },
+    py: {
+      base: pyCommon,
+      combo_base: pyComboBase,
+      combo_composite: pyComboComposite,
+      combo_strategy: pyComboBase + pyComboStrategy,
+      combo_facade: pyComboBase + pyComboFacade,
+      extras_base: pyExtrasBase,
+      extras_decorator: pyExtrasDecorator,
+      extras_adapter: pyExtrasBase + pyExtrasAdapter,
+      extras_singleton: pyExtrasBase + pyExtrasSingleton,
     },
   },
 })

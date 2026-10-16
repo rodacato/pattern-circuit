@@ -5,6 +5,11 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import saga from './saga.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommand from './py/command.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyObserver from './py/observer.py?raw'
+import pySaga from './py/saga.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommand from './ts/command.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsSaga from './ts/saga.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const notify = node('notify', 'Counter', [0, 5], { type: 'sink', expects: { hasTag: 'refunded' }, message: '' }, { codeRef: 'Counter#notify' })
 
 export default defineLevel({
@@ -77,5 +83,5 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0, label: '' },
     { metric: 'invalidAtSink', op: '==', value: 0, label: '' },
   ],
-  code: { rb: { base: code(base), saga: code(saga), command: code(base + command), observer: code(base + observer) }, ts: { base: codeTs(tsBase), saga: codeTs(tsSaga), command: codeTs(tsBase + tsCommand), observer: codeTs(tsBase + tsObserver) } },
+  code: { rb: { base: code(base), saga: code(saga), command: code(base + command), observer: code(base + observer) }, ts: { base: codeTs(tsBase), saga: codeTs(tsSaga), command: codeTs(tsBase + tsCommand), observer: codeTs(tsBase + tsObserver) }, py: { base: codePy(pyBase), saga: codePy(pySaga), command: codePy(pyBase + pyCommand), observer: codePy(pyBase + pyObserver) } },
 })

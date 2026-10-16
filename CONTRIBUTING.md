@@ -5,7 +5,8 @@ Thanks for your interest! This document explains how to set up the environment, 
 ## Environment
 
 - Node 22 or later.
-- Ruby (optional): if it is installed, `npm test` runs `ruby -wc` on every Ruby file the player sees.
+- Python (optional): same idea; CI uses Python 3.10, which Dojo also offers, so avoid newer syntax and library features (`typing.Self`, `enum.StrEnum`…).
+- Ruby (optional): if it is installed, `npm test` checks the syntax of every Ruby file the player sees and also runs them (and their TypeScript twins) with the outside world stubbed. CI uses Ruby 3.0.1, the version the hub runs, so keep snippets valid there: for example `def call(request) = raise("…")` needs the parentheses.
 
 ```bash
 npm install
@@ -41,6 +42,7 @@ npm run coverage # coverage with thresholds
    - `level.ts`: the data, using `defineLevel` and the helpers from `levels/kit.ts`;
    - the Ruby snippets (`.rb`), with `# region: Class#method` / `# endregion` regions for every `codeRef`;
    - their TypeScript equivalents in `ts/`, with the same keys, the same story line by line and `// region:` regions with the same names;
+   - their Python equivalents in `py/`: same keys and region names (with `# region:`; the method in a region is named like the Ruby one without `!`/`?`, in snake_case), standard library only, and printing exactly what the Ruby version prints;
    - `level.test.ts`: the pedagogical behavior of each option ("Observer charges three times", "Strategy + ticket touches 0 nodes");
    - `locales/en.ts` and `locales/<code>.ts` for every other locale: the texts of the level by key. `level.ts` itself holds no prose: titles, briefs, labels, notes, tickets and pulse labels are found by the key derived from where they are (`node.<id>`, `socket.<id>`, `option.<socket>.<pattern>.title`, …; see `src/engine/level/texts.ts`). Texts several levels share (a customer, a charge) go in `src/levels/locales/`.
    Everything inside the snippets (identifiers, comments, output strings) is English.

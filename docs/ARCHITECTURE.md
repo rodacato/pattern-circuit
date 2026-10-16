@@ -51,7 +51,7 @@ engine/
 
 - A level can have **several sockets**: the reachable variants are the Cartesian product of what can be plugged into each one, and the code is composed from `base` + one fragment per socket. Combination levels reuse the snippets of the levels where each pattern was learned.
 - `defineLevel` validates the schema and **every reachable variant** (any subset of repairs × patterns × tickets): if one does not compile, has no scenario or points at a code region that does not exist, the level does not load and the test fails.
-- **Code in several languages**: `code.rb` (reference) and `code.ts`, with the same keys. The TypeScript snippets live in `levels/<id>/ts/` (outside `tsc` and the project's lint: they are examples to display) and use `// region:` instead of `# region:`. `defineLevel` validates that every `codeRef` exists in every language, and `typescript.test.ts` checks the syntax with `ts.transpileModule`, just as `ruby.test.ts` does with `ruby -wc`. Everything inside the snippets (identifiers, comments, output strings) is English.
+- **Code in several languages**: `code.rb` (reference), `code.ts` and `code.py`, with the same keys. The TypeScript snippets live in `levels/<id>/ts/` (outside `tsc` and the project's lint: they are examples to display) and use `// region:` instead of `# region:`; the Python ones live in `levels/<id>/py/` and keep `# region:`. `defineLevel` validates that every `codeRef` exists in every language, and `typescript.test.ts` checks the syntax with `ts.transpileModule`, just as `ruby.test.ts` does with `ruby -wc`. Everything inside the snippets (identifiers, comments, output strings) is English.
 - A level has **at most one change ticket**: the flow has a single "change" stage and the schema enforces it.
 - The registry (`levels/index.ts`) discovers folders with `import.meta.glob`: adding a level touches no other file. A level's id is its folder name and has no ordinal; the position comes from `order`.
 - Ids are stored in the saved progress. Renamed ids are translated on load through `LEGACY_LEVEL_IDS` and `LEGACY_SOCKET_IDS` (`game/progress/progress.ts`).
@@ -109,7 +109,8 @@ render/
 | Levels | `levels/*/level.test.ts` + `levels/levels.test.ts` | behavior per pattern + invariants common to all levels |
 | Application | `game/**/*.test.ts` | session, flow and progress with an in-memory adapter |
 | Ruby code | `levels/ruby.test.ts` | `ruby -wc` over every file the player sees (skipped without ruby) |
-| TypeScript code | `levels/typescript.test.ts` | syntax of every TS snippet and that no level is missing |
+| TypeScript and Python code | `levels/typescript.test.ts`, `levels/python.test.ts` | syntax of every TS and Python snippet and that no level is missing |
+| Code that runs | `levels/verification.test.ts` | every file a variant can show is executed (Ruby with `ruby`, Python with `python3`, TypeScript transpiled and run in `node:vm`) against a stubbed outside world, and the three languages must print the same (skipped without the interpreter; in CI it is Ruby 3.0.1 and Python 3.10, versions Dojo runs) |
 | Translations | `i18n/catalogs.test.ts`, `i18n/sources.test.ts`, `i18n/scaffold.test.ts` | the same keys and holes in every locale, no prose in code, adding a language is files only |
 | Render | `render/layout.test.ts`, `render/motion.test.ts` | pure geometry and animations |
 | UI | `ui/ui.test.tsx` | components with Testing Library (jsdom) over a real session |

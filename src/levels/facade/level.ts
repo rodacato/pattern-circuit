@@ -7,6 +7,13 @@ import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import facadePreheat from './facade_preheat.rb?raw'
 import proxy from './proxy.rb?raw'
+import pyAdapter from './py/adapter.py?raw'
+import pyBase from './py/base.py?raw'
+import pyBasePreheat from './py/base_preheat.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFacade from './py/facade.py?raw'
+import pyFacadePreheat from './py/facade_preheat.py?raw'
+import pyProxy from './py/proxy.py?raw'
 import tsAdapter from './ts/adapter.ts?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBasePreheat from './ts/base_preheat.ts?raw'
@@ -17,6 +24,7 @@ import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const step = (id: string, className: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
   node(id, className, at, { type: 'transform', addTags: [tag] }, { codeRef })
 const preheat = (id: string, at: [number, number]) => step(id, 'EspressoMachine', 'EspressoMachine#preheat', at, 'preheated')
@@ -128,6 +136,14 @@ export default defineLevel({
       facade_preheat: codeTs(tsFacadePreheat),
       adapter: codeTs(tsBase + tsAdapter),
       proxy: codeTs(tsBase + tsProxy),
+    },
+    py: {
+      base: codePy(pyBase),
+      base_preheat: codePy(pyBasePreheat),
+      facade: codePy(pyFacade),
+      facade_preheat: codePy(pyFacadePreheat),
+      adapter: codePy(pyBase + pyAdapter),
+      proxy: codePy(pyBase + pyProxy),
     },
   },
 })

@@ -3,7 +3,7 @@
 // Text fields (`label`, `title`, `text`…) default to '' and are filled with their catalog key by `qualifyTexts`.
 import { z } from 'zod'
 
-export const CODE_LANGS = ['rb', 'ts'] as const
+export const CODE_LANGS = ['rb', 'ts', 'py'] as const
 export type CodeLang = (typeof CODE_LANGS)[number]
 
 export const PULSE_SHAPES = ['circle', 'square', 'triangle', 'diamond'] as const
@@ -220,7 +220,7 @@ export const LevelDef = z.object({
   winWhen: z.array(Assertion).default([]),
   checklist: z.array(ChecklistItem).default([]),
   // One fragment per key ({ base, strategy, … }) in each language; Ruby is the reference.
-  code: z.object({ rb: z.record(z.string(), z.string()), ts: z.record(z.string(), z.string()).optional() }),
+  code: z.object({ rb: z.record(z.string(), z.string()), ts: z.record(z.string(), z.string()).optional(), py: z.record(z.string(), z.string()).optional() }),
 })
 
 export type PulseShape = z.infer<typeof PulseShape>
