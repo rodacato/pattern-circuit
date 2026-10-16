@@ -36,11 +36,10 @@ const TAG_COLORS: Record<string, number> = {
 
 export const pulseColor = (tags: string[]) => TAG_COLORS[tags.find((t) => t in TAG_COLORS) ?? ''] ?? NEON.white
 
-// i18n
 export const DROP_TEXT = {
-  'no-wire': 'sin cable de salida',
-  unhandled: 'nadie lo maneja (else)',
-  guard: 'rechazado',
+  'no-wire': N('render.drop.noWire'),
+  unhandled: N('render.drop.unhandled'),
+  guard: N('render.drop.guard'),
 } as const
 
 export const FAMILY_COLORS = {
@@ -52,4 +51,4 @@ export const FAMILY_COLORS = {
   principle: NEON.white,
 } as const
 
-export const INVALID_TEXT = N('¡esto no es lo que pedí!')
+export const INVALID_TEXT = N('render.fx.invalid')

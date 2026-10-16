@@ -4,6 +4,8 @@ import type { LevelDef, PatternId, SocketDef, SocketOption, Variant } from '../.
 // Stages the level does not need are skipped: no sockets, no "choose"; no tickets, no "change".
 export type Stage = 'observe' | 'choose' | 'change' | 'compare' | 'complete'
 export type Side = 'without' | 'with'
+// The change ticket: waiting to be applied, applied and running, or applied and its goals met.
+export type TicketStage = 'open' | 'applied' | 'met'
 type Plugged = { socketId: string; pattern: PatternId; outcome: SocketOption['outcome'] }
 
 export type FlowState = {
@@ -12,8 +14,7 @@ export type FlowState = {
   plugs: Record<string, Plugged> // socket → plugged pattern
   last?: string // most recently plugged socket
   solved: boolean // the last run, with every socket resolved, met the goals
-  ticketApplied: boolean
-  ticketDone: boolean
+  ticket: TicketStage
   side: Side
 }
 
@@ -28,7 +29,7 @@ export type FlowEvent =
 
 type LevelShape = Pick<LevelDef, 'sockets' | 'changeTickets'>
 
-export const initialFlow = (): FlowState => ({ stage: 'observe', runs: 0, plugs: {}, solved: false, ticketApplied: false, ticketDone: false, side: 'with' })
+export const initialFlow = (): FlowState => ({ stage: 'observe', runs: 0, plugs: {}, solved: false, ticket: 'open', side: 'with' })
 
 const allSolved = (level: LevelShape, s: FlowState) => level.sockets.every((k) => s.plugs[k.id]?.outcome === 'solves')
 
@@ -42,7 +43,7 @@ export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowS
         return e.won ? { ...next, stage: 'complete' } : next
       }
       if (s.stage === 'choose') return { ...next, solved: e.won && allSolved(level, s) }
-      if (s.stage === 'change' && s.ticketApplied) return { ...next, ticketDone: e.won }
+      if (s.stage === 'change' && s.ticket !== 'open') return { ...next, ticket: e.won ? 'met' : 'applied' }
       return next
     }
     case 'plug':
@@ -56,10 +57,10 @@ export function reduceFlow(level: LevelShape, s: FlowState, e: FlowEvent): FlowS
     }
     case 'continue':
       if (s.stage === 'choose' && s.solved) return { ...s, stage: level.changeTickets.length ? 'change' : 'compare', side: 'with' }
-      if (s.stage === 'change' && s.ticketDone) return { ...s, stage: 'compare', side: 'with' }
+      if (s.stage === 'change' && s.ticket === 'met') return { ...s, stage: 'compare', side: 'with' }
       return s
     case 'apply-ticket':
-      return s.stage === 'change' ? { ...s, ticketApplied: true, ticketDone: false } : s
+      return s.stage === 'change' ? { ...s, ticket: 'applied' } : s
     case 'compare':
       return s.stage === 'compare' ? { ...s, side: e.side } : s
     case 'finish':
@@ -103,7 +104,7 @@ export function variantFor(level: LevelShape, s: FlowState, repairs: string[]): 
     case 'choose':
       return { ...base, ...plugged }
     case 'change':
-      return { ...base, ...plugged, ...(s.ticketApplied && ticket ? { ticket } : {}) }
+      return { ...base, ...plugged, ...(s.ticket !== 'open' && ticket ? { ticket } : {}) }
     case 'compare':
     case 'complete': {
       const withTicket = ticket ? { ticket } : {}

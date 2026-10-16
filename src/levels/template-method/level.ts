@@ -17,32 +17,27 @@ import tsTemplateSleeve from './ts/template_sleeve.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const step = (id: string, label: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
-  node(id, label, codeRef.split('#')[0], at, { type: 'transform', addTags: [tag] }, { codeRef })
-const skeleton = (id: string, label: string, codeRef: string, x: number, tag: string) => skinned('template-method', step(id, label, codeRef, [x, 2], tag))
+const step = (id: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
+  node(id, codeRef.split('#')[0], at, { type: 'transform', addTags: [tag] }, { codeRef })
+const skeleton = (id: string, codeRef: string, x: number, tag: string) => skinned('template-method', step(id, codeRef, [x, 2], tag))
 
 export default defineLevel({
   id: 'template-method',
   order: 14,
   chapter: 'rush-hour',
-  title: 'Recetas copiadas',
   targetPattern: 'template-method',
-  brief: {
-    problem: 'Café y té siguen la misma receta: hervir agua, preparar, servir, tapar. Pero son dos copias del mismo código, y a la copia del té se le olvidó la tapa.',
-    goal: 'Que los pasos comunes vivan en un solo lugar y cada bebida solo defina lo que la hace distinta.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('bar', 'Barra', 'Bar', [3, 2], { type: 'branch', cases: { coffee: 'coffee', tea: 'tea' } }, { codeRef: 'Bar#order' }),
-      step('boilC', 'Hervir agua', 'CoffeeRecipe#make', [6, 0], 'boiled'),
-      step('extract', 'Extraer', 'CoffeeRecipe#make', [9, 0], 'extracted'),
-      step('serveC', 'Servir', 'CoffeeRecipe#make', [12, 0], 'served'),
-      step('lidC', 'Tapar', 'CoffeeRecipe#make', [15, 0], 'lid'),
-      step('boilT', 'Hervir agua', 'TeaRecipe#make', [6, 4], 'boiled'),
-      step('infuse', 'Infusionar', 'TeaRecipe#make', [9, 4], 'infused'),
-      step('serveT', 'Servir', 'TeaRecipe#make', [12, 4], 'served'),
-      node('handOver', 'Entregar', 'Pickup', [19, 2], { type: 'sink', expects: { all: [{ hasTag: 'boiled' }, { hasTag: 'served' }, { hasTag: 'lid' }] } }, { codeRef: 'Pickup#hand_over' }),
+      actor('customer', [0, 2]),
+      node('bar', 'Bar', [3, 2], { type: 'branch', cases: { coffee: 'coffee', tea: 'tea' } }, { codeRef: 'Bar#order' }),
+      step('boilC', 'CoffeeRecipe#make', [6, 0], 'boiled'),
+      step('extract', 'CoffeeRecipe#make', [9, 0], 'extracted'),
+      step('serveC', 'CoffeeRecipe#make', [12, 0], 'served'),
+      step('lidC', 'CoffeeRecipe#make', [15, 0], 'lid'),
+      step('boilT', 'TeaRecipe#make', [6, 4], 'boiled'),
+      step('infuse', 'TeaRecipe#make', [9, 4], 'infused'),
+      step('serveT', 'TeaRecipe#make', [12, 4], 'served'),
+      node('handOver', 'Pickup', [19, 2], { type: 'sink', expects: { all: [{ hasTag: 'boiled' }, { hasTag: 'served' }, { hasTag: 'lid' }] } }, { codeRef: 'Pickup#hand_over' }),
     ],
     wires: [
       wire('customer', 'bar'),
@@ -56,16 +51,11 @@ export default defineLevel({
     {
       id: 'recipe',
       at: 'bar',
-      label: 'Receta',
       inventory: ['template-method', 'strategy', 'builder'],
       options: {
         'template-method': {
           outcome: 'solves',
           code: 'template',
-          note: {
-            title: 'Template Method: un esqueleto fijo con huecos',
-            body: 'La receta común vive en la clase base: hervir, preparar, servir, tapar. Cada bebida solo rellena el paso que cambia. Nadie puede olvidar la tapa, y un paso nuevo se agrega una sola vez.',
-          },
           patch: {
             remove: ['boilC', 'serveC', 'lidC', 'boilT', 'serveT'],
             update: [
@@ -75,10 +65,10 @@ export default defineLevel({
             ],
             add: {
               nodes: [
-                skeleton('boil', 'Hervir agua', 'Recipe#boil_water', 5.5, 'boiled'),
-                skinned('template-method', node('prepare', 'Preparar (hueco)', 'Recipe', [8, 2], { type: 'slot' }, { codeRef: 'Recipe#make' })),
-                skeleton('serve', 'Servir', 'Recipe#pour_in_cup', 13, 'served'),
-                skeleton('lid', 'Tapar', 'Recipe#put_lid', 15.5, 'lid'),
+                skeleton('boil', 'Recipe#boil_water', 5.5, 'boiled'),
+                skinned('template-method', node('prepare', 'Recipe', [8, 2], { type: 'slot' }, { codeRef: 'Recipe#make' })),
+                skeleton('serve', 'Recipe#pour_in_cup', 13, 'served'),
+                skeleton('lid', 'Recipe#put_lid', 15.5, 'lid'),
               ],
               wires: [
                 ...chain('bar', 'boil', 'prepare'),
@@ -94,10 +84,6 @@ export default defineLevel({
         strategy: {
           outcome: 'partial',
           code: 'strategy',
-          note: {
-            title: 'Strategy es la versión por composición… si la usas en el paso correcto',
-            body: 'Si la estrategia fuera solo el paso "preparar" y la receta común viviera en quien la usa, también funcionaría: es la alternativa por composición a Template Method. Pero aquí se eligió la receta completa como estrategia: dos algoritmos duplicados, y el té sigue sin tapa.',
-          },
           patch: {
             removeWires: ['bar.coffee->boilC', 'bar.tea->boilT'],
             update: [{ id: 'bar', behavior: { type: 'slot' }, skin: 'strategy', codeRef: 'RecipeStrategy' }],
@@ -107,14 +93,10 @@ export default defineLevel({
         builder: {
           outcome: 'misfit',
           code: 'builder',
-          note: {
-            title: 'Builder arma objetos, no comparte pasos',
-            body: 'Armar la taza paso a paso antes de la receta no toca las dos copias de la receta. La del té sigue sin tapa.',
-          },
           patch: {
             removeWires: ['customer->bar'],
             add: {
-              nodes: [skinned('builder', node('cup', 'Armar taza', 'CupBuilder', [1.5, 0], { type: 'pass' }))],
+              nodes: [skinned('builder', node('cup', 'CupBuilder', [1.5, 0], { type: 'pass' }))],
               wires: [wire('customer', 'cup'), wire('cup', 'bar')],
             },
           },
@@ -122,23 +104,22 @@ export default defineLevel({
       },
     },
   ],
-  scenarios: [{ id: 'main', pulses: [pulse(0, 'Café', ['coffee']), pulse(35, 'Té', ['tea']), pulse(70, 'Café', ['coffee']), pulse(105, 'Té', ['tea'])] }],
+  scenarios: [{ id: 'main', pulses: [pulse(0, ['coffee']), pulse(35, ['tea']), pulse(70, ['coffee']), pulse(105, ['tea'])] }],
   changeTickets: [
     {
       id: 'sleeve',
-      text: 'Todas las bebidas ahora llevan manga térmica.',
       scenario: 'main',
       without: {
         removeWires: ['lidC->handOver', 'serveT->handOver'],
         add: {
-          nodes: [step('sleeveC', 'Manga', 'CoffeeRecipe#make', [17, 0], 'sleeve'), step('sleeveT', 'Manga', 'TeaRecipe#make', [15, 4], 'sleeve')],
+          nodes: [step('sleeveC', 'CoffeeRecipe#make', [17, 0], 'sleeve'), step('sleeveT', 'TeaRecipe#make', [15, 4], 'sleeve')],
           wires: [...chain('lidC', 'sleeveC', 'handOver'), ...chain('serveT', 'sleeveT', 'handOver')],
         },
       },
       with: {
         removeWires: ['lid->handOver'],
         add: {
-          nodes: [skinned('template-method', step('sleeve', 'Manga', 'Recipe#add_sleeve', [17.25, 0], 'sleeve'))],
+          nodes: [skinned('template-method', step('sleeve', 'Recipe#add_sleeve', [17.25, 0], 'sleeve'))],
           wires: chain('lid', 'sleeve', 'handOver'),
         },
       },

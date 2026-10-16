@@ -18,20 +18,20 @@ const input = (overrides: Partial<LevelInput> = {}): LevelInput => ({
     ],
     wires: [{ from: 'src', to: 'a' }],
   },
-  repairs: [{ id: 'r', prompt: '', patch: { add: { wires: [{ from: 'a', to: 'out', port: 'out', dep: 'concrete' }] } }, code: 'reparado' }],
+  repairs: [{ id: 'r', prompt: '', patch: { add: { wires: [{ from: 'a', to: 'out', port: 'out', dep: 'concrete' }] } }, code: 'repaired' }],
   sockets: [
     {
       id: 's',
       at: 'a',
       label: '',
       inventory: ['strategy'],
-      options: { strategy: { outcome: 'solves', code: 'patron', note: { title: '', body: '' }, patch: {} } },
+      options: { strategy: { outcome: 'solves', code: 'pattern', note: { title: '', body: '' }, patch: {} } },
     },
   ],
   scenarios: [{ id: 'main', pulses: [{ at: 0, from: 'src' }] }],
-  changeTickets: [{ id: 't', text: '', scenario: 'main', without: {}, with: {}, code: { without: 'cambio', with: 'cambio_patron' } }],
+  changeTickets: [{ id: 't', text: '', scenario: 'main', without: {}, with: {}, code: { without: 'change', with: 'change_pattern' } }],
   code: {
-    rb: Object.fromEntries(['base', 'reparado', 'patron', 'cambio', 'cambio_patron'].map((k) => [k, `# region: A#run\n# ${k}\n# endregion`])),
+    rb: Object.fromEntries(['base', 'repaired', 'pattern', 'change', 'change_pattern'].map((k) => [k, `# region: A#run\n# ${k}\n# endregion`])),
   },
   ...overrides,
 })
@@ -48,22 +48,22 @@ describe('defineLevel', () => {
   })
 
   it('reports missing code', () => {
-    const { patron: _, ...rb } = input().code.rb
-    expect(() => defineLevel(input({ code: { rb } }))).toThrow(/falta el código patron/)
+    const { pattern: _, ...rb } = input().code.rb
+    expect(() => defineLevel(input({ code: { rb } }))).toThrow(/missing code pattern/)
   })
 
   it('reports a codeRef with no region in the variant code', () => {
     const { rb } = input().code
-    expect(() => defineLevel(input({ code: { rb: { ...rb, cambio: '# sin regiones' } } }))).toThrow(/a apunta a A#run, que no está en cambio/)
+    expect(() => defineLevel(input({ code: { rb: { ...rb, change: '# no regions' } } }))).toThrow(/a points at A#run, which is not in change/)
   })
 
   it('reports a pattern in the inventory with no option', () => {
     const [socket] = input().sockets!
-    expect(() => defineLevel(input({ sockets: [{ ...socket, inventory: ['strategy', 'observer'] }] }))).toThrow(/observer en inventario sin opción/)
+    expect(() => defineLevel(input({ sockets: [{ ...socket, inventory: ['strategy', 'observer'] }] }))).toThrow(/observer is in the inventory without an option/)
   })
 
   it('reports a wire to a nonexistent node', () => {
-    expect(() => defineLevel(input({ repairs: [], circuit: { ...input().circuit, wires: [{ from: 'src', to: 'nadie' }] } }))).toThrow(/destino inexistente nadie/)
+    expect(() => defineLevel(input({ repairs: [], circuit: { ...input().circuit, wires: [{ from: 'src', to: 'nobody' }] } }))).toThrow(/unknown target nobody/)
   })
 })
 
@@ -71,9 +71,9 @@ describe('codeKey', () => {
   const level = defineLevel(input())
   it('priority: ticket code, then pattern code, then repair code, then base', () => {
     expect(codeKey(level, {})).toBe('base')
-    expect(codeKey(level, { repairs: ['r'] })).toBe('reparado')
-    expect(codeKey(level, { repairs: ['r'], sockets: [{ id: 's', pattern: 'strategy' }] })).toBe('patron')
-    expect(codeKey(level, { ticket: 't' })).toBe('cambio')
-    expect(codeKey(level, { sockets: [{ id: 's', pattern: 'strategy' }], ticket: 't' })).toBe('cambio_patron')
+    expect(codeKey(level, { repairs: ['r'] })).toBe('repaired')
+    expect(codeKey(level, { repairs: ['r'], sockets: [{ id: 's', pattern: 'strategy' }] })).toBe('pattern')
+    expect(codeKey(level, { ticket: 't' })).toBe('change')
+    expect(codeKey(level, { sockets: [{ id: 's', pattern: 'strategy' }], ticket: 't' })).toBe('change_pattern')
   })
 })

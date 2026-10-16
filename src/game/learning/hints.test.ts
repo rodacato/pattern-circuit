@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { evaluate } from '../../engine'
 import { LEVELS } from '../../levels'
 import { initialFlow } from '../flow/levelFlow'
-import { identity } from '../../i18n'
+import { createTranslator } from '../../i18n'
+import { APP_CATALOGS } from '../../i18n/registry'
 import { hintLadder as ladder } from './hints'
 
-const hintLadder = (...args: Parameters<typeof ladder>) => ladder(...args).map(identity)
+const es = createTranslator([APP_CATALOGS['es-MX']])
+const hintLadder = (...args: Parameters<typeof ladder>) => ladder(...args).map(es)
 
 const level = (id: string) => LEVELS.find((l) => l.id === id)!
 
@@ -25,7 +27,7 @@ describe('hints', () => {
     const [first, second] = l.sockets
     const solved = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
     const flow = { ...initialFlow(), stage: 'choose' as const, plugs: { [first.id]: { socketId: first.id, pattern: solved, outcome: 'solves' as const } } }
-    expect(hintLadder(l, flow).at(-1)).toContain(`socket "${second.label}"`)
+    expect(hintLadder(l, flow).at(-1)).toContain(`socket "${es(second.label)}"`)
   })
 
   it('every level with sockets has at least a question, a family and an answer', () => {

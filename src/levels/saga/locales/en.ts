@@ -1,0 +1,22 @@
+// Level saga: English texts, by key (the source of the typed keys).
+export default {
+  title: 'Charged and out of oat milk',
+  'brief.problem': 'Taking an order is three steps in different services: charge, reserve supplies and prepare. If oat milk runs out, the charge already went through: the customer paid and gets nothing.',
+  'brief.goal': 'If a step fails, compensate the earlier ones: the customer gets their money back and finds out.',
+  'node.reserve': 'Reserve supplies',
+  'socket.steps': 'Order steps',
+  'option.steps.saga.title': 'Saga: each step with its compensation',
+  'option.steps.saga.body': 'With no transaction spanning all three services, each step brings its compensating action. If reserving fails, the compensations for what\'s already done run in reverse order: the charge is corrected with a refund.',
+  'option.steps.command.title': 'Command undoes in memory; a saga compensates across services',
+  'option.steps.command.body': 'Command\'s undo reverts local state the object itself saved. A charge at the bank can\'t be reverted: it\'s compensated with a new action (a refund), and someone has to coordinate what to compensate when a step fails in another service. Command can be the piece for each step, but it doesn\'t orchestrate the compensation.',
+  'option.steps.observer.title': 'Notifying isn\'t compensating',
+  'option.steps.observer.body': 'Everyone finds out the order failed, but nobody gives the money back.',
+  'win.1': 'customers who paid and got nothing',
+  'win.2': 'notifications without a refund',
+  'scenario.main.0': 'Latte',
+  'scenario.main.1': 'Mocha',
+  'scenario.main.2': 'Oat milk latte',
+  'scenario.main.3': 'Tea',
+  'node.refund': 'Refund',
+  'node.notify.message': '💸 refunded and notified',
+} as const

@@ -1,0 +1,36 @@
+import type en from './en'
+
+const texts: Record<keyof typeof en, string> = {
+  title: 'Recetas copiadas',
+  'brief.problem': 'Café y té siguen la misma receta: hervir agua, preparar, servir, tapar. Pero son dos copias del mismo código, y a la copia del té se le olvidó la tapa.',
+  'brief.goal': 'Que los pasos comunes vivan en un solo lugar y cada bebida solo defina lo que la hace distinta.',
+  'node.bar': 'Barra',
+  'node.boilC': 'Hervir agua',
+  'node.extract': 'Extraer',
+  'node.serveC': 'Servir',
+  'node.lidC': 'Tapar',
+  'node.boilT': 'Hervir agua',
+  'node.infuse': 'Infusionar',
+  'node.serveT': 'Servir',
+  'socket.recipe': 'Receta',
+  'option.recipe.template-method.title': 'Template Method: un esqueleto fijo con huecos',
+  'option.recipe.template-method.body': 'La receta común vive en la clase base: hervir, preparar, servir, tapar. Cada bebida solo rellena el paso que cambia. Nadie puede olvidar la tapa, y un paso nuevo se agrega una sola vez.',
+  'option.recipe.strategy.title': 'Strategy es la versión por composición… si la usas en el paso correcto',
+  'option.recipe.strategy.body': 'Si la estrategia fuera solo el paso "preparar" y la receta común viviera en quien la usa, también funcionaría: es la alternativa por composición a Template Method. Pero aquí se eligió la receta completa como estrategia: dos algoritmos duplicados, y el té sigue sin tapa.',
+  'option.recipe.builder.title': 'Builder arma objetos, no comparte pasos',
+  'option.recipe.builder.body': 'Armar la taza paso a paso antes de la receta no toca las dos copias de la receta. La del té sigue sin tapa.',
+  'ticket.sleeve': 'Todas las bebidas ahora llevan manga térmica.',
+  'scenario.main.0': 'Café',
+  'scenario.main.1': 'Té',
+  'scenario.main.2': 'Café',
+  'scenario.main.3': 'Té',
+  'node.boil': 'Hervir agua',
+  'node.prepare': 'Preparar (hueco)',
+  'node.lid': 'Tapar',
+  'node.cup': 'Armar taza',
+  'node.sleeveC': 'Manga',
+  'node.sleeveT': 'Manga',
+  'node.sleeve': 'Manga',
+}
+
+export default texts

@@ -1,5 +1,6 @@
 // Data format of a level. It is the single source of truth: the engine
 // types are inferred from here and the loader validates each level against this schema.
+// Text fields (`label`, `title`, `text`…) default to '' and are filled with their catalog key by `qualifyTexts`.
 import { z } from 'zod'
 
 export const CODE_LANGS = ['rb', 'ts'] as const
@@ -103,7 +104,7 @@ export const Behavior = z.discriminatedUnion('type', [
 
 export const NodeDef = z.object({
   id: z.string(),
-  label: z.string(),
+  label: z.string().default(''), // empty: its text is `node.<id>` in the level's catalog
   className: z.string().optional(),
   kind: z.enum(['class', 'interface', 'external', 'actor']).default('class'),
   at: z.tuple([z.number(), z.number()]),
@@ -136,21 +137,21 @@ export const GraphPatch = z.object({
 })
 
 export const FieldNote = z.object({
-  title: z.string(),
-  body: z.string(),
+  title: z.string().default(''),
+  body: z.string().default(''),
 })
 
 export const SocketOption = z.object({
   outcome: z.enum(['solves', 'partial', 'misfit']),
   patch: GraphPatch,
-  note: FieldNote,
+  note: FieldNote.default({ title: '', body: '' }),
   code: z.string(), // key inside level.code
 })
 
 export const SocketDef = z.object({
   id: z.string(),
   at: z.string(), // node where the socket appears
-  label: z.string(),
+  label: z.string().default(''),
   inventory: z.array(PatternId),
   options: z.partialRecord(PatternId, SocketOption),
   code: z.string().optional(), // with several sockets: code fragment while it is empty
@@ -172,7 +173,7 @@ export const Scenario = z.object({
 
 export const ChangeTicket = z.object({
   id: z.string(),
-  text: z.string(),
+  text: z.string().default(''),
   scenario: z.string(), // scenario that exercises the change
   without: GraphPatch, // applied to the base circuit
   with: GraphPatch, // applied to the already resolved circuit
@@ -181,7 +182,7 @@ export const ChangeTicket = z.object({
 
 export const Repair = z.object({
   id: z.string(),
-  prompt: z.string(),
+  prompt: z.string().default(''),
   patch: GraphPatch,
   code: z.string().optional(),
 })
@@ -191,7 +192,7 @@ export const PLAYER_ACTIONS = ['play', 'pause', 'step', 'back', 'reset', 'speed'
 export const PlayerAction = z.enum(PLAYER_ACTIONS)
 
 export const ChecklistItem = z.object({
-  text: z.string(),
+  text: z.string().default(''),
   on: PlayerAction,
 })
 
@@ -208,9 +209,9 @@ export const LevelDef = z.object({
   id: z.string(),
   order: z.number().int(),
   chapter: z.string(),
-  title: z.string(),
+  title: z.string().default(''),
   targetPattern: PatternId.optional(),
-  brief: z.object({ problem: z.string(), goal: z.string() }),
+  brief: z.object({ problem: z.string().default(''), goal: z.string().default('') }).default({ problem: '', goal: '' }),
   circuit: Circuit,
   sockets: z.array(SocketDef).default([]),
   repairs: z.array(Repair).default([]),

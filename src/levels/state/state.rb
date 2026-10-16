@@ -16,35 +16,35 @@ class Order
   # endregion
 end
 
-# region: Order#handle:pendiente
+# region: Order#handle:pending
 class Pending
   def name = :pending
   def on(event) = { pay: Paid.new, cancel: Cancelled.new }[event]
 end
 # endregion
 
-# region: Order#handle:pagado
+# region: Order#handle:paid
 class Paid
   def name = :paid
   def on(event) = { prepare: Preparing.new, cancel: Cancelled.new }[event]
 end
 # endregion
 
-# region: Order#handle:preparando
+# region: Order#handle:preparing
 class Preparing
   def name = :preparing
   def on(event) = { deliver: Delivered.new }[event]
 end
 # endregion
 
-# region: Order#handle:entregado
+# region: Order#handle:delivered
 class Delivered
   def name = :delivered
   def on(_event) = nil # a delivered order no longer changes
 end
 # endregion
 
-# region: Order#handle:cancelado
+# region: Order#handle:cancelled
 class Cancelled
   def name = :cancelled
   def on(_event) = nil

@@ -21,7 +21,7 @@ An educational game for understanding **design patterns by seeing them, not read
 | Repair a wire (level 0) | drag from the output port | "Connect… without dragging" button |
 | Camera | wheel: zoom · drag the background · double click: fit | — |
 
-The game is available in **Spanish and English** (ES/EN button at the top). Progress is saved in your browser (`localStorage`) and can be erased from the notebook. It is designed for desktop and tablet screens and respects the system's reduced-motion preference.
+The game is available in **Spanish and English** (ES/EN button at the top); adding a language means adding catalog files, with no code change (see [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-language)). Progress is saved in your browser (`localStorage`) and can be erased from the notebook. It is designed for desktop and tablet screens and respects the system's reduced-motion preference.
 
 | Chapter | Levels | Patterns |
 |---|---|---|

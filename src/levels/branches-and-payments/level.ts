@@ -23,43 +23,38 @@ import tsCreateSingleton from '../factory-method/ts/singleton.ts?raw'
 const MENU: Record<string, string> = { downtown: 'latte', beach: 'frappe', mountain: 'chocolate' }
 const rightDrink: Predicate = { any: Object.entries(MENU).map(([branch, drink]) => ({ all: [{ hasTag: branch }, { hasTag: `made:${drink}` }] })) }
 
-const product = (id: string, label: string, className: string, drink: string, y: number): NodeInput =>
-  node(id, label, className, [9, y], { type: 'transform', addTags: [`made:${drink}`], setShape: 'diamond' })
+const product = (id: string, className: string, drink: string, y: number): NodeInput =>
+  node(id, className, [9, y], { type: 'transform', addTags: [`made:${drink}`], setShape: 'diamond' })
 
 const BRANCHES = [
-  { key: 'downtown', id: 'downtownBranch', label: 'Centro', className: 'DowntownBranch', drink: 'latte', y: 0 },
-  { key: 'beach', id: 'beachBranch', label: 'Playa', className: 'BeachBranch', drink: 'frappe', y: 2 },
-  { key: 'mountain', id: 'mountainBranch', label: 'Montaña', className: 'MountainBranch', drink: 'chocolate', y: 4 },
+  { key: 'downtown', id: 'downtownBranch', className: 'DowntownBranch', drink: 'latte', y: 0 },
+  { key: 'beach', id: 'beachBranch', className: 'BeachBranch', drink: 'frappe', y: 2 },
+  { key: 'mountain', id: 'mountainBranch', className: 'MountainBranch', drink: 'chocolate', y: 4 },
 ]
 const PAYMENTS = [
-  { key: 'cash', id: 'cashPayment', label: 'Efectivo', className: 'CashPayment', y: 0 },
-  { key: 'card', id: 'cardPayment', label: 'Tarjeta', className: 'CardPayment', y: 2 },
-  { key: 'voucher', id: 'voucherPayment', label: 'Vale', className: 'VoucherPayment', y: 4 },
+  { key: 'cash', id: 'cashPayment', className: 'CashPayment', y: 0 },
+  { key: 'card', id: 'cardPayment', className: 'CardPayment', y: 2 },
+  { key: 'voucher', id: 'voucherPayment', className: 'VoucherPayment', y: 4 },
 ]
 const paymentNode = (p: (typeof PAYMENTS)[number], skin: 'strategy' | 'observer') =>
-  skinned(skin, node(p.id, p.label, p.className, [14.5, p.y], { type: 'pass' }, { codeRef: `${p.className}#charge` }))
+  skinned(skin, node(p.id, p.className, [14.5, p.y], { type: 'pass' }, { codeRef: `${p.className}#charge` }))
 
-const order = (at: number, branch: string, payment: string, label: string) => pulse(at, label, [branch, payment], { branch, payment })
+const order = (at: number, branch: string, payment: string) => pulse(at, [branch, payment], { branch, payment })
 
 export default defineLevel({
   id: 'branches-and-payments',
   order: 15,
   chapter: 'all-together',
-  title: 'Sucursales y pagos',
-  brief: {
-    problem: 'Dos problemas conocidos en el mismo circuito: el flujo compartido le da lattes a Montaña, y Cobrar pierde los pagos con vale. Cada uno está en un punto de variación distinto.',
-    goal: 'Resolver los dos sockets: cada sucursal su bebida y cada método de pago su cartucho.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('take', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
-      node('create', 'Crear bebida', 'OrderFlow', [6, 2], { type: 'branch', cases: { downtown: 'latte', beach: 'frappe' }, else: 'latte' }, { codeRef: 'OrderFlow#create_drink' }),
-      product('frappe', 'Frappé', 'Frappe', 'frappe', 1),
-      product('latte', 'Latte', 'Latte', 'latte', 3),
-      node('charge', 'Cobrar', 'Cashier', [12, 2], { type: 'branch', cases: { cash: 'out', card: 'out' }, else: 'drop' }, { codeRef: 'Cashier#charge' }),
-      node('prepare', 'Preparar', 'Barista', [17, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
-      node('handOver', 'Entregar', 'Counter', [20, 2], { type: 'sink', expects: rightDrink }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('take', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
+      node('create', 'OrderFlow', [6, 2], { type: 'branch', cases: { downtown: 'latte', beach: 'frappe' }, else: 'latte' }, { codeRef: 'OrderFlow#create_drink' }),
+      product('frappe', 'Frappe', 'frappe', 1),
+      product('latte', 'Latte', 'latte', 3),
+      node('charge', 'Cashier', [12, 2], { type: 'branch', cases: { cash: 'out', card: 'out' }, else: 'drop' }, { codeRef: 'Cashier#charge' }),
+      node('prepare', 'Barista', [17, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
+      node('handOver', 'Counter', [20, 2], { type: 'sink', expects: rightDrink }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [
       ...chain('customer', 'take', 'create'),
@@ -74,23 +69,18 @@ export default defineLevel({
     {
       id: 'create-drink',
       at: 'create',
-      label: 'Crear bebida',
       code: 'create_base',
       inventory: ['factory-method', 'singleton', 'builder'],
       options: {
         'factory-method': {
           outcome: 'solves',
           code: 'create_factory',
-          note: {
-            title: 'Factory Method decide qué se crea',
-            body: 'Cada sucursal es una subclase con su propio molde. Convive sin problema con Strategy: uno responde "qué objeto crear", el otro "cómo hacer algo con él".',
-          },
           patch: {
             remove: ['frappe', 'latte'],
-            update: [{ id: 'create', label: 'Sucursal', className: 'Branch', behavior: { type: 'slot' }, codeRef: 'Branch#take', skin: 'factory-method' }],
+            update: [{ id: 'create', label: 'option.create-drink.factory-method.label.create', className: 'Branch', behavior: { type: 'slot' }, codeRef: 'Branch#take', skin: 'factory-method' }],
             add: {
               nodes: BRANCHES.map((b) =>
-                skinned('factory-method', node(b.id, b.label, b.className, [9, b.y], { type: 'transform', addTags: [`made:${b.drink}`], setShape: 'diamond' }, { codeRef: `${b.className}#create_drink` })),
+                skinned('factory-method', node(b.id, b.className, [9, b.y], { type: 'transform', addTags: [`made:${b.drink}`], setShape: 'diamond' }, { codeRef: `${b.className}#create_drink` })),
               ),
               wires: BRANCHES.flatMap((b) => [abstract('create', b.id, b.key), wire(b.id, 'charge')]),
             },
@@ -99,23 +89,21 @@ export default defineLevel({
         singleton: {
           outcome: 'misfit',
           code: 'create_singleton',
-          note: { title: 'Singleton: todas las sucursales reciben lo mismo', body: 'Una fábrica única no sabe de qué sucursal viene cada pedido. La creación tenía que variar, no compartirse.' },
           patch: {
             remove: ['frappe', 'latte'],
-            update: [{ id: 'create', label: 'Fábrica única', className: 'DrinkFactory', behavior: { type: 'transform', addTags: ['made:latte'], setShape: 'diamond' }, codeRef: 'DrinkFactory#create', skin: 'singleton' }],
+            update: [{ id: 'create', label: 'option.create-drink.singleton.label.create', className: 'DrinkFactory', behavior: { type: 'transform', addTags: ['made:latte'], setShape: 'diamond' }, codeRef: 'DrinkFactory#create', skin: 'singleton' }],
             add: { wires: [wire('create', 'charge')] },
           },
         },
         builder: {
           outcome: 'misfit',
           code: 'create_builder',
-          note: { title: 'Builder arma, no elige la clase', body: 'Armar la bebida por pasos no cambia que el if del flujo compartido siga eligiendo mal para Montaña.' },
           patch: {
             removeWires: ['take->create'],
             add: {
               nodes: [
-                skinned('builder', node('bSize', 'Tamaño', 'DrinkBuilder', [4, 0], { type: 'pass' }, { codeRef: 'DrinkBuilder#size' })),
-                skinned('builder', node('bTemp', 'Temperatura', 'DrinkBuilder', [6, 0], { type: 'pass' }, { codeRef: 'DrinkBuilder#temperature' })),
+                skinned('builder', node('bSize', 'DrinkBuilder', [4, 0], { type: 'pass' }, { codeRef: 'DrinkBuilder#size' })),
+                skinned('builder', node('bTemp', 'DrinkBuilder', [6, 0], { type: 'pass' }, { codeRef: 'DrinkBuilder#temperature' })),
               ],
               wires: chain('take', 'bSize', 'bTemp', 'create'),
             },
@@ -126,17 +114,12 @@ export default defineLevel({
     {
       id: 'payment-method',
       at: 'charge',
-      label: 'Método de pago',
       code: 'charge_base',
       inventory: ['strategy', 'observer', 'decorator'],
       options: {
         strategy: {
           outcome: 'solves',
           code: 'charge_strategy',
-          note: {
-            title: 'Strategy decide cómo se cobra',
-            body: 'Cada forma de pago es un cartucho intercambiable. No le importa qué fábrica creó la bebida: los patrones se combinan porque cada uno atiende su propio punto de variación.',
-          },
           patch: {
             update: [{ id: 'charge', behavior: { type: 'slot' }, skin: 'strategy' }],
             removeWires: ['charge->prepare'],
@@ -146,7 +129,6 @@ export default defineLevel({
         observer: {
           outcome: 'misfit',
           code: 'charge_observer',
-          note: { title: 'Observer cobra en todos lados', body: 'Avisar a todos los métodos de pago hace que cada uno cobre el mismo pedido.' },
           patch: {
             update: [{ id: 'charge', behavior: { type: 'broadcast' }, skin: 'observer' }],
             removeWires: ['charge->prepare'],
@@ -156,11 +138,10 @@ export default defineLevel({
         decorator: {
           outcome: 'misfit',
           code: 'charge_decorator',
-          note: { title: 'Decorator envuelve, no elige', body: 'El pedido sale envuelto de Cobrar, pero el vale ya se perdió en el árbol de if.' },
           patch: {
             removeWires: ['charge->prepare'],
             add: {
-              nodes: [skinned('decorator', node('wrapper', 'Envoltura', 'TrackedOrder', [14.5, 2], { type: 'transform', addTags: ['tracked'] }))],
+              nodes: [skinned('decorator', node('wrapper', 'TrackedOrder', [14.5, 2], { type: 'transform', addTags: ['tracked'] }))],
               wires: chain('charge', 'wrapper', 'prepare'),
             },
           },
@@ -171,7 +152,7 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [order(0, 'downtown', 'cash', 'Centro · efectivo'), order(45, 'beach', 'card', 'Playa · tarjeta'), order(90, 'mountain', 'voucher', 'Montaña · vale'), order(135, 'mountain', 'card', 'Montaña · tarjeta')],
+      pulses: [order(0, 'downtown', 'cash'), order(45, 'beach', 'card'), order(90, 'mountain', 'voucher'), order(135, 'mountain', 'card')],
     },
   ],
   winWhen: [

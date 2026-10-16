@@ -17,27 +17,22 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const subscriber = (id: string, label: string, className: string, y: number) =>
-  node(id, label, className, [10, y], { type: 'sink', message: `🔔 ${label} avisada` }, { codeRef: `${className}#update` })
+const subscriber = (id: string, className: string, y: number) =>
+  node(id, className, [10, y], { type: 'sink', message: '' }, { codeRef: `${className}#update` })
 
 export default defineLevel({
   id: 'observer',
   order: 10,
   chapter: 'rush-hour',
-  title: '¡Pedido listo!',
   targetPattern: 'observer',
-  brief: {
-    problem: 'Cuando un pedido está listo hay que avisar a la pantalla, a la app del cliente y al programa de lealtad. El pedido llama a cada uno por nombre… y a Lealtad nunca la llama.',
-    goal: 'Que todos los interesados se enteren y que sumar uno nuevo no obligue a tocar el pedido.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('bar', 'Preparar', 'Barista', [3, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
-      node('ready', 'Pedido listo', 'Order', [6, 2], { type: 'broadcast' }, { codeRef: 'Order#complete!' }),
-      subscriber('display', 'Pantalla', 'Display', 0),
-      subscriber('push', 'App del cliente', 'PushNotifier', 2),
-      subscriber('loyalty', 'Lealtad', 'LoyaltyProgram', 4),
+      actor('customer', [0, 2]),
+      node('bar', 'Barista', [3, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
+      node('ready', 'Order', [6, 2], { type: 'broadcast' }, { codeRef: 'Order#complete!' }),
+      subscriber('display', 'Display', 0),
+      subscriber('push', 'PushNotifier', 2),
+      subscriber('loyalty', 'LoyaltyProgram', 4),
     ],
     wires: [...chain('customer', 'bar', 'ready'), wire('ready', 'display'), wire('ready', 'push')],
   },
@@ -45,16 +40,11 @@ export default defineLevel({
     {
       id: 'notices',
       at: 'ready',
-      label: 'Avisos',
       inventory: ['observer', 'strategy', 'chain-of-responsibility'],
       options: {
         observer: {
           outcome: 'solves',
           code: 'observer',
-          note: {
-            title: 'Observer: avisar a todos los suscriptores',
-            body: 'El pedido emite un aviso y cada interesado se suscribe por su cuenta. El pedido ya no conoce a nadie por nombre: sumar un suscriptor es registrarlo, sin tocar al pedido.',
-          },
           patch: {
             removeWires: ['ready->display', 'ready->push'],
             update: [{ id: 'ready', skin: 'observer' }, ...['display', 'push', 'loyalty'].map((id) => ({ id, skin: 'observer' as const }))],
@@ -64,10 +54,6 @@ export default defineLevel({
         strategy: {
           outcome: 'misfit',
           code: 'strategy',
-          note: {
-            title: 'Strategy elige uno; Observer avisa a todos',
-            body: 'Con una estrategia de aviso el pedido elige un canal: solo la pantalla se entera. Aquí no había que elegir, había que difundir.',
-          },
           patch: {
             removeWires: ['ready->display', 'ready->push'],
             update: [{ id: 'ready', behavior: { type: 'slot' }, skin: 'strategy' }],
@@ -77,10 +63,6 @@ export default defineLevel({
         'chain-of-responsibility': {
           outcome: 'misfit',
           code: 'chain',
-          note: {
-            title: 'En una cadena, alguien se queda con el mensaje',
-            body: 'Chain of Responsibility pasa la petición hasta que un eslabón la atiende, y ahí termina. La pantalla atendió el aviso y los demás nunca lo vieron.',
-          },
           patch: {
             removeWires: ['ready->push'],
             update: [{ id: 'ready', behavior: { type: 'pass' }, skin: 'chain-of-responsibility' }],
@@ -89,14 +71,13 @@ export default defineLevel({
       },
     },
   ],
-  scenarios: [{ id: 'main', pulses: [pulse(0, 'Latte', ['display']), pulse(40, 'Mocha', ['display']), pulse(80, 'Té', ['display'])] }],
+  scenarios: [{ id: 'main', pulses: [pulse(0, ['display']), pulse(40, ['display']), pulse(80, ['display'])] }],
   changeTickets: [
     {
       id: 'kitchen',
-      text: 'La cocina también quiere enterarse, para reponer insumos.',
       scenario: 'main',
-      without: { add: { nodes: [subscriber('kitchen', 'Cocina', 'Kitchen', 6)], wires: [wire('ready', 'kitchen')] } },
-      with: { add: { nodes: [skinned('observer', subscriber('kitchen', 'Cocina', 'Kitchen', 6))], wires: [abstract('ready', 'kitchen')] } },
+      without: { add: { nodes: [subscriber('kitchen', 'Kitchen', 6)], wires: [wire('ready', 'kitchen')] } },
+      with: { add: { nodes: [skinned('observer', subscriber('kitchen', 'Kitchen', 6))], wires: [abstract('ready', 'kitchen')] } },
       code: { without: 'base_kitchen', with: 'observer_kitchen' },
     },
   ],

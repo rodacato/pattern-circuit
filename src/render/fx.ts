@@ -17,7 +17,7 @@ export class Effects {
   private readonly reduced: boolean
   private readonly t: Translate
 
-  // Floating texts are translated here: the skins write in Spanish, like all the content.
+  // Floating texts are translated here: the skins pass keys, like all the content.
   constructor(layer: Container, reduced = false, t: Translate = identity) {
     this.layer = layer
     this.reduced = reduced

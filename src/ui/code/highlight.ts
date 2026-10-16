@@ -15,17 +15,21 @@ function load() {
     import('shiki/langs/ruby.mjs'),
     import('shiki/langs/typescript.mjs'),
     import('shiki/themes/tokyo-night.mjs'),
-  ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }, ruby, typescript, theme]) =>
-    createHighlighterCore({ themes: [theme.default], langs: [ruby.default, typescript.default], engine: createJavaScriptRegexEngine() }),
+    import('shiki/themes/github-light.mjs'),
+  ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }, ruby, typescript, dark, light]) =>
+    createHighlighterCore({ themes: [dark.default, light.default], langs: [ruby.default, typescript.default], engine: createJavaScriptRegexEngine() }),
   )
   highlighter.catch(() => (highlighter = undefined)) // a network failure does not leave the panel colorless forever
   return highlighter
 }
 
-export async function highlight(code: string, lang: CodeLang): Promise<Token[][]> {
+export type Mode = 'light' | 'dark'
+const THEME: Record<Mode, string> = { dark: 'tokyo-night', light: 'github-light' }
+
+export async function highlight(code: string, lang: CodeLang, mode: Mode = 'dark'): Promise<Token[][]> {
   const hl = await load()
   return hl
-    .codeToTokensBase(code, { lang: SHIKI_LANG[lang], theme: 'tokyo-night' })
+    .codeToTokensBase(code, { lang: SHIKI_LANG[lang], theme: THEME[mode] })
     .map((line: ThemedToken[]) => line.map((t) => ({ content: t.content, color: t.color })))
 }
 

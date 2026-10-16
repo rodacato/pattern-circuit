@@ -13,25 +13,20 @@ import tsSaga from './ts/saga.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const avisar = node('notify', 'Avisar al cliente', 'Counter', [0, 5], { type: 'sink', expects: { hasTag: 'refunded' }, message: '💸 reembolsado y avisado' }, { codeRef: 'Counter#notify' })
+const notify = node('notify', 'Counter', [0, 5], { type: 'sink', expects: { hasTag: 'refunded' }, message: '' }, { codeRef: 'Counter#notify' })
 
 export default defineLevel({
   id: 'saga',
   order: 23,
   chapter: 'resilience',
-  title: 'Cobrado y sin avena',
   targetPattern: 'saga',
-  brief: {
-    problem: 'Tomar un pedido son tres pasos en servicios distintos: cobrar, reservar insumos y preparar. Si falta avena, el cobro ya se hizo: el cliente pagó y se queda sin nada.',
-    goal: 'Que si un paso falla, los anteriores se compensen: el cliente recupera su dinero y se entera.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('charge', 'Cobrar', 'Payments', [3, 2], { type: 'pass' }, { codeRef: 'Payments.charge' }),
-      node('reserve', 'Reservar insumos', 'Inventory', [6.5, 2], { type: 'guard', require: { not: { hasTag: 'out-of-stock' } }, onFail: 'drop' }, { codeRef: 'Inventory.reserve' }),
-      node('prepare', 'Preparar', 'Barista', [10, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
-      node('handOver', 'Entregar', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('charge', 'Payments', [3, 2], { type: 'pass' }, { codeRef: 'Payments.charge' }),
+      node('reserve', 'Inventory', [6.5, 2], { type: 'guard', require: { not: { hasTag: 'out-of-stock' } }, onFail: 'drop' }, { codeRef: 'Inventory.reserve' }),
+      node('prepare', 'Barista', [10, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
+      node('handOver', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: chain('customer', 'charge', 'reserve', 'prepare', 'handOver'),
   },
@@ -39,23 +34,18 @@ export default defineLevel({
     {
       id: 'steps',
       at: 'reserve',
-      label: 'Pasos del pedido',
       inventory: ['saga', 'command', 'observer'],
       options: {
         saga: {
           outcome: 'solves',
           code: 'saga',
-          note: {
-            title: 'Saga: cada paso con su compensación',
-            body: 'Sin una transacción que abarque los tres servicios, cada paso trae su acción compensatoria. Si reservar falla, se ejecutan las compensaciones de lo ya hecho en orden inverso: el cobro se corrige con un reembolso.',
-          },
           patch: {
             update: [
               { id: 'reserve', behavior: { type: 'guard', require: { not: { hasTag: 'out-of-stock' } }, onFail: 'compensate' }, skin: 'saga' },
               { id: 'charge', skin: 'saga' },
             ],
             add: {
-              nodes: [skinned('saga', node('refund', 'Reembolsar', 'Payments', [3, 5], { type: 'transform', addTags: ['refunded'] }, { codeRef: 'Payments.refund' })), avisar],
+              nodes: [skinned('saga', node('refund', 'Payments', [3, 5], { type: 'transform', addTags: ['refunded'] }, { codeRef: 'Payments.refund' })), notify],
               wires: [wire('reserve', 'refund', { port: 'compensate' }), wire('refund', 'notify')],
             },
           },
@@ -63,19 +53,14 @@ export default defineLevel({
         command: {
           outcome: 'partial',
           code: 'command',
-          note: {
-            title: 'Command deshace en memoria; una saga compensa entre servicios',
-            body: 'El undo de Command revierte estado local que el propio objeto guardó. Un cobro en el banco no se revierte: se compensa con una acción nueva (un reembolso), y alguien tiene que coordinar qué compensar cuando falla un paso en otro servicio. Command puede ser la pieza de cada paso, pero no orquesta la compensación.',
-          },
           patch: { update: [{ id: 'charge', skin: 'command', codeRef: 'ChargeCommand' }] },
         },
         observer: {
           outcome: 'misfit',
           code: 'observer',
-          note: { title: 'Avisar no es compensar', body: 'Todos se enteran de que el pedido falló, pero nadie devuelve el dinero.' },
           patch: {
             update: [{ id: 'reserve', behavior: { type: 'guard', require: { not: { hasTag: 'out-of-stock' } }, onFail: 'notify' }, skin: 'observer' }],
-            add: { nodes: [avisar], wires: [wire('reserve', 'notify', { port: 'notify' })] },
+            add: { nodes: [notify], wires: [wire('reserve', 'notify', { port: 'notify' })] },
           },
         },
       },
@@ -84,13 +69,13 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Latte'), pulse(40, 'Mocha'), pulse(80, 'Latte de avena', ['out-of-stock']), pulse(120, 'Té')],
+      pulses: [pulse(0), pulse(40), pulse(80, ['out-of-stock']), pulse(120)],
     },
   ],
   winWhen: [
     { metric: 'delivered', op: '==', value: 4 },
-    { metric: 'dropped', op: '==', value: 0, label: 'clientes que pagaron y se quedaron sin nada' },
-    { metric: 'invalidAtSink', op: '==', value: 0, label: 'avisos sin reembolso' },
+    { metric: 'dropped', op: '==', value: 0, label: '' },
+    { metric: 'invalidAtSink', op: '==', value: 0, label: '' },
   ],
   code: { rb: { base: code(base), saga: code(saga), command: code(base + command), observer: code(base + observer) }, ts: { base: codeTs(tsBase), saga: codeTs(tsSaga), command: codeTs(tsBase + tsCommand), observer: codeTs(tsBase + tsObserver) } },
 })

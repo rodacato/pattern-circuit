@@ -32,7 +32,7 @@ npm run coverage # coverage with thresholds
 - **Logic does not live in components or in the render**: if something has to be decided, it goes to `game/` (pure functions when possible) with its test.
 - **The engine is deterministic**: no `Math.random()` and no real time inside `engine/`.
 - Short comments that explain the *why*, not the *what*.
-- Texts: write them in Spanish where they are shown, with `t()` / `msg()` / `N()`, and add their translation to the English catalog (`src/i18n/en/`); the coverage test tells you which ones are missing.
+- **Texts**: never write prose in components, render, game or level data. Add the text to the catalogs of every locale under `src/i18n/locales/<code>/<area>.ts` (English first: it defines the typed keys) and use the key: `t('ui.notebook.title')`, `msg('ui.header.notes', { n })`, `N('…')`. `npm test` tells you which keys are missing or unused and fails on prose in the sources.
 - Accessibility: everything new must be usable with the keyboard, and controls with an icon carry an `aria-label`.
 
 ## Adding a level
@@ -42,12 +42,16 @@ npm run coverage # coverage with thresholds
    - the Ruby snippets (`.rb`), with `# region: Class#method` / `# endregion` regions for every `codeRef`;
    - their TypeScript equivalents in `ts/`, with the same keys, the same story line by line and `// region:` regions with the same names;
    - `level.test.ts`: the pedagogical behavior of each option ("Observer charges three times", "Strategy + ticket touches 0 nodes");
-   - `en.ts`: the English translation of every text of the level (the `i18n` coverage test says which ones are missing).
+   - `locales/en.ts` and `locales/<code>.ts` for every other locale: the texts of the level by key. `level.ts` itself holds no prose: titles, briefs, labels, notes, tickets and pulse labels are found by the key derived from where they are (`node.<id>`, `socket.<id>`, `option.<socket>.<pattern>.title`, …; see `src/engine/level/texts.ts`). Texts several levels share (a customer, a charge) go in `src/levels/locales/`.
    Everything inside the snippets (identifiers, comments, output strings) is English.
 2. The registry discovers it by itself. `defineLevel` validates every reachable variant and `levels.test.ts` checks the common invariants (without a pattern it fails, with the right one it wins, no wrong one wins…).
 3. Ids are permanent: they are stored in the players' saved progress. If one ever has to change, add the old id to `LEGACY_LEVEL_IDS` / `LEGACY_SOCKET_IDS` in `src/game/progress/progress.ts`.
 4. If the level goes in a new chapter, add it in `levels/tracks.ts`, in order.
 5. Update the progression table in [docs/DESIGN.md](docs/DESIGN.md).
+
+## Adding a language
+
+`npm run i18n:scaffold -- pt-BR "Português (Brasil)" PT` creates `src/i18n/locales/pt-BR/` and a `locales/pt-BR.ts` in every level from the English files. Translate them (search for `TODO(translate)`): the registry is the list of folders, so no code changes.
 
 ## Adding a pattern
 

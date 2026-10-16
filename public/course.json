@@ -1,0 +1,340 @@
+{
+  "schema": 1,
+  "id": "pattern-circuit",
+  "version": "1.1.0",
+  "protocol": {
+    "min": 1,
+    "max": 1
+  },
+  "title": {
+    "es-MX": "Patrones de diseño",
+    "en": "Design patterns"
+  },
+  "description": {
+    "es-MX": "Aprende patrones de diseño enchufándolos en el circuito de una cafetería.",
+    "en": "Learn design patterns by plugging them into a cafeteria circuit."
+  },
+  "locales": [
+    "es-MX",
+    "en"
+  ],
+  "defaultLocale": "en",
+  "codeLanguages": [
+    "ruby",
+    "typescript"
+  ],
+  "defaultCodeLanguage": "ruby",
+  "entry": "./index.html",
+  "groups": [
+    {
+      "id": "opening",
+      "title": {
+        "es-MX": "Apertura",
+        "en": "Opening"
+      }
+    },
+    {
+      "id": "counter",
+      "title": {
+        "es-MX": "El mostrador",
+        "en": "The counter"
+      }
+    },
+    {
+      "id": "bar",
+      "title": {
+        "es-MX": "La barra crece",
+        "en": "The bar grows"
+      }
+    },
+    {
+      "id": "rush-hour",
+      "title": {
+        "es-MX": "Hora pico",
+        "en": "Rush hour"
+      }
+    },
+    {
+      "id": "all-together",
+      "title": {
+        "es-MX": "Todo junto",
+        "en": "All together"
+      }
+    },
+    {
+      "id": "architecture",
+      "title": {
+        "es-MX": "Arquitectura",
+        "en": "Architecture"
+      }
+    },
+    {
+      "id": "resilience",
+      "title": {
+        "es-MX": "Resiliencia",
+        "en": "Resilience"
+      }
+    },
+    {
+      "id": "judgment",
+      "title": {
+        "es-MX": "Criterio: cuándo no",
+        "en": "Judgment: when not to"
+      }
+    },
+    {
+      "id": "final",
+      "title": {
+        "es-MX": "La cafetería completa",
+        "en": "The whole coffee shop"
+      }
+    }
+  ],
+  "units": [
+    {
+      "id": "tutorial",
+      "group": "opening",
+      "title": {
+        "es-MX": "Abre la cafetería",
+        "en": "Open the coffee shop"
+      }
+    },
+    {
+      "id": "strategy",
+      "group": "counter",
+      "title": {
+        "es-MX": "¿Efectivo o tarjeta?",
+        "en": "Cash or card?"
+      }
+    },
+    {
+      "id": "factory-method",
+      "group": "counter",
+      "title": {
+        "es-MX": "Dos sucursales, dos menús",
+        "en": "Two branches, two menus"
+      }
+    },
+    {
+      "id": "builder",
+      "group": "counter",
+      "title": {
+        "es-MX": "Pedido a la medida",
+        "en": "Custom order"
+      }
+    },
+    {
+      "id": "singleton",
+      "group": "counter",
+      "title": {
+        "es-MX": "Turnos repetidos",
+        "en": "Repeated ticket numbers"
+      }
+    },
+    {
+      "id": "adapter",
+      "group": "bar",
+      "title": {
+        "es-MX": "La terminal nueva",
+        "en": "The new terminal"
+      }
+    },
+    {
+      "id": "decorator",
+      "group": "bar",
+      "title": {
+        "es-MX": "Extras sin fin",
+        "en": "Endless extras"
+      }
+    },
+    {
+      "id": "composite",
+      "group": "bar",
+      "title": {
+        "es-MX": "Combos dentro de combos",
+        "en": "Combos inside combos"
+      }
+    },
+    {
+      "id": "facade",
+      "group": "bar",
+      "title": {
+        "es-MX": "La cocina por dentro",
+        "en": "Inside the kitchen"
+      }
+    },
+    {
+      "id": "proxy",
+      "group": "bar",
+      "title": {
+        "es-MX": "El almacén está lejos",
+        "en": "The warehouse is far away"
+      }
+    },
+    {
+      "id": "observer",
+      "group": "rush-hour",
+      "title": {
+        "es-MX": "¡Pedido listo!",
+        "en": "Order ready!"
+      }
+    },
+    {
+      "id": "state",
+      "group": "rush-hour",
+      "title": {
+        "es-MX": "La vida de un pedido",
+        "en": "The life of an order"
+      }
+    },
+    {
+      "id": "chain",
+      "group": "rush-hour",
+      "title": {
+        "es-MX": "Reembolsos",
+        "en": "Refunds"
+      }
+    },
+    {
+      "id": "command",
+      "group": "rush-hour",
+      "title": {
+        "es-MX": "Me equivoqué de pedido",
+        "en": "Wrong order"
+      }
+    },
+    {
+      "id": "template-method",
+      "group": "rush-hour",
+      "title": {
+        "es-MX": "Recetas copiadas",
+        "en": "Copied recipes"
+      }
+    },
+    {
+      "id": "branches-and-payments",
+      "group": "all-together",
+      "title": {
+        "es-MX": "Sucursales y pagos",
+        "en": "Branches and payments"
+      }
+    },
+    {
+      "id": "combos-with-extras",
+      "group": "all-together",
+      "title": {
+        "es-MX": "Combos con extras",
+        "en": "Combos with extras"
+      }
+    },
+    {
+      "id": "live-orders",
+      "group": "all-together",
+      "title": {
+        "es-MX": "Pedidos en vivo",
+        "en": "Live orders"
+      }
+    },
+    {
+      "id": "ports-and-adapters",
+      "group": "architecture",
+      "title": {
+        "es-MX": "El núcleo y el mundo",
+        "en": "The core and the world"
+      }
+    },
+    {
+      "id": "event-bus",
+      "group": "architecture",
+      "title": {
+        "es-MX": "Servicios que se enteran",
+        "en": "Services that find out"
+      }
+    },
+    {
+      "id": "cqrs",
+      "group": "architecture",
+      "title": {
+        "es-MX": "Mil pantallas, un mostrador",
+        "en": "A thousand displays, one counter"
+      }
+    },
+    {
+      "id": "null-object",
+      "group": "resilience",
+      "title": {
+        "es-MX": "El cliente sin tarjeta",
+        "en": "The customer without a card"
+      }
+    },
+    {
+      "id": "circuit-breaker",
+      "group": "resilience",
+      "title": {
+        "es-MX": "El proveedor se cayó",
+        "en": "The provider went down"
+      }
+    },
+    {
+      "id": "saga",
+      "group": "resilience",
+      "title": {
+        "es-MX": "Cobrado y sin avena",
+        "en": "Charged and out of oat milk"
+      }
+    },
+    {
+      "id": "single-payment",
+      "group": "judgment",
+      "title": {
+        "es-MX": "Un solo método de pago",
+        "en": "A single payment method"
+      }
+    },
+    {
+      "id": "single-listener",
+      "group": "judgment",
+      "title": {
+        "es-MX": "Un solo interesado",
+        "en": "A single interested party"
+      }
+    },
+    {
+      "id": "full-cafe",
+      "group": "final",
+      "title": {
+        "es-MX": "La cafetería completa",
+        "en": "The complete coffee shop"
+      }
+    }
+  ],
+  "completion": {
+    "requires": "all"
+  },
+  "capabilities": {
+    "codeRunner": "none",
+    "theming": {
+      "modes": [
+        "light",
+        "dark"
+      ],
+      "honors": [
+        "page",
+        "surface",
+        "elevated",
+        "border",
+        "textPrimary",
+        "textSecondary",
+        "textMuted",
+        "accent",
+        "fontSans",
+        "fontMono"
+      ]
+    },
+    "minViewport": {
+      "width": 640,
+      "height": 480
+    },
+    "persistsOwnState": true
+  }
+}

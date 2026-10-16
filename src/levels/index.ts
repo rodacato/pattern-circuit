@@ -17,8 +17,26 @@ export function nextLevel(level: Level): Level | undefined {
   return next && trackOf(next.chapter) === trackOf(level.chapter) ? next : undefined
 }
 
-// Content translations: each level may ship an `en.ts` (Spanish text → English).
-const english = import.meta.glob<{ default: Catalog }>('./*/en.ts', { eager: true })
-export const LEVEL_CATALOGS = { en: Object.assign({}, ...Object.values(english).map((m) => m.default)) as Catalog }
+// Texts of the levels, by locale: `<level>/locales/<code>.ts` become `levels.<level>.<key>`, and the vocabulary
+// every level shares (`locales/<code>.ts`) becomes `levels.shared.<key>`.
+const ownFiles = import.meta.glob<{ default: Catalog }>('./*/locales/*.ts', { eager: true })
+const sharedFiles = import.meta.glob<{ default: Catalog }>('./locales/*.ts', { eager: true })
+
+function addCatalog(into: Record<string, Catalog>, locale: string, scope: string, catalog: Catalog) {
+  const target = (into[locale] ??= {})
+  for (const [key, text] of Object.entries(catalog)) target[`levels.${scope}.${key}`] = text
+}
+
+function levelCatalogs(): Record<string, Catalog> {
+  const out: Record<string, Catalog> = {}
+  for (const [path, m] of Object.entries(ownFiles)) {
+    const [, level, , file] = path.split('/')
+    addCatalog(out, file.replace(/\.ts$/, ''), level, m.default)
+  }
+  for (const [path, m] of Object.entries(sharedFiles)) addCatalog(out, path.split('/')[2].replace(/\.ts$/, ''), 'shared', m.default)
+  return out
+}
+
+export const LEVEL_CATALOGS: Record<string, Catalog> = levelCatalogs()
 
 export { chapterName, CHAPTERS, TRACKS, trackOf } from './tracks'

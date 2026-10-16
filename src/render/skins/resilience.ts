@@ -1,4 +1,6 @@
 // Skins of the Resilience chapter (Null Object, Circuit Breaker, Saga), with their own color.
+import { BREAKER_OPEN } from '../../engine'
+import { N } from '../../i18n'
 import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'
@@ -26,7 +28,7 @@ export function nullObject(): Skin {
 export function circuitBreaker(): Skin {
   return {
     drawNode({ d, gl, state }, node, at) {
-      const open = state.nodeState[node.id] === 'abierto'
+      const open = state.nodeState[node.id] === BREAKER_OPEN
       const y = at.y - NODE_H / 2 - 12
       d.circle(at.x - 12, y, 3).fill({ color: PINK })
       d.circle(at.x + 12, y, 3).fill({ color: PINK })
@@ -35,9 +37,9 @@ export function circuitBreaker(): Skin {
       gl.moveTo(at.x - 12, y).lineTo(end.x, end.y).stroke({ width: 6, color: open ? C.red : C.green, alpha: 0.5 })
     },
     onEvent({ fx }, _node, at, e) {
-      if (e.type === 'node.state' && e.state === 'abierto') {
+      if (e.type === 'node.state' && e.state === BREAKER_OPEN) {
         fx.ring(at, C.red, 90)
-        fx.float(at, '⚡ interruptor abierto: directo al respaldo', C.red)
+        fx.float(at, N('render.skin.resilience.breakerOpen'), C.red)
       }
     },
   }
@@ -54,7 +56,7 @@ export function saga(): Skin {
       d.moveTo(to, y).lineTo(to + (back ? 5 : -5), y - 4).moveTo(to, y).lineTo(to + (back ? 5 : -5), y + 4).stroke({ width: 1.5, color: PINK })
     },
     onEvent({ fx }, node, at, e) {
-      if (node.behavior.type === 'transform' && e.type === 'pulse.transform') fx.float(at, '↩ compensado', PINK)
+      if (node.behavior.type === 'transform' && e.type === 'pulse.transform') fx.float(at, N('render.skin.resilience.compensated'), PINK)
     },
   }
 }

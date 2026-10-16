@@ -15,28 +15,23 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const external = (id: string, label: string, className: string, at: [number, number], codeRef: string): NodeInput =>
-  node(id, label, className, at, { type: 'guard', require: { hasTag: 'env:prod' }, onFail: 'drop' }, { kind: 'external', codeRef })
-const adapterNode = (id: string, label: string, className: string, at: [number, number], extra: Partial<NodeInput> = {}) =>
-  skinned('ports-and-adapters', node(id, label, className, at, { type: 'pass' }, { codeRef: className, ...extra }))
+const external = (id: string, className: string, at: [number, number], codeRef: string): NodeInput =>
+  node(id, className, at, { type: 'guard', require: { hasTag: 'env:prod' }, onFail: 'drop' }, { kind: 'external', codeRef })
+const adapterNode = (id: string, className: string, at: [number, number], extra: Partial<NodeInput> = {}) =>
+  skinned('ports-and-adapters', node(id, className, at, { type: 'pass' }, { codeRef: className, ...extra }))
 
 export default defineLevel({
   id: 'ports-and-adapters',
   order: 18,
   chapter: 'architecture',
-  title: 'El núcleo y el mundo',
   targetPattern: 'ports-and-adapters',
-  brief: {
-    problem: 'Queremos correr pedidos de prueba en cada cambio. Pero el núcleo del negocio abre la base de datos real y cobra con Stripe directamente: en el entorno de pruebas no hay base de datos y todo explota.',
-    goal: 'Que el mismo núcleo funcione en pruebas y en producción cambiando solo lo que se enchufa alrededor.',
-  },
   circuit: {
     nodes: [
-      actor('web', 'App web', [0, 2]),
-      node('core', 'Núcleo: pedidos', 'OrderService', [3, 2], { type: 'pass' }, { codeRef: 'OrderService#place' }),
-      external('postgres', 'Postgres', 'PG', [7, 2], 'Postgres'),
-      external('stripe', 'Stripe', 'Stripe', [11, 2], 'Stripe'),
-      node('confirm', 'Confirmar', 'Receipt', [16, 2], { type: 'sink' }, { codeRef: 'Receipt#confirm' }),
+      actor('web', [0, 2]),
+      node('core', 'OrderService', [3, 2], { type: 'pass' }, { codeRef: 'OrderService#place' }),
+      external('postgres', 'PG', [7, 2], 'Postgres'),
+      external('stripe', 'Stripe', [11, 2], 'Stripe'),
+      node('confirm', 'Receipt', [16, 2], { type: 'sink' }, { codeRef: 'Receipt#confirm' }),
     ],
     wires: chain('web', 'core', 'postgres', 'stripe', 'confirm'),
   },
@@ -44,27 +39,22 @@ export default defineLevel({
     {
       id: 'dependencies',
       at: 'core',
-      label: 'Dependencias',
       inventory: ['ports-and-adapters', 'adapter', 'facade', 'singleton'],
       options: {
         'ports-and-adapters': {
           outcome: 'solves',
           code: 'ports',
-          note: {
-            title: 'Ports & Adapters: el núcleo define los enchufes',
-            body: 'El núcleo declara puertos (guardar pedidos, cobrar) y no sabe quién los implementa. En pruebas se enchufan adaptadores en memoria; en producción, Postgres y Stripe. Es la respuesta al Singleton del nivel 4: nada global: los adaptadores se enchufan desde afuera (por ejemplo, inyectados).',
-          },
           patch: {
             remove: ['postgres', 'stripe'],
             update: [{ id: 'core', skin: 'ports-and-adapters' }],
             add: {
               nodes: [
-                skinned('ports-and-adapters', node('repoPort', 'Puerto: pedidos', 'Port::Repository', [6, 2], { type: 'slot' }, { codeRef: 'Port::Repository' })),
-                adapterNode('memRepo', 'En memoria', 'InMemoryOrders', [8.5, 0.5]),
-                adapterNode('pgRepo', 'Postgres', 'PostgresOrders', [8.5, 3.5], { kind: 'external' }),
-                skinned('ports-and-adapters', node('payPort', 'Puerto: pagos', 'Port::Payments', [11, 2], { type: 'slot' }, { codeRef: 'Port::Payments' })),
-                adapterNode('fakePay', 'Pagos falsos', 'FakePayments', [13.5, 0.5]),
-                adapterNode('stripePay', 'Stripe', 'StripePayments', [13.5, 3.5], { kind: 'external' }),
+                skinned('ports-and-adapters', node('repoPort', 'Port::Repository', [6, 2], { type: 'slot' }, { codeRef: 'Port::Repository' })),
+                adapterNode('memRepo', 'InMemoryOrders', [8.5, 0.5]),
+                adapterNode('pgRepo', 'PostgresOrders', [8.5, 3.5], { kind: 'external' }),
+                skinned('ports-and-adapters', node('payPort', 'Port::Payments', [11, 2], { type: 'slot' }, { codeRef: 'Port::Payments' })),
+                adapterNode('fakePay', 'FakePayments', [13.5, 0.5]),
+                adapterNode('stripePay', 'StripePayments', [13.5, 3.5], { kind: 'external' }),
               ],
               wires: [
                 abstract('core', 'repoPort'),
@@ -83,14 +73,10 @@ export default defineLevel({
         adapter: {
           outcome: 'partial',
           code: 'adapter',
-          note: {
-            title: 'Un adaptador es una pieza, no la arquitectura',
-            body: 'Adaptar Stripe es un buen paso, pero el núcleo sigue atado a Postgres. Ports & Adapters aplica la misma idea a todas las dependencias, y hace que sea el núcleo quien define las interfaces.',
-          },
           patch: {
             removeWires: ['postgres->stripe'],
             add: {
-              nodes: [skinned('adapter', node('stripeAdapter', 'Adaptador', 'StripeAdapter', [9, 0.5], { type: 'pass' }, { codeRef: 'StripeAdapter' }))],
+              nodes: [skinned('adapter', node('stripeAdapter', 'StripeAdapter', [9, 0.5], { type: 'pass' }, { codeRef: 'StripeAdapter' }))],
               wires: chain('postgres', 'stripeAdapter', 'stripe'),
             },
           },
@@ -98,11 +84,10 @@ export default defineLevel({
         facade: {
           outcome: 'misfit',
           code: 'facade',
-          note: { title: 'Facade esconde, no desacopla', body: 'Agrupar la infraestructura detrás de una fachada no cambia que el núcleo termine llamando a la base de datos real.' },
           patch: {
             removeWires: ['core->postgres'],
             add: {
-              nodes: [skinned('facade', node('infra', 'Infraestructura', 'Infrastructure', [5, 0.5], { type: 'pass' }, { codeRef: 'Infrastructure' }))],
+              nodes: [skinned('facade', node('infra', 'Infrastructure', [5, 0.5], { type: 'pass' }, { codeRef: 'Infrastructure' }))],
               wires: chain('core', 'infra', 'postgres'),
             },
           },
@@ -110,10 +95,6 @@ export default defineLevel({
         singleton: {
           outcome: 'misfit',
           code: 'singleton',
-          note: {
-            title: 'El precio del Singleton',
-            body: 'Una conexión global única es justo lo que impide cambiarla por otra en las pruebas. Lo que en el nivel 4 resolvía, aquí estorba.',
-          },
           patch: { update: [{ id: 'postgres', skin: 'singleton', codeRef: 'Database.instance' }] },
         },
       },
@@ -122,7 +103,7 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Prueba 1', ['env:test'], {}, 'web'), pulse(40, 'Prueba 2', ['env:test'], {}, 'web'), pulse(80, 'Pedido real', ['env:prod'], {}, 'web')],
+      pulses: [pulse(0, ['env:test'], {}, 'web'), pulse(40, ['env:test'], {}, 'web'), pulse(80, ['env:prod'], {}, 'web')],
     },
   ],
   winWhen: [

@@ -1,17 +1,17 @@
+import { useState } from 'react'
 import { FAMILY_NAMES, PATTERNS, type Level, type PatternId, type SocketOption } from '../engine'
 import { parseNoteKey } from '../game/progress/progress'
-import { msg } from '../i18n'
+import { msg, N } from '../i18n'
 import { useT } from './i18nContext'
 import { SeenIn } from './SeenIn'
 import { useDialog } from './useDialog'
 
 type Entry = { level: Level; option: SocketOption }
 
-// i18n
 const OUTCOME_LABEL = {
-  solves: 'Resuelve',
-  partial: 'Parcial',
-  misfit: 'No encaja',
+  solves: N('ui.notebook.outcome.solves'),
+  partial: N('ui.notebook.outcome.partial'),
+  misfit: N('ui.notebook.outcome.misfit'),
 } as const
 
 // One note per level socket where that pattern was tried (a pattern can be offered in several).
@@ -36,28 +36,27 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
   const total = [...byPattern.values()].reduce((n, list) => n + list.length, 0)
   const closeButton = useDialog<HTMLButtonElement>(onClose)
 
-  const reset = () => {
-    if (window.confirm(t('¿Borrar todo el progreso? Se pierden los niveles completados y las notas del cuaderno.'))) onReset()
-  }
+  // A native confirm() is blocked inside a sandboxed iframe, so the question is part of the dialog.
+  const [confirming, setConfirming] = useState(false)
 
   return (
     <div className="notebook-backdrop" onClick={onClose}>
       <aside className="notebook card" role="dialog" aria-modal="true" aria-labelledby="notebook-title" onClick={(e) => e.stopPropagation()}>
         <header>
           <div>
-            <span className="eyebrow">{t('Cuaderno de patrones')}</span>
-            <h2 id="notebook-title">{t(msg('{n} notas de campo', { n: total }))}</h2>
+            <span className="eyebrow">{t('ui.notebook.eyebrow')}</span>
+            <h2 id="notebook-title">{t(msg('ui.notebook.title', { n: total }))}</h2>
             {!!predictions?.total && (
               <span className="muted">
-                🔮 {t(msg('Predicciones acertadas: {right} de {total}', { right: predictions.right, total: predictions.total }))}
+                🔮 {t(msg('ui.notebook.predictions', { right: predictions.right, total: predictions.total }))}
               </span>
             )}
           </div>
-          <button ref={closeButton} className="close" onClick={onClose} aria-label={t('Cerrar cuaderno')}>
+          <button ref={closeButton} className="close" onClick={onClose} aria-label={t('ui.notebook.close')}>
             ×
           </button>
         </header>
-        {total === 0 && <p className="muted">{t('Todavía vacío. Cada patrón que pruebes en un socket deja aquí lo que aprendiste.')}</p>}
+        {total === 0 && <p className="muted">{t('ui.notebook.empty')}</p>}
         {[...byPattern].map(([pattern, list]) => (
           <section key={pattern} className={`note-group ${PATTERNS[pattern].family}`}>
             <h3>
@@ -69,7 +68,7 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
             {list.map(({ level, option }) => (
               <article key={`${level.id}:${option.note.title}`} className={`note ${option.outcome}`}>
                 <span className="where">
-                  {t(msg('Nivel {n} · {title}', { n: level.order, title: level.title }))} · <b>{t(OUTCOME_LABEL[option.outcome])}</b>
+                  {t(msg('ui.common.levelTitle', { n: level.order, title: level.title }))} · <b>{t(OUTCOME_LABEL[option.outcome])}</b>
                 </span>
                 <strong>{t(option.note.title)}</strong>
                 <p>{t(option.note.body)}</p>
@@ -78,9 +77,21 @@ export function Notebook({ levels, notes, predictions, onClose, onReset }: Props
           </section>
         ))}
         <footer className="notebook-foot">
-          <button className="link danger" onClick={reset}>
-            {t('Borrar progreso')}
-          </button>
+          {confirming ? (
+            <div role="alert" className="confirm">
+              <p>{t('ui.notebook.confirmReset')}</p>
+              <button className="link danger" onClick={onReset}>
+                {t('ui.notebook.resetYes')}
+              </button>
+              <button className="link" onClick={() => setConfirming(false)}>
+                {t('ui.notebook.resetNo')}
+              </button>
+            </div>
+          ) : (
+            <button className="link danger" onClick={() => setConfirming(true)}>
+              {t('ui.notebook.reset')}
+            </button>
+          )}
         </footer>
       </aside>
     </div>

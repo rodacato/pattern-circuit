@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { identity } from '../../i18n'
+import { createTranslator } from '../../i18n'
+import { APP_CATALOGS } from '../../i18n/registry'
 import { choiceLabel, guessed, isRight, outcomePrediction, touchedPrediction } from './prediction'
+
+const es = createTranslator([APP_CATALOGS['es-MX']])
 
 describe('predictions', () => {
   it('the answer of an outcome prediction is the outcome of the option', () => {
     const p = outcomePrediction('Strategy', 'partial')
     expect(p.answer).toBe('partial')
-    expect(identity(p.question)).toContain('Strategy')
+    expect(es(p.question)).toContain('Strategy')
     expect(isRight(p)).toBe(false)
     expect(isRight(guessed(p, 'partial'))).toBe(true)
     expect(isRight(guessed(p, 'solves'))).toBe(false)
@@ -17,6 +20,6 @@ describe('predictions', () => {
   })
 
   it('choiceLabel translates the id into its text', () => {
-    expect(choiceLabel(touchedPrediction(0), '0')).toContain('Ninguna')
+    expect(es(choiceLabel(touchedPrediction(0), '0')!)).toContain('Ninguna')
   })
 })

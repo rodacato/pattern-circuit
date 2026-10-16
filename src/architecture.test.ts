@@ -3,21 +3,23 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-type Layer = 'engine' | 'i18n' | 'levels' | 'game' | 'render' | 'ui' | 'debug' | 'root'
+type Layer = 'engine' | 'i18n' | 'course-kit' | 'course' | 'levels' | 'game' | 'render' | 'ui' | 'debug' | 'root'
 
 const RULES: Record<Layer, { layers: Layer[]; packages: string[] }> = {
   engine: { layers: [], packages: ['zod'] },
   i18n: { layers: [], packages: [] },
+  'course-kit': { layers: [], packages: ['zod'] },
+  course: { layers: ['course-kit', 'engine', 'game', 'i18n', 'levels'], packages: [] },
   levels: { layers: ['engine', 'i18n'], packages: [] },
   game: { layers: ['engine', 'i18n'], packages: ['zod'] },
   render: { layers: ['engine', 'game', 'i18n'], packages: ['pixi.js'] },
-  ui: { layers: ['engine', 'game', 'render', 'levels', 'i18n'], packages: ['react', 'react-dom', 'shiki'] },
+  ui: { layers: ['engine', 'game', 'render', 'levels', 'i18n', 'course-kit', 'course'], packages: ['react', 'react-dom', 'shiki'] },
   debug: { layers: ['engine', 'levels'], packages: ['react'] },
-  root: { layers: ['ui', 'debug'], packages: ['react', 'react-dom'] },
+  root: { layers: ['ui', 'debug', 'course'], packages: ['react', 'react-dom'] },
 }
 
 // Tests may also load real levels and use vitest/node.
-const TEST_EXTRA = { layers: ['levels', 'engine'] as Layer[], packages: ['vitest', 'node:fs', 'node:path', 'node:child_process', '@testing-library/react', 'typescript'] }
+const TEST_EXTRA = { layers: ['levels', 'engine'] as Layer[], packages: ['vitest', 'node:fs', 'node:path', 'node:url', 'node:child_process', '@testing-library/react', 'typescript'] }
 
 const SRC = resolve(import.meta.dirname)
 const files = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

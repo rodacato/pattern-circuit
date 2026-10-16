@@ -8,9 +8,9 @@ export function SeenIn({ info }: { info?: SeenInInfo }) {
   if (!info) return null
   return (
     <p className="seen-in">
-      <span className="label">📍 {t(msg('En Ruby: {example}.', { example: info.example }))}</span> {t(info.text)}{' '}
+      <span className="label">📍 {t(msg('ui.seenIn.label', { example: info.example }))}</span> {t(info.text)}{' '}
       <a href={info.url} target="_blank" rel="noopener noreferrer">
-        {t('Ver fuente ↗')}
+        {t('ui.seenIn.source')}
       </a>
     </p>
   )

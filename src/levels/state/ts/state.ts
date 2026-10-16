@@ -20,35 +20,35 @@ class Order {
   // endregion
 }
 
-// region: Order#handle:pendiente
+// region: Order#handle:pending
 class Pending implements State {
   name = 'pending'
   on(event: string) { return ({ pay: new Paid(), cancel: new Cancelled() } as Record<string, State>)[event] }
 }
 // endregion
 
-// region: Order#handle:pagado
+// region: Order#handle:paid
 class Paid implements State {
   name = 'paid'
   on(event: string) { return ({ prepare: new Preparing(), cancel: new Cancelled() } as Record<string, State>)[event] }
 }
 // endregion
 
-// region: Order#handle:preparando
+// region: Order#handle:preparing
 class Preparing implements State {
   name = 'preparing'
   on(event: string) { return ({ deliver: new Delivered() } as Record<string, State>)[event] }
 }
 // endregion
 
-// region: Order#handle:entregado
+// region: Order#handle:delivered
 class Delivered implements State {
   name = 'delivered'
   on(_event: string) { return undefined } // a delivered order no longer changes
 }
 // endregion
 
-// region: Order#handle:cancelado
+// region: Order#handle:cancelled
 class Cancelled implements State {
   name = 'cancelled'
   on(_event: string) { return undefined }

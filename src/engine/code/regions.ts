@@ -1,5 +1,7 @@
 // Code fragments with `# region: Class#method` / `# endregion` markers (nestable).
 // The marker is a comment of the language: `#` in Ruby, `//` in TypeScript.
+import type { CodeLang } from '../schema'
+
 export type CodeRegion = { start: number; end: number } // 1-based lines, inclusive
 export type CodeFile = { text: string; regions: Record<string, CodeRegion> }
 
@@ -19,13 +21,13 @@ export function parseCode(source: string): CodeFile {
     }
     if (CLOSE.test(raw)) {
       const r = open.pop()
-      if (!r) throw new Error(`endregion sin region en la línea ${lines.length + 1}`)
+      if (!r) throw new Error(`endregion without a region at line ${lines.length + 1}`)
       regions[r.name] = { start: r.start, end: lines.length }
       continue
     }
     lines.push(raw)
   }
-  if (open.length) throw new Error(`region sin cerrar: ${open.map((r) => r.name).join(', ')}`)
+  if (open.length) throw new Error(`unclosed region: ${open.map((r) => r.name).join(', ')}`)
   return { text: lines.join('\n'), regions }
 }
 
@@ -33,4 +35,11 @@ export function parseCode(source: string): CodeFile {
 export function resolveRegion(file: CodeFile, ref: string | undefined): CodeRegion | undefined {
   if (!ref) return undefined
   return file.regions[ref] ?? file.regions[ref.split(':')[0]]
+}
+
+// Region ids follow Ruby's method names (`Counter#hand_over`, `Order#complete!`); each language shows the name
+// the way its own code spells it.
+export function regionLabel(ref: string, lang: CodeLang): string {
+  if (lang !== 'ts') return ref
+  return ref.replace(/#([A-Za-z0-9_]+)[!?]?/, (_, method: string) => `#${method.replace(/_([a-z0-9])/g, (_m, c: string) => c.toUpperCase())}`)
 }

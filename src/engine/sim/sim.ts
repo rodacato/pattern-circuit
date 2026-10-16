@@ -24,7 +24,7 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
     .sort((a, b) => a.p.at - b.p.at || a.i - b.i)
     .map(({ p }) => p)
   for (const p of schedule) {
-    if (!compiled.nodes.has(p.from)) throw new Error(`Escenario ${scenario.id}: nodo inexistente ${p.from}`)
+    if (!compiled.nodes.has(p.from)) throw new Error(`Scenario ${scenario.id}: unknown node ${p.from}`)
   }
   return {
     circuit: compiled,
@@ -49,8 +49,8 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
   }
 }
 
-export const BREAKER_OPEN = 'abierto'
-const BREAKER_CLOSED = 'cerrado'
+export const BREAKER_OPEN = 'open'
+const BREAKER_CLOSED = 'closed'
 
 // State a stateful node (machine or breaker) starts with, before receiving pulses.
 export function initialNodeState(behavior: Behavior): string | undefined {
@@ -81,7 +81,7 @@ export function runToEnd(sim: Sim, maxTicks = 20_000): { sim: Sim; events: SimEv
   const events: SimEvent[] = []
   let current = sim
   while (!isDone(current)) {
-    if (current.state.tick >= maxTicks) throw new Error(`La simulación no terminó en ${maxTicks} ticks`)
+    if (current.state.tick >= maxTicks) throw new Error(`The simulation did not finish in ${maxTicks} ticks`)
     const r = step(current)
     current = r.sim
     events.push(...r.events)

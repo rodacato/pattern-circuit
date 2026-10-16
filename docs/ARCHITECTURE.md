@@ -16,12 +16,14 @@ Pattern Circuit is organized in **layers with dependencies in one direction only
 
 | Layer | Folder | Responsibility | May import |
 |---|---|---|---|
-| **i18n** | `src/i18n/` | Languages: translator, catalogs (English) and text extraction for the tests. | nothing |
+| **i18n** | `src/i18n/` | Languages: translator, registry of locales and the catalogs of the application texts. | nothing |
 | **engine** | `src/engine/` | Pure domain: level format, deterministic simulation, circuit patches, evaluation. No DOM, no React, no Pixi. | only `zod` |
 | **levels** | `src/levels/` | Content. One level = a folder with `level.ts` + code snippets. | `engine` |
 | **game** | `src/game/` | Application: the session (playback, focus, player decisions), the level flow and progress. No DOM, no Pixi. | `engine`, `zod` |
 | **render** | `src/render/` | Draws the circuit with PixiJS and translates gestures into session calls. | `engine`, `game`, `pixi.js` |
 | **ui** | `src/ui/` | React: layout, cards, controls, code panel. Mounts the render. | engine, game, render, levels, `react`, `shiki` |
+| **course-kit** | `src/course-kit/` | The contract with a host: manifest, protocol, bridges. Knows nothing of this game. | only `zod` |
+| **course** | `src/course/` | Connects the contract to this game: manifest, browser storage, how the course starts. | course-kit, engine, game, i18n, levels |
 | **debug** | `src/debug/` | Raw engine view (`?debug`). | `engine`, `levels`, `react` |
 
 In addition, **outside `engine/` only `engine/index.ts` is imported**: the engine's public API (tests may also use `engine/testing.ts`). Internals can be reorganized without touching the rest. Tests may also load real levels and use `vitest`, `node:*` and Testing Library.
@@ -108,7 +110,7 @@ render/
 | Application | `game/**/*.test.ts` | session, flow and progress with an in-memory adapter |
 | Ruby code | `levels/ruby.test.ts` | `ruby -wc` over every file the player sees (skipped without ruby) |
 | TypeScript code | `levels/typescript.test.ts` | syntax of every TS snippet and that no level is missing |
-| Translations | `i18n/coverage.test.ts` | every visible text has English and keeps its holes |
+| Translations | `i18n/catalogs.test.ts`, `i18n/sources.test.ts`, `i18n/scaffold.test.ts` | the same keys and holes in every locale, no prose in code, adding a language is files only |
 | Render | `render/layout.test.ts`, `render/motion.test.ts` | pure geometry and animations |
 | UI | `ui/ui.test.tsx` | components with Testing Library (jsdom) over a real session |
 | Architecture | `architecture.test.ts` | dependency rules between layers |
@@ -121,7 +123,7 @@ Things that are left as they are on purpose, with their reason:
 
 - **Pixi drawing has no unit tests.** It is verified by playing and with the `?debug` view; whatever has logic was extracted to pure modules.
 - **`GameApp.tsx` has no component test**: it mounts Pixi. Its pieces (shortcuts, cards, inventory, notebook) do have one.
-- **The main bundle weighs ~850 kB** (PixiJS + React + levels). The Ruby grammar is loaded separately, on demand.
+- **The main bundle weighs ~1.1 MB** (PixiJS + React + levels + all the catalogs). The Ruby grammar is loaded separately, on demand.
 - **The breaker counts accumulated failures**: in the model successes do not go through it again, so it cannot reset the count. It is enough for level 22, where all the failures are consecutive.
 - **The strategy level builds its nodes by hand** instead of using `kit.ts`: it was the first level and serves as an example of the long form.
 
@@ -133,11 +135,28 @@ Things that are left as they are on purpose, with their reason:
 
 ## Languages
 
-- **Spanish is the source language**: each text is written in Spanish where it lives (levels, catalog, cards). The catalogs of other languages translate it using that text as the key, gettext style; whatever has no translation is shown in Spanish.
-- `t(text)` translates; `msg('Nivel {n}', { n })` builds texts with holes (the values are also translated and may be other messages); `N('text')` marks a text for translation without changing it; a `// i18n` comment marks a map of texts.
-- `engine` and `game` return Spanish texts or a `Message`; the translation happens when displaying, in `ui` (the `useT` context) and in `render` (the translator enters through `NeonStage.create` and floating texts are translated in `Effects`).
-- Every level brings its own `en.ts`. `i18n/coverage.test.ts` requires a translation for every visible text (source code, pattern catalog, tracks and every level with all its variants) and that the `{x}` holes are preserved.
-- The language is a browser preference (`localStorage`), separate from progress. Code snippets, ids, comments and documentation are always English.
+- **No prose in code.** Components, render, game, engine and level data contain no visible text: every text is identified by a **key** (`ui.notebook.title`, `levels.strategy.node.charge`) and lives in a catalog file per locale. `i18n/sources.test.ts` scans the sources and fails on any literal that reads like prose.
+- **The folders are the registry.** `src/i18n/locales/<code>/` holds one locale (`meta.ts` with its name and short code, plus the area files `ui`, `cards`, `render`, `game`, `patterns`); `i18n/registry.ts` lists them with `import.meta.glob`, so a new language is new files and no code change. Locale codes are BCP 47 tags (`es-MX`, `en`); a browser tag such as `es` or `es-AR` matches the locale of the same language, and a browser that lists Spanish anywhere gets Spanish.
+- **English is the source of the typed keys.** `locales/en/<area>.ts` are `as const` objects; every other locale types its file against them (`Record<keyof typeof source, string>`), so a missing or extra key does not compile. `msg()` and `N()` only accept existing keys, and a test checks every key written in the source against the English catalog (and that none is unused).
+- **Level texts are derived, not written.** A level's fields hold no text: `defineLevel` fills each empty text field with the key of where it is (`title`, `brief.problem`, `node.<id>`, `socket.<id>`, `option.<socket>.<pattern>.title|body`, `ticket.<id>`, `repair.<id>`, `win.<n>`, `scenario.<id>.<n>`, `state.<id>`…), qualified with the level id (`levels.<id>.…`). The texts live in `levels/<id>/locales/<code>.ts`; whatever a level does not define falls back to the shared vocabulary in `levels/locales/<code>.ts` (`levels.shared.…`). `engine/level/texts.ts` is the one place that knows those keys; a field can carry a hand-written relative key (`option.<socket>.<pattern>.label.<node>`) when it needs its own text.
+- **Fallback.** A missing translation falls back to the canonical locale and, as a last resort, shows the key. Nothing is left blank.
+- `t(key)` translates; `msg('ui.header.notes', { n })` builds texts with holes (`{n}`; the values are also translated and may be other messages); `N('ui.…')` marks a key that is chosen in one place and shown in another. `engine` and `game` return keys or `Message`s; the translation happens when displaying, in `ui` (the `useT` context) and in `render` (the translator enters through `NeonStage.create`).
+- **Validation for every locale** (`i18n/catalogs.test.ts`): the same keys as English, no blank text, the same `{holes}`, every text a level shows is defined, and no text nobody shows.
+- **Adding a language:** `npm run i18n:scaffold -- <code> "<name>" <short>` creates the files from the English ones (placeholders marked `TODO(translate)`); translate them and the parity tests tell what is missing.
+- The language is a browser preference (`localStorage`, key `pattern-circuit:locale`), separate from progress. Snippets, ids, comments and documentation are always English.
+
+## Hosting: course-kit
+
+The game can run on its own or inside a hub such as Dojo (an iframe). The contract between the two lives in `src/course-kit/` and imports only `zod`, so it can become a package other courses share.
+
+- **Manifest** (`public/course.json`, built by `src/course/manifest.ts` from the levels and their catalogs; a test keeps the file in sync, `UPDATE_MANIFEST=1 npm test` rewrites it): the id, version, languages, units (one per level, with its permanent id) and what the course can do.
+- **Protocol** (`course-kit/protocol.ts`): typed, versioned messages (`course.unit.completed`, `host.locale`, …) over `postMessage`; every message is parsed with zod, unknown fields are stripped and unknown types ignored.
+- **Trust** (`course-kit/transport.ts`): a course learns who embeds it from its own URL fragment (`#ck-host=<origin>`) and only accepts messages whose sender is exactly that window *and* origin; it posts only to that origin, never `'*'`.
+- **Ports**: `HostBridge` with two adapters: `StandaloneHostBridge` (today's behavior) and `EmbeddedHostBridge` (handshake with retries, then events up and commands down). If the host does not answer in five seconds the game runs standalone and says so. `HostController` (`course-kit/host.ts`) is the matching host side.
+- **Progress**: standalone, the browser's `localStorage` as always. Embedded, the host is the record: `HostProgressStore` starts from what the host sends and reports debounced snapshots (`course.progress`); completed levels travel as `course.unit.completed`. Nothing else in the game knows which mode it is in.
+- **Preferences**: language and code language are requested from the host (`course.preference.requested`) and obeyed when it answers; the game never sends back what the host just imposed.
+- **Theme**: a host sends `{ mode, tokens }` (validated: colors, font names, radii; never URLs). The game honors the tokens of its chrome (`course/theme.ts` maps them to CSS variables; text that would be hard to read on the host's surface is ignored) and picks the code colors by mode. The circuit stage and the cards over it keep their own dark palette: the glow needs a dark ground and pulse, family and status colors mean something.
+- **Try it**: `npm run dev` (the course) and `npm run host:test` (a small host on another port, `host-test/`) reproduce the real conditions: another origin, another storage.
 
 ## New tracks
 

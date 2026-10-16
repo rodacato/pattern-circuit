@@ -13,25 +13,20 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const items = ['café', 'leche', 'café', 'café', 'leche', 'café']
+const items = ['coffee', 'milk', 'coffee', 'coffee', 'milk', 'coffee']
 
 export default defineLevel({
   id: 'proxy',
   order: 9,
   chapter: 'bar',
-  title: 'El almacén está lejos',
   targetPattern: 'proxy',
-  brief: {
-    problem: 'Cada pedido pregunta al almacén remoto si hay stock. El almacén tarda y atiende de a uno: se forma una fila enorme, aunque casi siempre preguntamos lo mismo.',
-    goal: 'Que la fila frente al almacén no pase de dos consultas sin cambiar a quien pregunta.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('take', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
-      node('warehouse', 'Almacén remoto', 'RemoteInventory', [8, 0], { type: 'pass' }, { kind: 'external', cost: 90, capacity: 1, codeRef: 'RemoteInventory#in_stock?' }),
-      node('prepare', 'Preparar', 'Barista', [11, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
-      node('handOver', 'Entregar', 'Counter', [14, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('take', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
+      node('warehouse', 'RemoteInventory', [8, 0], { type: 'pass' }, { kind: 'external', cost: 90, capacity: 1, codeRef: 'RemoteInventory#in_stock?' }),
+      node('prepare', 'Barista', [11, 2], { type: 'pass' }, { codeRef: 'Barista#prepare' }),
+      node('handOver', 'Counter', [14, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [wire('customer', 'take'), wire('take', 'warehouse'), wire('warehouse', 'prepare'), wire('prepare', 'handOver')],
   },
@@ -39,20 +34,15 @@ export default defineLevel({
     {
       id: 'inventory',
       at: 'take',
-      label: 'Inventario',
       inventory: ['proxy', 'singleton', 'facade'],
       options: {
         proxy: {
           outcome: 'solves',
           code: 'proxy',
-          note: {
-            title: 'Proxy: un sustituto que controla el acceso',
-            body: 'El proxy tiene la misma interfaz que el almacén, así que quien pregunta no nota el cambio. Solo viaja al almacén cuando no conoce la respuesta; lo demás rebota en el proxy sin hacer fila. El precio: la respuesta guardada puede quedar vieja, así que un proxy real le pone caducidad.',
-          },
           patch: {
             removeWires: ['take->warehouse'],
             add: {
-              nodes: [skinned('proxy', node('proxy', 'Proxy', 'CachedInventory', [5.5, 2], { type: 'cache', key: 'item' }, { codeRef: 'CachedInventory#in_stock?' }))],
+              nodes: [skinned('proxy', node('proxy', 'CachedInventory', [5.5, 2], { type: 'cache', key: 'item' }, { codeRef: 'CachedInventory#in_stock?' }))],
               wires: [wire('take', 'proxy'), wire('proxy', 'warehouse', { port: 'miss' }), wire('proxy', 'prepare', { port: 'hit' })],
             },
           },
@@ -60,23 +50,15 @@ export default defineLevel({
         singleton: {
           outcome: 'misfit',
           code: 'singleton',
-          note: {
-            title: 'Singleton no ahorra viajes',
-            body: 'Tener una sola instancia del cliente remoto no cambia cuántas veces se consulta el almacén. La fila sigue igual de larga.',
-          },
           patch: { update: [{ id: 'warehouse', skin: 'singleton', codeRef: 'RemoteInventory.instance' }] },
         },
         facade: {
           outcome: 'misfit',
           code: 'facade',
-          note: {
-            title: 'Facade simplifica, no evita el trabajo',
-            body: 'Poner una ventanilla única delante del almacén no reduce las consultas: cada pedido sigue llegando hasta el almacén.',
-          },
           patch: {
             removeWires: ['take->warehouse'],
             add: {
-              nodes: [skinned('facade', node('desk', 'Ventanilla', 'StockDesk', [5.5, 2], { type: 'pass' }, { codeRef: 'StockDesk#in_stock?' }))],
+              nodes: [skinned('facade', node('desk', 'StockDesk', [5.5, 2], { type: 'pass' }, { codeRef: 'StockDesk#in_stock?' }))],
               wires: [wire('take', 'desk'), wire('desk', 'warehouse')],
             },
           },
@@ -84,7 +66,7 @@ export default defineLevel({
       },
     },
   ],
-  scenarios: [{ id: 'main', pulses: items.map((item, i) => pulse(i * 20, item, [item === 'café' ? 'coffee' : 'milk'], { item })) }],
+  scenarios: [{ id: 'main', pulses: items.map((item, i) => pulse(i * 20, [item], { item })) }],
   winWhen: [
     { metric: 'delivered', op: '==', value: 6 },
     { metric: 'maxLoad', op: '<=', value: 2 },

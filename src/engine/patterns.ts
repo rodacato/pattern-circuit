@@ -9,30 +9,31 @@ export type SeenIn = { example: string; text: string; url: string }
 export type PatternInfo = { name: string; family: PatternFamily; gist: string; seenIn?: SeenIn }
 
 // Pattern catalog: visible name, family and the idea in one sentence.
+// `name`, `gist` and the family names are catalog keys (the engine does not import i18n): whoever shows them translates them.
 // GoF families per Gamma et al. (1994); Null Object is "object structural" per Woolf (1997).
 // The sources for each pattern are in docs/DESIGN.md.
 const CATALOG: Record<PatternId, Omit<PatternInfo, 'seenIn'>> = {
-  'factory-method': { name: 'Factory Method', family: 'creational', gist: 'Una subclase decide qué objeto crear.' },
-  builder: { name: 'Builder', family: 'creational', gist: 'Arma un objeto complejo paso a paso y lo entrega al final con build(), que puede validarlo.' },
-  singleton: { name: 'Singleton', family: 'creational', gist: 'Una sola instancia de la clase, con un punto de acceso global.' },
-  adapter: { name: 'Adapter', family: 'structural', gist: 'Convierte una interfaz en la que el cliente espera.' },
-  decorator: { name: 'Decorator', family: 'structural', gist: 'Envuelve un objeto para sumarle comportamiento.' },
-  proxy: { name: 'Proxy', family: 'structural', gist: 'Un sustituto que controla el acceso al objeto real.' },
-  composite: { name: 'Composite', family: 'structural', gist: 'Trata igual a un objeto suelto y a un grupo, aunque el grupo contenga otros grupos.' },
-  facade: { name: 'Facade', family: 'structural', gist: 'Una puerta simple a un subsistema complicado.' },
-  strategy: { name: 'Strategy', family: 'behavioral', gist: 'Alternativas intercambiables detrás de una misma interfaz.' },
-  observer: { name: 'Observer', family: 'behavioral', gist: 'Avisa a todos los suscriptores cuando algo pasa.' },
-  state: { name: 'State', family: 'behavioral', gist: 'El comportamiento cambia según el estado interno.' },
-  command: { name: 'Command', family: 'behavioral', gist: 'Una petición convertida en objeto: se encola, se cancela antes de correr o se revierte con undo.' },
-  'chain-of-responsibility': { name: 'Chain of Responsibility', family: 'behavioral', gist: 'La petición pasa de mano en mano hasta que alguien la atiende.' },
-  'template-method': { name: 'Template Method', family: 'behavioral', gist: 'Un esqueleto fijo con pasos que las subclases rellenan.' },
-  'ports-and-adapters': { name: 'Ports & Adapters', family: 'architecture', gist: 'El núcleo no conoce el mundo exterior, solo sus puertos.' },
-  'event-bus': { name: 'Event Bus', family: 'architecture', gist: 'Los componentes se hablan por eventos, sin conocerse.' },
-  cqrs: { name: 'CQRS', family: 'architecture', gist: 'Un modelo para escribir y otro distinto para leer.' },
-  'null-object': { name: 'Null Object', family: 'structural', gist: 'Un objeto que no hace nada en lugar de nil: sin ifs de "¿existe?".' },
-  'circuit-breaker': { name: 'Circuit Breaker', family: 'resilience', gist: 'Tras varios fallos deja de llamar al servicio caído y falla rápido (o usa un respaldo).' },
-  'keep-simple': { name: 'Mantenerlo simple', family: 'principle', gist: 'Sin variación real a la vista, la solución directa: el patrón se agrega cuando un cambio lo pida (YAGNI).' },
-  saga: { name: 'Saga', family: 'architecture', gist: 'Pasos con acciones que los compensan si algo falla más adelante.' },
+  'factory-method': { name: 'pattern.factoryMethod.name', family: 'creational', gist: 'pattern.factoryMethod.gist' },
+  builder: { name: 'pattern.builder.name', family: 'creational', gist: 'pattern.builder.gist' },
+  singleton: { name: 'pattern.singleton.name', family: 'creational', gist: 'pattern.singleton.gist' },
+  adapter: { name: 'pattern.adapter.name', family: 'structural', gist: 'pattern.adapter.gist' },
+  decorator: { name: 'pattern.decorator.name', family: 'structural', gist: 'pattern.decorator.gist' },
+  proxy: { name: 'pattern.proxy.name', family: 'structural', gist: 'pattern.proxy.gist' },
+  composite: { name: 'pattern.composite.name', family: 'structural', gist: 'pattern.composite.gist' },
+  facade: { name: 'pattern.facade.name', family: 'structural', gist: 'pattern.facade.gist' },
+  strategy: { name: 'pattern.strategy.name', family: 'behavioral', gist: 'pattern.strategy.gist' },
+  observer: { name: 'pattern.observer.name', family: 'behavioral', gist: 'pattern.observer.gist' },
+  state: { name: 'pattern.state.name', family: 'behavioral', gist: 'pattern.state.gist' },
+  command: { name: 'pattern.command.name', family: 'behavioral', gist: 'pattern.command.gist' },
+  'chain-of-responsibility': { name: 'pattern.chainOfResponsibility.name', family: 'behavioral', gist: 'pattern.chainOfResponsibility.gist' },
+  'template-method': { name: 'pattern.templateMethod.name', family: 'behavioral', gist: 'pattern.templateMethod.gist' },
+  'ports-and-adapters': { name: 'pattern.portsAndAdapters.name', family: 'architecture', gist: 'pattern.portsAndAdapters.gist' },
+  'event-bus': { name: 'pattern.eventBus.name', family: 'architecture', gist: 'pattern.eventBus.gist' },
+  cqrs: { name: 'pattern.cqrs.name', family: 'architecture', gist: 'pattern.cqrs.gist' },
+  'null-object': { name: 'pattern.nullObject.name', family: 'structural', gist: 'pattern.nullObject.gist' },
+  'circuit-breaker': { name: 'pattern.circuitBreaker.name', family: 'resilience', gist: 'pattern.circuitBreaker.gist' },
+  'keep-simple': { name: 'pattern.keepSimple.name', family: 'principle', gist: 'pattern.keepSimple.gist' },
+  saga: { name: 'pattern.saga.name', family: 'architecture', gist: 'pattern.saga.gist' },
 }
 
 export const PATTERNS = Object.fromEntries(
@@ -40,10 +41,10 @@ export const PATTERNS = Object.fromEntries(
 ) as Record<PatternId, PatternInfo>
 
 export const FAMILY_NAMES: Record<PatternFamily, string> = {
-  creational: 'creacional',
-  structural: 'estructural',
-  behavioral: 'comportamiento',
-  architecture: 'arquitectura',
-  resilience: 'resiliencia',
-  principle: 'principio',
+  creational: 'family.creational',
+  structural: 'family.structural',
+  behavioral: 'family.behavioral',
+  architecture: 'family.architecture',
+  resilience: 'family.resilience',
+  principle: 'family.principle',
 }

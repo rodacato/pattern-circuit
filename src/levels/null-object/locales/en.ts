@@ -1,0 +1,23 @@
+// Level null-object: English texts, by key (the source of the typed keys).
+export default {
+  title: 'The customer without a card',
+  'brief.problem': 'Looking up the loyalty card returns nil when the customer doesn\'t have one. Loyalty, Discount and the Receipt use it without checking, and the order blows up with NoMethodError.',
+  'brief.goal': 'Let customers without a card go through the whole circuit without filling every place that uses it with "if card.nil?".',
+  'node.lookup': 'Find card',
+  'node.discount': 'Discount',
+  'node.receipt': 'Receipt',
+  'socket.card': 'Card',
+  'option.card.null-object.title': 'Null Object: an object that does nothing',
+  'option.card.null-object.body': 'Instead of nil, the lookup returns a NullCard that answers everything a card answers, with no effect: zero points, zero discount. The code that uses it doesn\'t change or check anything.',
+  'option.card.decorator.title': 'Wrapping nil is still nil',
+  'option.card.decorator.body': 'A decorator delegates to what it wraps. If it wraps nil, the first call blows up all the same.',
+  'option.card.proxy.title': 'A proxy needs a real object behind it',
+  'option.card.proxy.body': 'The stand-in tries to load the real card when used, but there isn\'t one: the problem is only postponed.',
+  'option.card.adapter.title': 'There\'s nothing to adapt',
+  'option.card.adapter.body': 'An adapter translates an existing interface. With no card, there\'s no interface to translate.',
+  'win.1': 'orders that blew up with NoMethodError',
+  'scenario.main.0': 'Ana (with card)',
+  'scenario.main.1': 'Beto (no card)',
+  'scenario.main.2': 'Carla (with card)',
+  'scenario.main.3': 'Dani (no card)',
+} as const

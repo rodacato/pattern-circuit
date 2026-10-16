@@ -40,7 +40,13 @@ import {
 import { Playback } from '../playback/Playback'
 import { emptyProgress, withCompleted, withNotes, withPrediction, type Progress, type ProgressStore } from '../progress/progress'
 
-export type ConnectResult = 'repaired' | 'wrong' | 'none'
+// Pattern names are keys, so "A + B" is a message with holes rather than a concatenation.
+const joinNames = (names: string[]): Message => names.reduceRight<Message>((tail, head) => (tail === '' ? head : msg('game.names.join', { head, tail })), '')
+
+// What the host of the course hears about: the level the player opened and the one they just completed.
+export type UnitEvents = { started?: (unitId: string) => void; completed?: (unitId: string) => void }
+
+export type ConnectResult ='repaired' | 'wrong' | 'none'
 export type CodeChange = { title: Message; lines: DiffLine[]; added: number; removed: number }
 export type Comparison = Record<Side, Evaluation>
 
@@ -62,12 +68,15 @@ export class GameSession {
 
   private readonly emitter = new Emitter()
   private readonly store: ProgressStore
+  private readonly units: UnitEvents
 
-  constructor(level: Level, store: ProgressStore) {
+  constructor(level: Level, store: ProgressStore, units: UnitEvents = {}) {
     this.level = level
     this.store = store
+    this.units = units
     this.progress = store.load()
     this.rebuild()
+    units.started?.(level.id)
   }
 
   subscribe = this.emitter.subscribe
@@ -144,11 +153,11 @@ export class GameSession {
     if (this.flow.stage !== 'compare' && this.flow.stage !== 'complete') return undefined
     const code = (stage: FlowState['stage'], side: Side) => this.files[codeKey(this.level, variantFor(this.level, { ...this.flow, stage, side }, this.repairs))]
     const side = this.flow.side
-    const names = this.pluggedPatterns.map((p) => PATTERNS[p].name).join(' + ')
+    const names = joinNames(this.pluggedPatterns.map((p) => PATTERNS[p].name))
     // 'observe' = base circuit and 'choose' = with pattern, both without ticket; 'compare' = the chosen side, with ticket.
     const [before, after, title] = this.ticket
-      ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), side === 'with' ? msg('Lo que cambió con el ticket, con {names}', { names }) : N('Lo que cambió con el ticket, sin patrón')]
-      : [code('compare', 'without'), code('compare', 'with'), msg('Del código sin patrón al código con {names}', { names })]
+      ? [code(side === 'with' ? 'choose' : 'observe', side), code('compare', side), side === 'with' ? msg('game.diff.ticketWith', { names }) : N('game.diff.ticketWithout')]
+      : [code('compare', 'without'), code('compare', 'with'), msg('game.diff.withoutToWith', { names })]
     if (!before || !after) return undefined
     const lines = diffLines(before.text, after.text)
     return { title, lines, ...diffStats(lines) }
@@ -325,7 +334,7 @@ export class GameSession {
 
   // Nodes the ticket would touch with what is plugged now: the answer to the change prediction.
   private ticketTouched(): number {
-    return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticketApplied: true }, this.repairs)).touched.length
+    return buildCircuit(this.level, variantFor(this.level, { ...this.flow, ticket: 'applied' }, this.repairs)).touched.length
   }
 
   private compare(): Comparison {
@@ -349,8 +358,10 @@ export class GameSession {
 
   private saveProgress(next: Progress) {
     if (next === this.progress) return
+    const completedNow = next.completed.includes(this.level.id) && !this.progress.completed.includes(this.level.id)
     this.progress = next
     this.store.save(next)
+    if (completedNow) this.units.completed?.(this.level.id)
   }
 
   private dispatch(event: FlowEvent) {

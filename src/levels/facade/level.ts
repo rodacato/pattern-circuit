@@ -17,30 +17,25 @@ import tsProxy from './ts/proxy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
-const step = (id: string, label: string, className: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
-  node(id, label, className, at, { type: 'transform', addTags: [tag] }, { codeRef })
-const preheat = (id: string, at: [number, number]) => step(id, 'Precalentar', 'EspressoMachine', 'EspressoMachine#preheat', at, 'preheated')
+const step = (id: string, className: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
+  node(id, className, at, { type: 'transform', addTags: [tag] }, { codeRef })
+const preheat = (id: string, at: [number, number]) => step(id, 'EspressoMachine', 'EspressoMachine#preheat', at, 'preheated')
 
 export default defineLevel({
   id: 'facade',
   order: 8,
   chapter: 'bar',
-  title: 'La cocina por dentro',
   targetPattern: 'facade',
-  brief: {
-    problem: 'Para hacer un latte hay que usar molino, máquina y espumador en orden. El mostrador lo hace bien; la app de delivery copió los pasos y se saltó el espumador: sus lattes salen sin espuma.',
-    goal: 'Que cualquier cliente pida un latte correcto sin conocer las máquinas, y que cambiar la cocina se haga en un solo lugar.',
-  },
   circuit: {
     nodes: [
-      actor('counter', 'Mostrador', [0, 1]),
-      actor('app', 'App delivery', [0, 4]),
-      step('grinder', 'Molino', 'Grinder', 'Grinder#grind', [6, 1], 'ground'),
-      step('espresso', 'Máquina', 'EspressoMachine', 'EspressoMachine#extract', [9, 1], 'extracted'),
-      step('frother', 'Espumador', 'MilkFrother', 'MilkFrother#froth', [12, 1], 'frothed'),
-      step('grinderApp', 'Molino (app)', 'Grinder', 'DeliveryApp#make_latte', [6, 4], 'ground'),
-      step('espressoApp', 'Máquina (app)', 'EspressoMachine', 'DeliveryApp#make_latte', [9, 4], 'extracted'),
-      node('handOver', 'Entregar', 'Counter', [15, 2.5], { type: 'sink', expects: { all: [{ hasTag: 'ground' }, { hasTag: 'extracted' }, { hasTag: 'frothed' }] } }, { codeRef: 'Counter#hand_over' }),
+      actor('counter', [0, 1]),
+      actor('app', [0, 4]),
+      step('grinder', 'Grinder', 'Grinder#grind', [6, 1], 'ground'),
+      step('espresso', 'EspressoMachine', 'EspressoMachine#extract', [9, 1], 'extracted'),
+      step('frother', 'MilkFrother', 'MilkFrother#froth', [12, 1], 'frothed'),
+      step('grinderApp', 'Grinder', 'DeliveryApp#make_latte', [6, 4], 'ground'),
+      step('espressoApp', 'EspressoMachine', 'DeliveryApp#make_latte', [9, 4], 'extracted'),
+      node('handOver', 'Counter', [15, 2.5], { type: 'sink', expects: { all: [{ hasTag: 'ground' }, { hasTag: 'extracted' }, { hasTag: 'frothed' }] } }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [...chain('counter', 'grinder', 'espresso', 'frother', 'handOver'), ...chain('app', 'grinderApp', 'espressoApp', 'handOver')],
   },
@@ -48,22 +43,17 @@ export default defineLevel({
     {
       id: 'kitchen',
       at: 'grinder',
-      label: 'Cocina',
       inventory: ['facade', 'adapter', 'proxy'],
       options: {
         facade: {
           outcome: 'solves',
           code: 'facade',
-          note: {
-            title: 'Facade: una puerta simple a un subsistema complicado',
-            body: 'Mostrador y app piden "un latte" a la fachada, y solo ella conoce el orden de las máquinas. La orquestación vive en un único lugar: nadie se salta un paso y un cambio en la cocina se hace una vez.',
-          },
           patch: {
             remove: ['grinderApp', 'espressoApp'],
             removeWires: ['counter->grinder'],
             update: ['grinder', 'espresso', 'frother'].map((id) => ({ id, skin: 'facade' as const })),
             add: {
-              nodes: [skinned('facade', node('kitchen', 'Cocina', 'KitchenFacade', [3, 2.5], { type: 'pass' }, { codeRef: 'KitchenFacade#latte' }))],
+              nodes: [skinned('facade', node('kitchen', 'KitchenFacade', [3, 2.5], { type: 'pass' }, { codeRef: 'KitchenFacade#latte' }))],
               wires: [wire('counter', 'kitchen'), wire('app', 'kitchen'), wire('kitchen', 'grinder')],
             },
           },
@@ -71,14 +61,10 @@ export default defineLevel({
         adapter: {
           outcome: 'misfit',
           code: 'adapter',
-          note: {
-            title: 'Adapter traduce la llamada, no la completa',
-            body: 'Adaptar el pedido de la app al formato del mostrador no cambia que la app siga orquestando las máquinas por su cuenta, sin espumador.',
-          },
           patch: {
             removeWires: ['app->grinderApp'],
             add: {
-              nodes: [skinned('adapter', node('adapter', 'Adaptador', 'DeliveryRequestAdapter', [3, 4], { type: 'transform', setShape: 'square' }))],
+              nodes: [skinned('adapter', node('adapter', 'DeliveryRequestAdapter', [3, 4], { type: 'transform', setShape: 'square' }))],
               wires: [wire('app', 'adapter'), wire('adapter', 'grinderApp')],
             },
           },
@@ -86,14 +72,10 @@ export default defineLevel({
         proxy: {
           outcome: 'misfit',
           code: 'proxy',
-          note: {
-            title: 'Proxy controla el acceso, no la receta',
-            body: 'Un intermediario frente a la máquina puede registrar o limitar su uso, pero no sabe que a la app le falta un paso de la receta.',
-          },
           patch: {
             removeWires: ['grinderApp->espressoApp'],
             add: {
-              nodes: [skinned('proxy', node('machineProxy', 'Proxy', 'EspressoMachineProxy', [7.5, 5.5]))],
+              nodes: [skinned('proxy', node('machineProxy', 'EspressoMachineProxy', [7.5, 5.5]))],
               wires: [wire('grinderApp', 'machineProxy'), wire('machineProxy', 'espressoApp')],
             },
           },
@@ -104,13 +86,12 @@ export default defineLevel({
   scenarios: [
     {
       id: 'main',
-      pulses: [pulse(0, 'Latte', [], {}, 'counter'), pulse(0, 'Latte (app)', ['app'], {}, 'app'), pulse(60, 'Latte', [], {}, 'counter'), pulse(60, 'Latte (app)', ['app'], {}, 'app')],
+      pulses: [pulse(0, [], {}, 'counter'), pulse(0, ['app'], {}, 'app'), pulse(60, [], {}, 'counter'), pulse(60, ['app'], {}, 'app')],
     },
   ],
   changeTickets: [
     {
       id: 'preheat',
-      text: 'La máquina nueva necesita precalentarse antes de extraer.',
       scenario: 'main',
       without: {
         removeWires: ['grinder->espresso', 'grinderApp->espressoApp'],

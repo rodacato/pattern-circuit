@@ -124,15 +124,15 @@ describe('primitives with memory', () => {
       m: {
         type: 'machine',
         initial: 'pendiente',
-        states: { pendiente: { pagar: { to: 'pagado', port: 'out' } }, pagado: { entregar: { to: 'entregado', port: 'out' } } },
+        states: { pendiente: { pagar: { to: 'pagado', port: 'out' } }, pagado: { entregar: { to: 'delivered', port: 'out' } } },
         else: 'drop',
       },
       out: { type: 'sink' },
     })
     const { sim, events } = runToEnd(createSim(c, scenario({ at: 0, tags: ['entregar'] }, { at: 30, tags: ['pagar'] }, { at: 60, tags: ['entregar'] })))
     expect(sim.state.metrics).toMatchObject({ delivered: 2, dropped: 1 })
-    expect(sim.state.nodeState.m).toBe('entregado')
-    expect(events.filter((e) => e.type === 'node.state').map((e) => e.state)).toEqual(['pagado', 'entregado'])
+    expect(sim.state.nodeState.m).toBe('delivered')
+    expect(events.filter((e) => e.type === 'node.state').map((e) => e.state)).toEqual(['pagado', 'delivered'])
   })
 
   it('buffer: cancelling cancels the held order of the same request', () => {
@@ -154,15 +154,15 @@ describe('primitives with memory', () => {
     const c = Circuit.parse({
       nodes: [
         node('src', 0, { type: 'source' }),
-        node('b', 2, { type: 'breaker', threshold: 2, failTag: 'fallo' }),
-        node('svc', 4, { type: 'guard', require: { hasTag: 'nunca' }, onFail: 'fallo' }),
-        node('mark', 3, { type: 'transform', addTags: ['fallo'] }, 2),
+        node('b', 2, { type: 'breaker', threshold: 2, failTag: 'failure' }),
+        node('svc', 4, { type: 'guard', require: { hasTag: 'nunca' }, onFail: 'failure' }),
+        node('mark', 3, { type: 'transform', addTags: ['failure'] }, 2),
         node('backup', 6, { type: 'sink' }, 2),
       ],
       wires: [
         { from: 'src', to: 'b' },
         { from: 'b', port: 'call', to: 'svc' },
-        { from: 'svc', port: 'fallo', to: 'mark' },
+        { from: 'svc', port: 'failure', to: 'mark' },
         { from: 'mark', to: 'b' },
         { from: 'b', port: 'fallback', to: 'backup' },
       ],
@@ -170,7 +170,7 @@ describe('primitives with memory', () => {
     const s = Scenario.parse({ id: 's', pulses: [0, 150, 300, 450].map((at) => ({ at, from: 'src' })) })
     const { sim } = runToEnd(createSim(c, s))
     expect(sim.state.metrics).toMatchObject({ delivered: 4, dropped: 0 })
-    expect(sim.state.nodeState.b).toBe('abierto')
+    expect(sim.state.nodeState.b).toBe('open')
     expect(sim.state.pulses.map((p) => p.trail.includes('svc'))).toEqual([true, true, false, false])
   })
 })

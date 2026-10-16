@@ -19,19 +19,14 @@ export default defineLevel({
   id: 'single-listener',
   order: 25,
   chapter: 'judgment',
-  title: 'Un solo interesado',
   targetPattern: 'keep-simple',
-  brief: {
-    problem: 'Cuando se cobra un pedido, la cocina tiene que enterarse para empezar a prepararlo. Hoy nadie le avisa y los pedidos se pierden. Solo la cocina necesita saberlo, y no hay otros interesados a la vista.',
-    goal: 'Que la cocina reciba cada pedido y que el flujo se siga leyendo de corrido.',
-  },
   circuit: {
     nodes: [
-      actor('customer', 'Cliente', [0, 2]),
-      node('take', 'Tomar pedido', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
-      node('charge', 'Cobrar', 'Cashier', [6, 2], { type: 'pass' }, { codeRef: 'Cashier#charge' }),
-      node('kitchen', 'Cocina', 'Kitchen', [10, 2], { type: 'pass' }, { codeRef: 'Kitchen#start' }),
-      node('handOver', 'Entregar', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
+      actor('customer', [0, 2]),
+      node('take', 'OrderTaker', [3, 2], { type: 'pass' }, { codeRef: 'OrderTaker#take' }),
+      node('charge', 'Cashier', [6, 2], { type: 'pass' }, { codeRef: 'Cashier#charge' }),
+      node('kitchen', 'Kitchen', [10, 2], { type: 'pass' }, { codeRef: 'Kitchen#start' }),
+      node('handOver', 'Counter', [13, 2], { type: 'sink' }, { codeRef: 'Counter#hand_over' }),
     ],
     wires: [...chain('customer', 'take', 'charge'), wire('kitchen', 'handOver')],
   },
@@ -39,28 +34,19 @@ export default defineLevel({
     {
       id: 'notice',
       at: 'charge',
-      label: 'Aviso a la cocina',
       inventory: ['event-bus', 'command', 'keep-simple'],
       options: {
         'keep-simple': {
           outcome: 'solves',
           code: 'simple',
-          note: {
-            title: 'Una llamada directa se lee de corrido',
-            body: 'Con un solo interesado, Cashier llama a la cocina y el flujo queda escrito en el código de principio a fin. Un bus o una lista de suscriptores tendrán sentido cuando aparezcan más interesados.',
-          },
           patch: { update: [{ id: 'charge', skin: 'keep-simple' }], add: { wires: [wire('charge', 'kitchen', { dep: 'concrete' })] } },
         },
         'event-bus': {
           outcome: 'misfit',
           code: 'event_bus',
-          note: {
-            title: 'Un bus para un solo suscriptor',
-            body: 'Funciona, pero el flujo ya no está escrito en ningún lado: para saber qué pasa tras cobrar hay que buscar quién se suscribió. Fowler advierte que con eventos el flujo cuesta ver; con un solo oyente, no hay nada que desacoplar.',
-          },
           patch: {
             add: {
-              nodes: [skinned('event-bus', node('bus', 'Bus de eventos', 'EventBus', [8, 0], { type: 'broadcast' }, { codeRef: 'EventBus#publish' }))],
+              nodes: [skinned('event-bus', node('bus', 'EventBus', [8, 0], { type: 'broadcast' }, { codeRef: 'EventBus#publish' }))],
               wires: [wire('charge', 'bus', { dep: 'concrete' }), abstract('bus', 'kitchen')],
             },
           },
@@ -68,13 +54,9 @@ export default defineLevel({
         command: {
           outcome: 'misfit',
           code: 'command',
-          note: {
-            title: 'Un comando que nadie encola ni deshace',
-            body: 'Command convierte una petición en objeto para poder encolarla, deshacerla o registrarla. Aquí no se hace nada de eso: es un objeto más entre Cashier y la cocina.',
-          },
           patch: {
             add: {
-              nodes: [skinned('command', node('startOrder', 'Orden a cocina', 'StartOrder', [8, 0], { type: 'pass' }, { codeRef: 'StartOrder#call' }))],
+              nodes: [skinned('command', node('startOrder', 'StartOrder', [8, 0], { type: 'pass' }, { codeRef: 'StartOrder#call' }))],
               wires: [wire('charge', 'startOrder', { dep: 'concrete' }), wire('startOrder', 'kitchen', { dep: 'concrete' })],
             },
           },
@@ -82,7 +64,7 @@ export default defineLevel({
       },
     },
   ],
-  scenarios: [{ id: 'main', pulses: [pulse(0, 'Latte'), pulse(40, 'Mocha'), pulse(80, 'Té')] }],
+  scenarios: [{ id: 'main', pulses: [pulse(0), pulse(40), pulse(80)] }],
   winWhen: [
     { metric: 'delivered', op: '>=', value: 3 },
     { metric: 'dropped', op: '==', value: 0 },

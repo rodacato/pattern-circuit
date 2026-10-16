@@ -10,10 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - **Everything that is code is English.** Level ids and folders no longer carry their position (`strategy`, `branches-and-payments`, `full-cafe`…); the ids of nodes, sockets, repairs, tickets, scenarios, wires, tags, ports and chapters, the snippet files and code keys, the test titles, the comments and the documentation are all English. Commits are in English from now on.
 - The Ruby and TypeScript snippets shown in the code panel are fully English: comments, output strings and identifiers (for example `Charged: …`, `:oat`, `OatMilkLatte`). The texts the player reads in the game (briefs, notes, labels) are unchanged.
+- **Texts are identified by keys and live in catalogs**: components, render, game and level data contain no prose. A new language is a folder of catalog files (`npm run i18n:scaffold`), with parity tests for every locale. English is the source of the typed keys. The Spanish locale is now `es-MX` (a saved `es` is recognized), and the language button cycles through the registered languages.
+- "Erase progress" asks for confirmation inside the notebook instead of a native `confirm()` (which an embedding page can block). The flow's change ticket is one state (`open`, `applied`, `met`) instead of two booleans, and the engine's error messages are English.
+- The English label of the language button is now "Change language" (it read "Cambiar idioma (switch to Spanish)").
+- The game's page (`index.html`) is described in English and says 27 levels, Ruby and TypeScript.
 - Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).
 
 ### Added
 
+- **A host can theme the course**: the chrome (bars, panels, text, code panel and its colors) follows the colors, fonts and light or dark mode the host sends, with unreadable text ignored; the circuit stage keeps the neon identity (dark ground, pulse, family and status colors) in any theme.
+- **The course can be embedded** in a hub (such as Dojo) through an iframe, with the same game on its own: a manifest (`course.json`), a typed, versioned `postMessage` protocol with strict origin checks, progress and preferences kept by the host when embedded, and a test host (`npm run host:test`). See `docs/ARCHITECTURE.md`.
+- The code panel shows each region's name the way the language spells it (`Counter#hand_over` in Ruby, `Counter#handOver` in TypeScript); a test checks that both languages tell the story with the same regions.
+- `npm run i18n:scaffold` to start a new language from the English catalogs.
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.
 
 ## [1.1.0] - 2026-09-24
