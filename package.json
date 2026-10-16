@@ -17,7 +17,8 @@
     "test": "vitest run",
     "typecheck": "tsc -b",
     "check": "tsc -b && oxlint && vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "i18n:scaffold": "node scripts/i18n-scaffold.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.21.0",
