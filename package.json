@@ -2,8 +2,14 @@
   "name": "pattern-circuit",
   "private": true,
   "version": "1.1.0",
-  "description": "Juego educativo para entender patrones de diseño viendo cómo un pulso recorre el circuito de una cafetería.",
+  "description": "A design patterns game: plug patterns into a coffee shop's circuit and watch every order flow through them.",
   "license": "MIT",
+  "homepage": "https://rodacato.github.io/pattern-circuit/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodacato/pattern-circuit.git"
+  },
+  "bugs": "https://github.com/rodacato/pattern-circuit/issues",
   "author": "Adrian Castillo",
   "type": "module",
   "engines": {
