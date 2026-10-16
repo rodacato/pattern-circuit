@@ -5,6 +5,11 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import state from './state.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommand from './py/command.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyState from './py/state.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommand from './ts/command.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 
 const STATES = ['pending', 'paid', 'preparing', 'delivered', 'cancelled']
 const TARGET: Record<string, string> = { pay: 'paid', prepare: 'preparing', deliver: 'delivered', cancel: 'cancelled' }
@@ -88,5 +94,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), state: code(state), strategy: code(strategy), command: code(base + command) },
     ts: { base: codeTs(tsBase), state: codeTs(tsState), strategy: codeTs(tsStrategy), command: codeTs(tsBase + tsCommand) },
+    py: { base: codePy(pyBase), state: codePy(pyState), strategy: codePy(pyStrategy), command: codePy(pyBase + pyCommand) },
   },
 })

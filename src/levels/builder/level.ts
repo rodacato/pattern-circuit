@@ -5,6 +5,11 @@ import common from './common.rb?raw'
 import { withCommon } from '../kit'
 import decorator from './decorator.rb?raw'
 import factory from './factory.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBuilder from './py/builder.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyDecorator from './py/decorator.py?raw'
+import pyFactory from './py/factory.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBuilder from './ts/builder.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsFactory from './ts/factory.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 
 const impossible: Predicate = { all: [{ hasTag: 'hot' }, { hasTag: 'ice' }] }
 
@@ -168,6 +174,12 @@ export default defineLevel({
       builder: codeTs(tsBuilder),
       factory: codeTs(tsFactory),
       decorator: codeTs(tsDecorator),
+    },
+    py: {
+      base: codePy(pyBase),
+      builder: codePy(pyBuilder),
+      factory: codePy(pyFactory),
+      decorator: codePy(pyDecorator),
     },
   },
 })

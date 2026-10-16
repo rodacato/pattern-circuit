@@ -5,6 +5,11 @@ import common from './common.rb?raw'
 import factory from './factory.rb?raw'
 import simple from './simple.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFactory from './py/factory.py?raw'
+import pySimple from './py/simple.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsFactory from './ts/factory.ts?raw'
@@ -13,6 +18,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const PIECES = 5 // the pieces the circuit already has: fixing the charge needs no more
 
 export default defineLevel({
@@ -77,5 +83,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), simple: code(simple), strategy: code(strategy), factory: code(factory) },
     ts: { base: codeTs(tsBase), simple: codeTs(tsSimple), strategy: codeTs(tsStrategy), factory: codeTs(tsFactory) },
+    py: { base: codePy(pyBase), simple: codePy(pySimple), strategy: codePy(pyStrategy), factory: codePy(pyFactory) },
   },
 })

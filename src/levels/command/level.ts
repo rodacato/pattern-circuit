@@ -5,6 +5,11 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommand from './py/command.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyObserver from './py/observer.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommand from './ts/command.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 
 export default defineLevel({
   id: 'command',
@@ -88,5 +94,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), command: code(command), strategy: code(base + strategy), observer: code(base + observer) },
     ts: { base: codeTs(tsBase), command: codeTs(tsCommand), strategy: codeTs(tsBase + tsStrategy), observer: codeTs(tsBase + tsObserver) },
+    py: { base: codePy(pyBase), command: codePy(pyCommand), strategy: codePy(pyBase + pyStrategy), observer: codePy(pyBase + pyObserver) },
   },
 })

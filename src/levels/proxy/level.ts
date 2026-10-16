@@ -5,6 +5,11 @@ import common from './common.rb?raw'
 import facade from './facade.rb?raw'
 import proxy from './proxy.rb?raw'
 import singleton from './singleton.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFacade from './py/facade.py?raw'
+import pyProxy from './py/proxy.py?raw'
+import pySingleton from './py/singleton.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsFacade from './ts/facade.ts?raw'
@@ -13,6 +18,7 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const items = ['coffee', 'milk', 'coffee', 'coffee', 'milk', 'coffee']
 
 export default defineLevel({
@@ -74,5 +80,7 @@ export default defineLevel({
   code: {
     rb: { base: code(base), proxy: code(proxy), singleton: code(singleton), facade: code(facade) },
     ts: { base: codeTs(tsBase), proxy: codeTs(tsProxy), singleton: codeTs(tsSingleton), facade: codeTs(tsFacade) },
+    // In Python a second `class RemoteInventory` would replace the first: the singleton snippet adds to the class, so the common code goes first.
+    py: { base: codePy(pyBase), proxy: codePy(pyProxy), singleton: `${pyCommon}\n${pySingleton}`, facade: codePy(pyFacade) },
   },
 })

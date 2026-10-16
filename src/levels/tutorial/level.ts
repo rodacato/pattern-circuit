@@ -1,6 +1,8 @@
 import { defineLevel } from '../../engine'
 import base from './base.rb?raw'
 import repaired from './repaired.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyRepaired from './py/repaired.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsRepaired from './ts/repaired.ts?raw'
 
@@ -44,5 +46,5 @@ export default defineLevel({
     { metric: 'delivered', op: '==', value: 3 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base, repaired }, ts: { base: tsBase, repaired: tsRepaired } },
+  code: { rb: { base, repaired }, ts: { base: tsBase, repaired: tsRepaired }, py: { base: pyBase, repaired: pyRepaired } },
 })

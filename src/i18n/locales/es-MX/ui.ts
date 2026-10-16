@@ -75,7 +75,7 @@ export const ui: Record<keyof typeof source, string> = {
   'ui.review.socket': 'socket "{label}"',
 
   // seen in
-  'ui.seenIn.label': 'En Ruby: {example}.',
+  'ui.seenIn.label': 'En {language}: {example}.',
   'ui.seenIn.source': 'Ver fuente ↗',
 
   // transport
@@ -102,6 +102,7 @@ export const ui: Record<keyof typeof source, string> = {
   'ui.code.node': 'nodo · {label}',
   'ui.code.labelRuby': 'Código Ruby del circuito',
   'ui.code.labelTypeScript': 'Código TypeScript del circuito',
+  'ui.code.labelPython': 'Código Python del circuito',
   'ui.code.language': 'Lenguaje del código',
   'ui.code.footHint': 'Haz clic en un nodo o en un pulso para seguir su código.',
 }

@@ -7,6 +7,13 @@ import common from './common.rb?raw'
 import strategy from './strategy.rb?raw'
 import template from './template.rb?raw'
 import templateSleeve from './template_sleeve.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseSleeve from './py/base_sleeve.py?raw'
+import pyBuilder from './py/builder.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyStrategy from './py/strategy.py?raw'
+import pyTemplate from './py/template.py?raw'
+import pyTemplateSleeve from './py/template_sleeve.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseSleeve from './ts/base_sleeve.ts?raw'
 import tsBuilder from './ts/builder.ts?raw'
@@ -17,6 +24,7 @@ import tsTemplateSleeve from './ts/template_sleeve.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const step = (id: string, codeRef: string, at: [number, number], tag: string): NodeInput =>
   node(id, codeRef.split('#')[0], at, { type: 'transform', addTags: [tag] }, { codeRef })
 const skeleton = (id: string, codeRef: string, x: number, tag: string) => skinned('template-method', step(id, codeRef, [x, 2], tag))
@@ -147,6 +155,14 @@ export default defineLevel({
       template_sleeve: codeTs(tsTemplateSleeve),
       strategy: codeTs(tsStrategy),
       builder: codeTs(tsBuilder),
+    },
+    py: {
+      base: codePy(pyBase),
+      base_sleeve: codePy(pyBaseSleeve),
+      template: codePy(pyTemplate),
+      template_sleeve: codePy(pyTemplateSleeve),
+      strategy: codePy(pyStrategy),
+      builder: codePy(pyBuilder),
     },
   },
 })

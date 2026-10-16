@@ -1,6 +1,6 @@
 # Pattern Circuit
 
-An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby or TypeScript**.
+An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
 
 - **27 levels** in 9 chapters, from the tutorial to "the whole cafeteria".
 - **20 patterns**: 14 from the GoF catalog, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker and Saga. Plus a chapter about the opposite: when **not** to apply one.
@@ -37,7 +37,7 @@ The game is available in **Spanish and English** (ES/EN button at the top); addi
 
 ## Development
 
-Requires Node 22 or later. Ruby is optional: if it is installed, the tests verify the syntax of all the Ruby code the player sees (the TypeScript is always verified).
+Requires Node 22 or later. Ruby and Python are optional: if they are installed, the tests verify and run all the Ruby and Python code the player sees (the TypeScript is always verified).
 
 ```bash
 npm install

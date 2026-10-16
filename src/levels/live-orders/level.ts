@@ -9,6 +9,14 @@ import { permissive, strict } from '../state/level'
 import eventsCommand from './events_command.rb?raw'
 import statesState from '../state/state.rb?raw'
 import eventsBase from '../command/base.rb?raw'
+import pyNoticesBase from '../observer/py/base.py?raw'
+import pyNoticesCommon from '../observer/py/common.py?raw'
+import pyNoticesObserver from '../observer/py/observer.py?raw'
+import pyStatesBase from '../state/py/base.py?raw'
+import pyStatesCommon from '../state/py/common.py?raw'
+import pyStatesState from '../state/py/state.py?raw'
+import pyEventsBase from '../command/py/base.py?raw'
+import pyEventsCommand from './py/events_command.py?raw'
 import tsNoticesBase from '../observer/ts/base.ts?raw'
 import tsNoticesCommon from '../observer/ts/common.ts?raw'
 import tsNoticesObserver from '../observer/ts/observer.ts?raw'
@@ -152,6 +160,15 @@ export default defineLevel({
       states_state: tsStatesState,
       notices_base: tsNoticesBase,
       notices_observer: tsNoticesObserver,
+    },
+    py: {
+      base: `${pyStatesCommon}\n${pyNoticesCommon}`,
+      events_base: pyEventsBase,
+      events_command: pyEventsCommand,
+      states_base: pyStatesBase,
+      states_state: pyStatesState,
+      notices_base: pyNoticesBase,
+      notices_observer: pyNoticesObserver,
     },
   },
 })

@@ -319,7 +319,7 @@ function WinCard({ session, onNext }: { session: GameSession; onNext?: () => voi
       {patterns.map((p) => (
         <div key={p}>
           <p className="muted">{t(PATTERNS[p].gist)}</p>
-          <SeenIn info={PATTERNS[p].seenIn} />
+          <SeenIn pattern={p} lang={session.shownCodeLang} />
         </div>
       ))}
       <div className="actions">

@@ -1,18 +1,20 @@
-import type { PatternId } from './schema'
+import type { CodeLang, PatternId } from './schema'
 import { SEEN_IN } from './seenIn'
+import { SEEN_IN_PYTHON } from './seenInPython'
 
 export type PatternFamily = 'creational' | 'structural' | 'behavioral' | 'architecture' | 'resilience' | 'principle'
 
-// Where it appears in the Ruby ecosystem: a real example, with the source that shows it.
+// Where it appears in a language's ecosystem: a real example, with the source that shows it.
 export type SeenIn = { example: string; text: string; url: string }
 
-export type PatternInfo = { name: string; family: PatternFamily; gist: string; seenIn?: SeenIn }
+// `seenIn` is the Ruby example (the reference); `seenInPython` exists where a verified Python one does.
+export type PatternInfo = { name: string; family: PatternFamily; gist: string; seenIn?: SeenIn; seenInPython?: SeenIn }
 
 // Pattern catalog: visible name, family and the idea in one sentence.
 // `name`, `gist` and the family names are catalog keys (the engine does not import i18n): whoever shows them translates them.
 // GoF families per Gamma et al. (1994); Null Object is "object structural" per Woolf (1997).
 // The sources for each pattern are in docs/DESIGN.md.
-const CATALOG: Record<PatternId, Omit<PatternInfo, 'seenIn'>> = {
+const CATALOG: Record<PatternId, Omit<PatternInfo, 'seenIn' | 'seenInPython'>> = {
   'factory-method': { name: 'pattern.factoryMethod.name', family: 'creational', gist: 'pattern.factoryMethod.gist' },
   builder: { name: 'pattern.builder.name', family: 'creational', gist: 'pattern.builder.gist' },
   singleton: { name: 'pattern.singleton.name', family: 'creational', gist: 'pattern.singleton.gist' },
@@ -37,7 +39,7 @@ const CATALOG: Record<PatternId, Omit<PatternInfo, 'seenIn'>> = {
 }
 
 export const PATTERNS = Object.fromEntries(
-  Object.entries(CATALOG).map(([id, info]) => [id, { ...info, seenIn: SEEN_IN[id as PatternId] }]),
+  Object.entries(CATALOG).map(([id, info]) => [id, { ...info, seenIn: SEEN_IN[id as PatternId], seenInPython: SEEN_IN_PYTHON[id as PatternId] }]),
 ) as Record<PatternId, PatternInfo>
 
 export const FAMILY_NAMES: Record<PatternFamily, string> = {
@@ -47,4 +49,11 @@ export const FAMILY_NAMES: Record<PatternFamily, string> = {
   architecture: 'family.architecture',
   resilience: 'family.resilience',
   principle: 'family.principle',
+}
+
+// The example for the language of the code panel; a language without one of its own shows the Ruby example.
+export function seenInFor(pattern: PatternId, lang: CodeLang): { info: SeenIn; lang: CodeLang } | undefined {
+  const { seenIn, seenInPython } = PATTERNS[pattern]
+  if (lang === 'py' && seenInPython) return { info: seenInPython, lang: 'py' }
+  return seenIn ? { info: seenIn, lang: 'rb' } : undefined
 }

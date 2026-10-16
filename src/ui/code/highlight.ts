@@ -3,7 +3,7 @@ import type { CodeLang } from '../../engine'
 
 export type Token = { content: string; color?: string }
 
-const SHIKI_LANG: Record<CodeLang, string> = { rb: 'ruby', ts: 'typescript' }
+const SHIKI_LANG: Record<CodeLang, string> = { rb: 'ruby', ts: 'typescript', py: 'python' }
 
 let highlighter: Promise<HighlighterCore> | undefined
 
@@ -14,10 +14,11 @@ function load() {
     import('shiki/engine/javascript'),
     import('shiki/langs/ruby.mjs'),
     import('shiki/langs/typescript.mjs'),
+    import('shiki/langs/python.mjs'),
     import('shiki/themes/tokyo-night.mjs'),
     import('shiki/themes/github-light.mjs'),
-  ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }, ruby, typescript, dark, light]) =>
-    createHighlighterCore({ themes: [dark.default, light.default], langs: [ruby.default, typescript.default], engine: createJavaScriptRegexEngine() }),
+  ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }, ruby, typescript, python, dark, light]) =>
+    createHighlighterCore({ themes: [dark.default, light.default], langs: [ruby.default, typescript.default, python.default], engine: createJavaScriptRegexEngine() }),
   )
   highlighter.catch(() => (highlighter = undefined)) // a network failure does not leave the panel colorless forever
   return highlighter

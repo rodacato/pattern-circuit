@@ -1,6 +1,7 @@
 import { defineLevel } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire } from '../kit'
 import cafeteria from './cafeteria.rb?raw'
+import pyCafeteria from './py/cafeteria.py?raw'
 import tsCafeteria from './ts/cafeteria.ts?raw'
 
 const impossible = { all: [{ hasTag: 'hot' }, { hasTag: 'ice' }] }
@@ -65,5 +66,5 @@ export default defineLevel({
     { metric: 'cancelled', op: '==', value: 1 },
     { metric: 'dropped', op: '==', value: 0 },
   ],
-  code: { rb: { base: cafeteria }, ts: { base: tsCafeteria } },
+  code: { rb: { base: cafeteria }, ts: { base: tsCafeteria }, py: { base: pyCafeteria } },
 })

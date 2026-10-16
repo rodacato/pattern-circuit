@@ -5,6 +5,11 @@ import command from './command.rb?raw'
 import common from './common.rb?raw'
 import eventBus from './event_bus.rb?raw'
 import simple from './simple.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommand from './py/command.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyEventBus from './py/event_bus.py?raw'
+import pySimple from './py/simple.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommand from './ts/command.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -13,6 +18,7 @@ import tsSimple from './ts/simple.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const PIECES = 5 // notifying the kitchen needs no new pieces: one wire is enough
 
 export default defineLevel({
@@ -73,5 +79,6 @@ export default defineLevel({
   code: {
     rb: { base: code(base), simple: code(simple), event_bus: code(eventBus), command: code(command) },
     ts: { base: codeTs(tsBase), simple: codeTs(tsSimple), event_bus: codeTs(tsEventBus), command: codeTs(tsCommand) },
+    py: { base: codePy(pyBase), simple: codePy(pySimple), event_bus: codePy(pyEventBus), command: codePy(pyCommand) },
   },
 })

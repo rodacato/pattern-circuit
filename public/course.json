@@ -21,7 +21,8 @@
   "defaultLocale": "en",
   "codeLanguages": [
     "ruby",
-    "typescript"
+    "typescript",
+    "python"
   ],
   "defaultCodeLanguage": "ruby",
   "entry": "./index.html",

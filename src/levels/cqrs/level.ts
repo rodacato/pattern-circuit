@@ -5,6 +5,11 @@ import common from './common.rb?raw'
 import cqrs from './cqrs.rb?raw'
 import facade from './facade.rb?raw'
 import singleton from './singleton.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyCqrs from './py/cqrs.py?raw'
+import pyFacade from './py/facade.py?raw'
+import pySingleton from './py/singleton.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsCommon from './ts/common.ts?raw'
 import tsCqrs from './ts/cqrs.ts?raw'
@@ -13,6 +18,7 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const reads = Array.from({ length: 8 }, (_, i) => pulse(i * 10, ['read'], {}, 'displays'))
 const writes = [5, 35, 65].map((at) => pulse(at, ['write'], {}, 'counter'))
 
@@ -76,5 +82,5 @@ export default defineLevel({
     { metric: 'dropped', op: '==', value: 0 },
     { metric: 'maxLoad', op: '<=', value: 3 },
   ],
-  code: { rb: { base: code(base), cqrs: code(cqrs), singleton: code(base + singleton), facade: code(base + facade) }, ts: { base: codeTs(tsBase), cqrs: codeTs(tsCqrs), singleton: codeTs(tsBase + tsSingleton), facade: codeTs(tsBase + tsFacade) } },
+  code: { rb: { base: code(base), cqrs: code(cqrs), singleton: code(base + singleton), facade: code(base + facade) }, ts: { base: codeTs(tsBase), cqrs: codeTs(tsCqrs), singleton: codeTs(tsBase + tsSingleton), facade: codeTs(tsBase + tsFacade) }, py: { base: codePy(pyBase), cqrs: codePy(pyCqrs), singleton: codePy(pyBase + pySingleton), facade: codePy(pyBase + pyFacade) } },
 })

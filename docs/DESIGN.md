@@ -6,7 +6,7 @@ An educational game for understanding design patterns by seeing them, not readin
 
 | Topic | Decision |
 |---|---|
-| Language of the displayed code | **Ruby** and **TypeScript** (the `code: { rb, ts }` format admits more); everything inside the snippets is English |
+| Language of the displayed code | **Ruby**, **TypeScript** and **Python** (the `code: { rb, ts, py }` format admits more); everything inside the snippets is English |
 | Language | UI in Spanish and English; identifiers, comments and documentation in English |
 | Platform | Desktop and tablet |
 | Stack | React + TypeScript + Vite, **PixiJS** (game-like render), zod to validate levels, vitest |
@@ -67,7 +67,7 @@ session ─► neon PixiJS render + skins · code panel · HUD · progress (loca
 - `Timeline` keeps references to snapshots every N ticks; going back = restoring + re-simulating.
 - **Closed primitives** (`source`, `sink`, `pass`, `transform`, `branch`, `slot`, `broadcast`, `guard`, `counter`, `join`, `cache`, `machine`, `buffer`, `breaker`). A pattern is a `GraphPatch` of primitives + a skin. A new level = data only.
 - `nodesTouched`: an existing node counts if its definition changes, it disappears or it gains/loses an outgoing **concrete** dependency. Registering an abstract wire in a `slot` does not count.
-- Code with nestable `# region: Class#method` markers (`// region:` in TypeScript); `Class#method:branch` falls back to the parent region.
+- Code with nestable `# region: Class#method` markers (`// region:` in TypeScript, `#` again in Python); `Class#method:branch` falls back to the parent region.
 - `defineLevel` walks every reachable variant (repairs × sockets × tickets) and fails if one does not compile, has no scenario or points at a code region that does not exist.
 
 The complete schema is in [`src/engine/schema.ts`](../src/engine/schema.ts).

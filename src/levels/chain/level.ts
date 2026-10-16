@@ -7,6 +7,13 @@ import chainSupervisor from './chain_supervisor.rb?raw'
 import common from './common.rb?raw'
 import observer from './observer.rb?raw'
 import strategy from './strategy.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseSupervisor from './py/base_supervisor.py?raw'
+import pyChain from './py/chain.py?raw'
+import pyChainSupervisor from './py/chain_supervisor.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyObserver from './py/observer.py?raw'
+import pyStrategy from './py/strategy.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseSupervisor from './ts/base_supervisor.ts?raw'
 import tsChain from './ts/chain.ts?raw'
@@ -17,6 +24,7 @@ import tsStrategy from './ts/strategy.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 const handler = (id: string, className: string, at: [number, number], amount: string): NodeInput =>
   skinned('chain-of-responsibility', node(id, className, at, { type: 'guard', require: { hasTag: `amount:${amount}` }, onFail: 'next' }, { codeRef: `${className}#handle` }))
 const next = (from: string, to: string) => ({ ...abstract(from, to), port: 'next' })
@@ -148,6 +156,14 @@ export default defineLevel({
       chain_supervisor: codeTs(tsChainSupervisor),
       strategy: codeTs(tsStrategy),
       observer: codeTs(tsObserver),
+    },
+    py: {
+      base: codePy(pyBase),
+      base_supervisor: codePy(pyBaseSupervisor),
+      chain: codePy(pyChain),
+      chain_supervisor: codePy(pyChainSupervisor),
+      strategy: codePy(pyStrategy),
+      observer: codePy(pyObserver),
     },
   },
 })

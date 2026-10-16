@@ -26,6 +26,9 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0.1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
       - run: npm ci
       - run: npm run check
       - run: npm run build

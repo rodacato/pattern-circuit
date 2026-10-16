@@ -1,7 +1,7 @@
 import { EmbeddedHostBridge, PROTOCOL_VERSION, StandaloneHostBridge, embeddingOrigin, windowTransport, type HostBridge, type HostInit } from '../course-kit'
 import { detectLocale } from '../i18n/registry'
 import { createBrowserStorage, type BrowserStorage, type Preference } from './browserStorage'
-import { fromHostLanguage, toHostLanguage } from './codeLanguages'
+import { fromHostLanguage, storedLanguage, toHostLanguage } from './codeLanguages'
 import { HostProgressStore } from './hostProgress'
 
 declare const __APP_VERSION__: string
@@ -23,7 +23,7 @@ function standaloneInit(storage: BrowserStorage, languages: readonly string[]): 
   return {
     protocol: PROTOCOL_VERSION,
     locale: detectLocale(storage.locale.load(), languages),
-    codeLanguage: toHostLanguage(storage.codeLanguage.load() === 'ts' ? 'ts' : 'rb'),
+    codeLanguage: toHostLanguage(storedLanguage(storage.codeLanguage.load())),
     progress: null,
     features: { codeRunner: false },
   }
@@ -57,7 +57,7 @@ async function embedded(hostOrigin: string): Promise<Course> {
   const storage: BrowserStorage = {
     progress,
     locale: hostPreference(bridge, 'locale', init.locale),
-    codeLanguage: hostPreference(bridge, 'codeLanguage', fromHostLanguage(init.codeLanguage) ?? 'rb', (v) => toHostLanguage(v === 'ts' ? 'ts' : 'rb')),
+    codeLanguage: hostPreference(bridge, 'codeLanguage', fromHostLanguage(init.codeLanguage) ?? 'rb', (v) => toHostLanguage(storedLanguage(v))),
   }
   bridge.onCommand((command) => {
     if (command.type === 'progress') progress.replace(command.progress)

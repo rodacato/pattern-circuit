@@ -7,6 +7,13 @@ import { withCommon } from '../kit'
 import factory from './factory.rb?raw'
 import factoryHarbor from './factory_harbor.rb?raw'
 import singleton from './singleton.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseHarbor from './py/base_harbor.py?raw'
+import pyBuilder from './py/builder.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyFactory from './py/factory.py?raw'
+import pyFactoryHarbor from './py/factory_harbor.py?raw'
+import pySingleton from './py/singleton.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseHarbor from './ts/base_harbor.ts?raw'
 import tsBuilder from './ts/builder.ts?raw'
@@ -17,6 +24,7 @@ import tsSingleton from './ts/singleton.ts?raw'
 
 const code = withCommon(common)
 const codeTs = withCommon(tsCommon)
+const codePy = withCommon(pyCommon)
 
 // Each branch has its own drink; delivering another one is a wrong order.
 const MENU: Record<string, string> = { downtown: 'latte', beach: 'frappe', mountain: 'chocolate', harbor: 'tea' }
@@ -190,6 +198,14 @@ export default defineLevel({
       factory_harbor: codeTs(tsFactoryHarbor),
       singleton: codeTs(tsSingleton),
       builder: codeTs(tsBuilder),
+    },
+    py: {
+      base: codePy(pyBase),
+      base_harbor: codePy(pyBaseHarbor),
+      factory: codePy(pyFactory),
+      factory_harbor: codePy(pyFactoryHarbor),
+      singleton: codePy(pySingleton),
+      builder: codePy(pyBuilder),
     },
   },
 })

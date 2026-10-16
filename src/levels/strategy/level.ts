@@ -6,6 +6,13 @@ import decoratorCashier from './decorator.rb?raw'
 import observerCashier from './observer.rb?raw'
 import strategyCashier from './strategy.rb?raw'
 import strategyAppCashier from './strategy_app.rb?raw'
+import pyBase from './py/base.py?raw'
+import pyBaseApp from './py/base_app.py?raw'
+import pyCommon from './py/common.py?raw'
+import pyDecorator from './py/decorator.py?raw'
+import pyObserver from './py/observer.py?raw'
+import pyStrategy from './py/strategy.py?raw'
+import pyStrategyApp from './py/strategy_app.py?raw'
 import tsBase from './ts/base.ts?raw'
 import tsBaseApp from './ts/base_app.ts?raw'
 import tsCommon from './ts/common.ts?raw'
@@ -17,6 +24,7 @@ import { withCommon as withCommonCode } from '../kit'
 
 const withCommon = withCommonCode(common)
 const withCommonTs = withCommonCode(tsCommon)
+const withCommonPy = withCommonCode(pyCommon)
 
 const PAYMENTS = [
   { key: 'cash', id: 'cashPayment', className: 'CashPayment', row: 0 },
@@ -175,6 +183,14 @@ export default defineLevel({
       strategy_app: withCommonTs(tsStrategyApp),
       observer: withCommonTs(tsObserver),
       decorator: withCommonTs(tsDecorator),
+    },
+    py: {
+      base: withCommonPy(pyBase),
+      base_app: withCommonPy(pyBaseApp),
+      strategy: withCommonPy(pyStrategy),
+      strategy_app: withCommonPy(pyStrategyApp),
+      observer: withCommonPy(pyObserver),
+      decorator: withCommonPy(pyDecorator),
     },
   },
 })
