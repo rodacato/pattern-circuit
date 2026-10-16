@@ -14,8 +14,8 @@ const withoutComments = (code: string) => code.replace(/\/\*[\s\S]*?\*\//g, '').
 const BRAND = 'Pattern Circuit'
 const KEY = /^[a-z][A-Za-z0-9]*(\.[A-Za-z0-9-]+)+$/
 // Strings that look like prose but are code: CSS classes, import paths, regexes, formats.
-// Lines that hold identifiers, class names or storage keys rather than text.
-const CODE_LINE = ['className', 'querySelector', 'classList', '.css', 'getItem', 'setItem', 'import ', " from '"]
+// Lines that hold identifiers, class names, storage keys or developer errors rather than text the player reads.
+const CODE_LINE = ['new Error(', 'className', 'querySelector', 'classList', '.css', 'getItem', 'setItem', 'import ', " from '"]
 const NOT_PROSE = [/^\.{0,2}\//, /^https?:/, /sans-serif|monospace/, /^noopener noreferrer$/]
 
 describe('no prose in code', () => {

@@ -1,6 +1,8 @@
 import type { ui as source } from '../en/ui'
 
 export const ui: Record<keyof typeof source, string> = {
+  // course description (course.json)
+  'ui.course.description': 'Aprende patrones de diseño enchufándolos en el circuito de una cafetería.',
   // top bar
   'ui.header.language': 'Cambiar idioma',
   'ui.header.reviewHint': 'Repasa problemas de niveles ya completados',

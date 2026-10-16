@@ -236,7 +236,23 @@ describe('GameSession · review', () => {
   it('records the answer in the saved progress', () => {
     const store = new MemoryProgressStore()
     const s = session('tutorial', store)
-    s.recordReview('strategy/metodo-de-pago', true, 1000)
-    expect(store.load().review['strategy/metodo-de-pago']).toMatchObject({ box: 1 })
+    s.recordReview('strategy/payment-method', true, 1000)
+    expect(store.load().review['strategy/payment-method']).toMatchObject({ box: 1 })
+  })
+})
+
+describe('events for the host of the course', () => {
+  it('tells the unit that was opened and, once, the unit that was completed', () => {
+    const heard: string[] = []
+    const s = new GameSession(LEVELS.find((l) => l.id === 'tutorial')!, new MemoryProgressStore(), { started: (id) => heard.push(`started ${id}`), completed: (id) => heard.push(`completed ${id}`) })
+    expect(heard).toEqual(['started tutorial'])
+    runOut(s)
+    expect(heard).toEqual(['started tutorial'])
+    s.connect('prepare', 'handOver')
+    runOut(s)
+    expect(heard).toEqual(['started tutorial', 'completed tutorial'])
+    s.reset()
+    runOut(s)
+    expect(heard.filter((h) => h.startsWith('completed'))).toHaveLength(1)
   })
 })

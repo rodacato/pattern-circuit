@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { CodeLang } from '../engine'
 import { dueItems, reviewItems } from '../game/learning/review'
-import { firstUnfinished, KeyValueProgressStore, MemoryProgressStore, type ProgressStore } from '../game/progress/progress'
+import { initialCodeLanguage } from '../course/startCourse'
+import { firstUnfinished } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { chapterName, LEVELS, nextLevel, TRACKS, trackOf } from '../levels'
 import { NeonStage } from '../render/NeonStage'
@@ -13,50 +13,26 @@ import { Notebook } from './Notebook'
 import { Review } from './Review'
 import { msg } from '../i18n'
 import { LOCALE_META, LOCALES, nextLocale } from '../i18n/registry'
+import { useCourse } from './courseContext'
 import { useLocale, useT } from './i18nContext'
 import { isShortcut, SHORTCUTS } from './shortcuts'
 import { Transport } from './Transport'
 import { useSession } from './useSession'
 import './game.css'
 
-// With storage blocked (strict private mode, cookies disabled) the game goes on, without saving.
-function browserProgressStore(): ProgressStore {
-  try {
-    return new KeyValueProgressStore(window.localStorage)
-  } catch {
-    return new MemoryProgressStore()
-  }
-}
-
-const progressStore = browserProgressStore()
-
-// The code language is a preference of this browser, like the language.
-const CODE_LANG_KEY = 'pattern-circuit:code'
-const storedCodeLang = (): CodeLang => {
-  try {
-    return window.localStorage.getItem(CODE_LANG_KEY) === 'ts' ? 'ts' : 'rb'
-  } catch {
-    return 'rb'
-  }
-}
-
 export default function GameApp() {
-  const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, progressStore.load()).id)
+  const { bridge, init, storage } = useCourse()
+  const [levelId, setLevelId] = useState(() => firstUnfinished(LEVELS, storage.progress.load()).id)
   const index = LEVELS.findIndex((l) => l.id === levelId)
   const next = nextLevel(LEVELS[index])
   const session = useMemo(() => {
-    const s = new GameSession(LEVELS[index], progressStore)
-    s.codeLang = storedCodeLang()
+    const units = { started: (unitId: string) => bridge.emit({ type: 'unit.started', unitId }), completed: (unitId: string) => bridge.emit({ type: 'unit.completed', unitId }) }
+    const s = new GameSession(LEVELS[index], storage.progress, units)
+    s.codeLang = initialCodeLanguage(init)
     return s
-  }, [index])
+  }, [index, bridge, init, storage])
   const codeLang = useSession(session, (s) => s.codeLang)
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(CODE_LANG_KEY, codeLang)
-    } catch {
-      // without storage, the preference lasts this session
-    }
-  }, [codeLang])
+  useEffect(() => storage.codeLanguage.save(codeLang), [codeLang, storage])
   const { t, locale, setLocale } = useLocale()
   const upcoming = nextLocale(locale)
   const host = useRef<HTMLDivElement>(null)
