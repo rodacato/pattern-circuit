@@ -22,6 +22,8 @@ Pattern Circuit is organized in **layers with dependencies in one direction only
 | **game** | `src/game/` | Application: the session (playback, focus, player decisions), the level flow and progress. No DOM, no Pixi. | `engine`, `zod` |
 | **render** | `src/render/` | Draws the circuit with PixiJS and translates gestures into session calls. | `engine`, `game`, `pixi.js` |
 | **ui** | `src/ui/` | React: layout, cards, controls, code panel. Mounts the render. | engine, game, render, levels, `react`, `shiki` |
+| **course-kit** | `src/course-kit/` | The contract with a host: manifest, protocol, bridges. Knows nothing of this game. | only `zod` |
+| **course** | `src/course/` | Connects the contract to this game: manifest, browser storage, how the course starts. | course-kit, engine, game, i18n, levels |
 | **debug** | `src/debug/` | Raw engine view (`?debug`). | `engine`, `levels`, `react` |
 
 In addition, **outside `engine/` only `engine/index.ts` is imported**: the engine's public API (tests may also use `engine/testing.ts`). Internals can be reorganized without touching the rest. Tests may also load real levels and use `vitest`, `node:*` and Testing Library.
@@ -142,6 +144,19 @@ Things that are left as they are on purpose, with their reason:
 - **Validation for every locale** (`i18n/catalogs.test.ts`): the same keys as English, no blank text, the same `{holes}`, every text a level shows is defined, and no text nobody shows.
 - **Adding a language:** `npm run i18n:scaffold -- <code> "<name>" <short>` creates the files from the English ones (placeholders marked `TODO(translate)`); translate them and the parity tests tell what is missing.
 - The language is a browser preference (`localStorage`, key `pattern-circuit:locale`), separate from progress. Snippets, ids, comments and documentation are always English.
+
+## Hosting: course-kit
+
+The game can run on its own or inside a hub such as Dojo (an iframe). The contract between the two lives in `src/course-kit/` and imports only `zod`, so it can become a package other courses share.
+
+- **Manifest** (`public/course.json`, built by `src/course/manifest.ts` from the levels and their catalogs; a test keeps the file in sync, `UPDATE_MANIFEST=1 npm test` rewrites it): the id, version, languages, units (one per level, with its permanent id) and what the course can do.
+- **Protocol** (`course-kit/protocol.ts`): typed, versioned messages (`course.unit.completed`, `host.locale`, …) over `postMessage`; every message is parsed with zod, unknown fields are stripped and unknown types ignored.
+- **Trust** (`course-kit/transport.ts`): a course learns who embeds it from its own URL fragment (`#ck-host=<origin>`) and only accepts messages whose sender is exactly that window *and* origin; it posts only to that origin, never `'*'`.
+- **Ports**: `HostBridge` with two adapters: `StandaloneHostBridge` (today's behavior) and `EmbeddedHostBridge` (handshake with retries, then events up and commands down). If the host does not answer in five seconds the game runs standalone and says so. `HostController` (`course-kit/host.ts`) is the matching host side.
+- **Progress**: standalone, the browser's `localStorage` as always. Embedded, the host is the record: `HostProgressStore` starts from what the host sends and reports debounced snapshots (`course.progress`); completed levels travel as `course.unit.completed`. Nothing else in the game knows which mode it is in.
+- **Preferences**: language and code language are requested from the host (`course.preference.requested`) and obeyed when it answers; the game never sends back what the host just imposed.
+- **Theme**: a host sends `{ mode, tokens }` (validated: colors, font names, radii; never URLs). The game honors the tokens of its chrome (`course/theme.ts` maps them to CSS variables; text that would be hard to read on the host's surface is ignored) and picks the code colors by mode. The circuit stage and the cards over it keep their own dark palette: the glow needs a dark ground and pulse, family and status colors mean something.
+- **Try it**: `npm run dev` (the course) and `npm run host:test` (a small host on another port, `host-test/`) reproduce the real conditions: another origin, another storage.
 
 ## New tracks
 

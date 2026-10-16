@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { collapse, regionLabel, resolveRegion, type CodeLang } from '../engine'
-import { highlight, plainTokens, type Token } from './code/highlight'
+import { highlight, plainTokens, type Mode, type Token } from './code/highlight'
+import { useMode } from './themeContext'
 import type { GameSession } from '../game/session/GameSession'
 import { prefersReducedMotion } from '../render/motion'
 import { msg } from '../i18n'
@@ -71,20 +72,21 @@ function CodeView({ session }: { session: GameSession }) {
   const activeRef = useSession(session, (s) => s.playback.activeRef)
   const followed = useSession(session, (s) => s.playback.followed)
   const inspected = useSession(session, (s) => (s.playback.inspected ? s.playback.circuit.nodes.get(s.playback.inspected)?.label : undefined))
-  const [highlighted, setHighlighted] = useState<{ text: string; tokens: Token[][] }>()
-  const tokens = highlighted?.text === file.text ? highlighted.tokens : plainTokens(file.text)
+  const mode = useMode()
+  const [highlighted, setHighlighted] = useState<{ text: string; mode: Mode; tokens: Token[][] }>()
+  const tokens = highlighted?.text === file.text && highlighted.mode === mode ? highlighted.tokens : plainTokens(file.text)
   const body = useRef<HTMLDivElement>(null)
   const region = resolveRegion(file, activeRef)
 
   useEffect(() => {
     let alive = true
-    highlight(file.text, lang)
-      .then((t) => alive && setHighlighted({ text: file.text, tokens: t }))
+    highlight(file.text, lang, mode)
+      .then((t) => alive && setHighlighted({ text: file.text, mode, tokens: t }))
       .catch(() => {}) // without highlighting, the plain code is still readable
     return () => {
       alive = false
     }
-  }, [file.text, lang])
+  }, [file.text, lang, mode])
 
   useEffect(() => {
     body.current?.querySelector('.line.on')?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })

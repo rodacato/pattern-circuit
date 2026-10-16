@@ -1,14 +1,18 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
+
+const { version } = JSON.parse(readFileSync('./package.json', 'utf8')) as { version: string }
 
 // https://vite.dev/config/
 export default defineConfig({
   // Relative paths: the build works on GitHub Pages under /<repo>/ without any further configuration.
   base: './',
   plugins: [react()],
+  define: { __APP_VERSION__: JSON.stringify(version) },
   optimizeDeps: {
-    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs'],
+    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs', 'shiki/themes/github-light.mjs'],
   },
   build: {
     // Shiki's Ruby grammar (~1.9 MB, loaded on demand) exceeds the default warning.

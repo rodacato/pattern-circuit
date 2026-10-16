@@ -43,6 +43,9 @@ import { emptyProgress, withCompleted, withNotes, withPrediction, type Progress,
 // Pattern names are keys, so "A + B" is a message with holes rather than a concatenation.
 const joinNames = (names: string[]): Message => names.reduceRight<Message>((tail, head) => (tail === '' ? head : msg('game.names.join', { head, tail })), '')
 
+// What the host of the course hears about: the level the player opened and the one they just completed.
+export type UnitEvents = { started?: (unitId: string) => void; completed?: (unitId: string) => void }
+
 export type ConnectResult ='repaired' | 'wrong' | 'none'
 export type CodeChange = { title: Message; lines: DiffLine[]; added: number; removed: number }
 export type Comparison = Record<Side, Evaluation>
@@ -65,12 +68,15 @@ export class GameSession {
 
   private readonly emitter = new Emitter()
   private readonly store: ProgressStore
+  private readonly units: UnitEvents
 
-  constructor(level: Level, store: ProgressStore) {
+  constructor(level: Level, store: ProgressStore, units: UnitEvents = {}) {
     this.level = level
     this.store = store
+    this.units = units
     this.progress = store.load()
     this.rebuild()
+    units.started?.(level.id)
   }
 
   subscribe = this.emitter.subscribe
@@ -352,8 +358,10 @@ export class GameSession {
 
   private saveProgress(next: Progress) {
     if (next === this.progress) return
+    const completedNow = next.completed.includes(this.level.id) && !this.progress.completed.includes(this.level.id)
     this.progress = next
     this.store.save(next)
+    if (completedNow) this.units.completed?.(this.level.id)
   }
 
   private dispatch(event: FlowEvent) {

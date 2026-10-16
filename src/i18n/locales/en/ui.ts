@@ -1,5 +1,9 @@
 // Texts of the ui area. Keys are `ui.<element>`; the other locales must define exactly the same ones.
 export const ui = {
+  // course description (course.json)
+  'ui.course.description': 'Learn design patterns by plugging them into a cafeteria circuit.',
+  // host
+  'ui.host.unavailable': 'Not connected to its host: your progress is saved only in this browser.',
   // top bar
   'ui.header.language': 'Change language',
   'ui.header.reviewHint': 'Review problems from levels you already completed',

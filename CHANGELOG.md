@@ -18,6 +18,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A host can theme the course**: the chrome (bars, panels, text, code panel and its colors) follows the colors, fonts and light or dark mode the host sends, with unreadable text ignored; the circuit stage keeps the neon identity (dark ground, pulse, family and status colors) in any theme.
+- **The course can be embedded** in a hub (such as Dojo) through an iframe, with the same game on its own: a manifest (`course.json`), a typed, versioned `postMessage` protocol with strict origin checks, progress and preferences kept by the host when embedded, and a test host (`npm run host:test`). See `docs/ARCHITECTURE.md`.
 - The code panel shows each region's name the way the language spells it (`Counter#hand_over` in Ruby, `Counter#handOver` in TypeScript); a test checks that both languages tell the story with the same regions.
 - `npm run i18n:scaffold` to start a new language from the English catalogs.
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.

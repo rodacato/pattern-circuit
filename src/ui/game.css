@@ -12,12 +12,15 @@
   --green: #7cff9b;
   --red: #ff4d6d;
   --radius: 14px;
+  --accent: var(--cyan);
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   height: 100vh;
   display: grid;
   grid-template-rows: 56px 1fr;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 Inter, system-ui, sans-serif;
+  font: 14px/1.5 var(--font-sans);
   overflow: hidden;
 }
 
@@ -34,7 +37,7 @@
   justify-content: space-between;
   padding: 0 24px;
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, #0a1120, var(--bg));
+  background: linear-gradient(180deg, var(--panel), var(--bg));
 }
 
 .logo {
@@ -68,8 +71,17 @@
   min-height: 0;
 }
 
-/* stage */
+/* stage: the circuit and the cards over it are the game's own screen; a host theme paints the chrome around it */
 .stage-wrap {
+  --bg: #060a13;
+  --panel: #0b1222;
+  --panel-2: #0f182c;
+  --line: #1b2640;
+  --text: #e3ebff;
+  --muted: #7282a3;
+  --faint: #3b4866;
+  --accent: var(--cyan);
+  color: var(--text);
   container-type: inline-size;
   position: relative;
   min-width: 0;
@@ -129,7 +141,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  color: var(--cyan);
+  color: var(--accent);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -145,7 +157,7 @@
 }
 
 .brief .goal strong {
-  color: var(--cyan);
+  color: var(--accent);
   font-weight: 600;
   margin-right: 4px;
 }
@@ -234,12 +246,12 @@
 }
 
 .stage-card.ticket {
-  border-color: color-mix(in srgb, var(--cyan) 45%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .stage-card.ticket > .eyebrow,
 .stage-card.compare > .eyebrow {
-  color: var(--cyan);
+  color: var(--accent);
 }
 
 .stage-card.won {
@@ -406,7 +418,7 @@
 }
 
 .actions button:hover:not(:disabled) {
-  border-color: var(--cyan);
+  border-color: var(--accent);
 }
 
 .actions button:disabled {
@@ -448,9 +460,9 @@
 }
 
 .stages li.now {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  box-shadow: 0 -6px 12px -8px var(--cyan);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 -6px 12px -8px var(--accent);
 }
 
 /* inventory */
@@ -757,8 +769,8 @@
   min-width: 48px;
   height: 48px;
   color: var(--bg);
-  background: var(--cyan);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 60%, transparent);
+  background: var(--accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 60%, transparent);
   font-size: 16px;
 }
 
@@ -773,8 +785,8 @@
 }
 
 .transport .speed.on {
-  color: var(--cyan);
-  border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
 .transport .sep {
@@ -787,7 +799,7 @@
 .transport .tick {
   padding: 0 12px 0 4px;
   color: var(--muted);
-  font: 12px/1 'JetBrains Mono', ui-monospace, monospace;
+  font: 12px/1 var(--font-mono);
 }
 
 /* legend */
@@ -828,7 +840,7 @@
 }
 
 .legend .solid {
-  border-top: 2px solid var(--cyan);
+  border-top: 2px solid var(--accent);
 }
 
 .legend .dashed {
@@ -855,7 +867,7 @@
 }
 
 .code-head .file {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--font-mono);
   color: #b8c4de;
 }
 
@@ -875,9 +887,9 @@
 .code-head code {
   padding: 3px 8px;
   border-radius: 6px;
-  background: color-mix(in srgb, var(--cyan) 12%, transparent);
-  color: var(--cyan);
-  font: 12px 'JetBrains Mono', ui-monospace, monospace;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font: 12px var(--font-mono);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -888,7 +900,7 @@
   min-height: 0;
   overflow: auto;
   padding: 12px 0 40px;
-  font: 12.5px/1.65 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font: 12.5px/1.65 var(--font-mono);
   color: #a9b1d6;
 }
 
@@ -914,12 +926,12 @@
 }
 
 .line.on {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 85%);
-  border-left-color: var(--cyan);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent 85%);
+  border-left-color: var(--accent);
 }
 
 .line.on .ln {
-  color: var(--cyan);
+  color: var(--accent);
 }
 
 .code-foot {
@@ -991,7 +1003,7 @@
 }
 
 .game :focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -1163,7 +1175,7 @@
 }
 
 .seen-in a {
-  color: var(--cyan);
+  color: var(--accent);
 }
 
 .hints {
@@ -1267,4 +1279,25 @@
   flex: 1 1 100%;
   margin: 0;
   text-align: left;
+}
+
+.game.reduce-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.host-notice {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  z-index: 30;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 6px 12px;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: 12px;
 }
