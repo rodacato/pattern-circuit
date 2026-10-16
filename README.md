@@ -1,5 +1,11 @@
 # Pattern Circuit
 
+[![CI · Test](https://github.com/rodacato/pattern-circuit/actions/workflows/ci.yml/badge.svg)](https://github.com/rodacato/pattern-circuit/actions/workflows/ci.yml)
+[![Site · Pages](https://github.com/rodacato/pattern-circuit/actions/workflows/site-pages.yml/badge.svg)](https://github.com/rodacato/pattern-circuit/actions/workflows/site-pages.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+
+**Play it in your browser: [rodacato.github.io/pattern-circuit](https://rodacato.github.io/pattern-circuit/)**
+
 An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
 
 - **27 levels** in 9 chapters, from the tutorial to "the whole cafeteria".
@@ -70,7 +76,7 @@ Layers depend in one direction only, and a test verifies it. Details in [docs/AR
 
 1. Push the repo to GitHub (branch `main`).
 2. In **Settings → Pages**, choose **Source: GitHub Actions**.
-3. Every push to `main` runs the checks and publishes the game ([`deploy.yml`](.github/workflows/deploy.yml)). Pull requests run the same checks ([`ci.yml`](.github/workflows/ci.yml)).
+3. Every push to `main` runs the checks and publishes the game ([`site-pages.yml`](.github/workflows/site-pages.yml)). Pull requests and pushes to `main` run the same checks ([`ci.yml`](.github/workflows/ci.yml)).
 
 The build uses relative paths, so it works under any subpath (`https://<user>.github.io/<repo>/`).
 

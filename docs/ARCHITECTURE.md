@@ -168,4 +168,4 @@ A **track** (`levels/tracks.ts`) is a path of its own: a name, chapters in order
 
 ## Deploy
 
-`vite.config.ts` uses `base: './'`, so the build is static and works under any subpath (`https://<user>.github.io/<repo>/`). The workflow [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) runs `npm run check` and publishes `dist/` to GitHub Pages on every push to `main`. The player's progress lives in the browser's `localStorage`.
+`vite.config.ts` uses `base: './'`, so the build is static and works under any subpath (`https://<user>.github.io/<repo>/`). The workflow [`.github/workflows/site-pages.yml`](../.github/workflows/site-pages.yml) runs `npm run check` and publishes `dist/` to GitHub Pages on every push to `main`. The player's progress lives in the browser's `localStorage`.
