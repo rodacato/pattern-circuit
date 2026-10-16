@@ -1,4 +1,4 @@
-// Constructores de circuitos mínimos para los tests del motor.
+// Minimal circuit builders for the engine tests.
 import { Circuit, Scenario, type Behavior } from './schema'
 
 export const line = (behaviors: Record<string, Behavior>, extra: Partial<Record<string, { capacity?: number; cost?: number }>> = {}) => {

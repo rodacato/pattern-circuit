@@ -5,7 +5,7 @@ import type { SimMetrics } from '../sim/types'
 
 export type Plug = { id: string; pattern: PatternId }
 
-// Una variante es una combinación de decisiones del jugador sobre el circuito base.
+// A variant is a combination of player decisions on the base circuit.
 export type Variant = {
   repairs?: string[]
   sockets?: Plug[]
@@ -14,7 +14,7 @@ export type Variant = {
 
 const plugsOf = (v: Variant): Plug[] => v.sockets ?? []
 
-// Opciones enchufadas en el orden en que el nivel declara sus sockets.
+// Options plugged in the order in which the level declares its sockets.
 export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef; option: SocketOption }[] {
   const plugs = plugsOf(v)
   for (const p of plugs) {
@@ -28,7 +28,7 @@ export function pluggedOptions(level: LevelDef, v: Variant): { socket: SocketDef
   })
 }
 
-// Un ticket se aplica "a la manera correcta" solo con todos los sockets resueltos.
+// A ticket is applied "the right way" only with every socket resolved.
 export const solvesAll = (level: LevelDef, v: Variant) => {
   const plugged = pluggedOptions(level, v)
   return plugged.length === level.sockets.length && plugged.every((p) => p.option.outcome === 'solves')
@@ -63,7 +63,7 @@ export function scenarioFor(level: LevelDef, v: Variant): Scenario {
   return scenario
 }
 
-// Con varios sockets el código se compone: 'base' + el fragmento de cada socket (vacío o enchufado).
+// With several sockets the code is composed: 'base' + the fragment of each socket (empty or plugged).
 export function codeKey(level: LevelDef, v: Variant): string {
   const plugged = pluggedOptions(level, v)
   const ticket = level.changeTickets.find((t) => t.id === v.ticket)
@@ -85,14 +85,14 @@ export type Evaluation = {
   won: boolean
 }
 
-// Corre la variante completa y la califica. Si ya se tiene la simulación terminada, basta con `score`.
+// Runs the full variant and scores it. If the simulation is already finished, `score` is enough.
 export function evaluate(level: LevelDef, v: Variant): Evaluation {
   const { circuit, touched } = buildCircuit(level, v)
   const { sim } = runToEnd(createSim(circuit, scenarioFor(level, v)))
   return score(level, sim.state.metrics, touched, circuit.nodes.length)
 }
 
-// `nodes` = piezas del circuito: mide la complejidad que agrega un patrón.
+// `nodes` = circuit pieces: measures the complexity a pattern adds.
 export function score(level: LevelDef, simMetrics: SimMetrics, touched: string[], nodes: number): Evaluation {
   const metrics = { ...simMetrics, nodesTouched: touched.length, nodes }
   const results = level.winWhen.map((assertion) => {

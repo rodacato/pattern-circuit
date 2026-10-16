@@ -3,7 +3,7 @@ import { NODE_H, NODE_W } from '../layout'
 import { arc } from '../draw'
 import type { Skin } from './types'
 
-// Factory Method: cada creador es una prensa con molde que baja al estampar el producto.
+// Factory Method: each creator is a press with a mold that comes down when stamping the product.
 export function factoryMethod(): Skin {
   const stamps = new Map<string, number>()
   return {
@@ -27,7 +27,7 @@ export function factoryMethod(): Skin {
   }
 }
 
-// Builder: estaciones de una cinta; el pulso recoge una ficha por estación que orbita a su alrededor.
+// Builder: stations on a belt; the pulse picks up one token per station that orbits around it.
 export function builder(): Skin {
   return {
     drawNode({ d }, _node, at) {
@@ -50,7 +50,7 @@ export function builder(): Skin {
   }
 }
 
-// Singleton: halo con candado; todos comparten la misma instancia.
+// Singleton: halo with a lock; everyone shares the same instance.
 export function singleton(): Skin {
   return {
     drawNode({ d, gl, time }, _node, at) {

@@ -15,28 +15,28 @@ const circuit = compile(
 const pulse = (loc: Pulse['loc']): Pulse => ({ id: 1, originId: 1, shape: 'circle', tags: [], data: {}, loc, status: 'alive', trail: [] })
 
 describe('layout', () => {
-  it('mide el circuito en píxeles', () => {
+  it('measures the circuit in pixels', () => {
     expect(circuitBounds(circuit.nodes.values())).toEqual({ w: 4 * CELL, h: 2 * CELL })
   })
 
-  it('deja libres las franjas de tarjetas y controles', () => {
+  it('leaves the card and control bands free', () => {
     const fit = fitWorld({ width: 2000, height: 800 }, { w: 1000, h: 100 }, { top: 200, bottom: 100 })
     expect(fit.y).toBeGreaterThanOrEqual(200)
     expect(fit.y + 100 * fit.zoom).toBeLessThanOrEqual(700)
   })
 
-  it('centra el circuito y limita el zoom', () => {
+  it('centers the circuit and limits the zoom', () => {
     const fit = fitWorld({ width: 10_000, height: 10_000 }, { w: 100, h: 100 })
     expect(fit.zoom).toBe(1.7)
     expect(fit.x).toBe(Math.round((10_000 - 170) / 2))
   })
 
-  it('encuentra el nodo bajo el puntero', () => {
+  it('finds the node under the pointer', () => {
     expect(nodeAt(circuit.nodes.values(), { x: 4 * CELL + NODE_W / 2 - 1, y: 2 * CELL })?.id).toBe('b')
     expect(nodeAt(circuit.nodes.values(), { x: 2 * CELL, y: 1 * CELL })).toBeUndefined()
   })
 
-  it('elige el pulso más cercano dentro del radio', () => {
+  it('picks the nearest pulse within the radius', () => {
     const positions = new Map([
       [1, { x: 0, y: 0 }],
       [2, { x: 10, y: 0 }],
@@ -45,7 +45,7 @@ describe('layout', () => {
     expect(nearestPulse(positions, { x: 100, y: 0 })).toBeUndefined()
   })
 
-  it('interpola la posición del pulso entre dos ticks del mismo cable', () => {
+  it('interpolates the pulse position between two ticks on the same wire', () => {
     const wireId = [...circuit.wires.keys()][0]
     const before = pulse({ kind: 'wire', wireId, progress: 0 })
     const now = pulse({ kind: 'wire', wireId, progress: 0.5 })
@@ -55,7 +55,7 @@ describe('layout', () => {
     expect(pulsePosition(circuit, now, undefined, 0.5, 0)).toEqual(end)
   })
 
-  it('coloca el socket sobre su nodo del circuito base y acepta soltar cerca', () => {
+  it('places the socket over its base circuit node and accepts drops nearby', () => {
     const base = [...circuit.nodes.values()]
     const at = socketCenter(base, 'b')!
     expect(at.x).toBe(4 * CELL)
@@ -65,7 +65,7 @@ describe('layout', () => {
     expect(socketCenter(base, 'nope')).toBeUndefined()
   })
 
-  it('el zoom mantiene fijo el punto bajo el puntero y respeta los límites', () => {
+  it('zoom keeps the point under the pointer fixed and respects the limits', () => {
     const screen = { width: 800, height: 600 }
     const bounds = { w: 600, h: 300 }
     const view = { zoom: 1, x: 0, y: 0 }

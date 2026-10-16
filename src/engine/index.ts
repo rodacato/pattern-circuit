@@ -1,4 +1,4 @@
-// API pública del motor: lo único que el resto de la app puede importar de `engine/`.
+// Public API of the engine: the only thing the rest of the app may import from `engine/`.
 export * from './schema'
 export * from './patterns'
 export * from './sim/types'

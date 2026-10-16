@@ -17,7 +17,7 @@ const STAGE_LABEL: Record<Exclude<Stage, 'complete'>, string> = {
 export function BriefCard({ session }: { session: GameSession }) {
   const t = useT()
   const { level } = session
-  const done = useSession(session, (s) => [...s.actions].join(',')) // string: el selector debe ser estable
+  const done = useSession(session, (s) => [...s.actions].join(',')) // string: the selector must be stable
   const [open, setOpen] = useState(true)
   const completed = level.checklist.filter((c) => done.split(',').includes(c.on)).length
   const stage = useSession(session, (s) => s.flow.stage)

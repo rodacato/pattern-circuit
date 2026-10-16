@@ -3,13 +3,13 @@ import { compile } from '../circuit/compile'
 import { buildCircuit, codeKey, scenarioFor, solvesAll, type Plug, type Variant } from './variants'
 import { CODE_LANGS, LevelDef, type CodeLang, type LevelInput } from '../schema'
 
-// codeFiles[lenguaje][clave]: los lenguajes que el nivel no trae quedan vacíos.
+// codeFiles[language][key]: languages the level does not provide stay empty.
 export type Level = LevelDef & { codeFiles: Record<CodeLang, Record<string, CodeFile>> }
 
-// Las reparaciones se hacen de a una, en cualquier orden: cualquier subconjunto es alcanzable.
+// Repairs are made one at a time, in any order: any subset is reachable.
 const subsets = <T>(items: T[]): T[][] => items.reduce<T[][]>((acc, x) => acc.flatMap((s) => [s, [...s, x]]), [[]])
 
-// Los tickets de cambio solo se lanzan sobre el circuito base o con todos los sockets resueltos.
+// Change tickets only launch on the base circuit or with every socket resolved.
 export function reachableVariants(level: LevelDef): Variant[] {
   const all = level.repairs.map((r) => r.id)
   const partial = subsets(all).filter((s) => s.length < all.length)
@@ -27,7 +27,7 @@ export function reachableVariants(level: LevelDef): Variant[] {
   return variants
 }
 
-// Valida el esquema y además que cada variante alcanzable compile, tenga escenario y código.
+// Validates the schema, and that every reachable variant compiles and has a scenario and code.
 export function defineLevel(input: LevelInput): Level {
   const level = LevelDef.parse(input)
   const errors: string[] = []
@@ -43,7 +43,7 @@ export function defineLevel(input: LevelInput): Level {
         errors.push(`código ${lang}/${key}: ${(e as Error).message}`)
       }
     }
-    // Otro lenguaje cuenta la misma historia: los mismos fragmentos que en Ruby.
+    // Another language tells the same story: the same fragments as in Ruby.
     for (const key of Object.keys(level.code.rb)) if (!(key in sources)) errors.push(`código ${lang}: falta ${key}`)
   }
   for (const socket of level.sockets) {
@@ -54,7 +54,7 @@ export function defineLevel(input: LevelInput): Level {
   const fail = () => {
     throw new Error(`Nivel ${level.id} inválido:\n- ${[...new Set(errors)].join('\n- ')}`)
   }
-  if (errors.length) fail() // sin inventario coherente no se pueden recorrer las variantes
+  if (errors.length) fail() // without a coherent inventory the variants cannot be walked
 
   for (const v of reachableVariants(level)) {
     const label = JSON.stringify(v)

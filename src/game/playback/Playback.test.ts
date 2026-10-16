@@ -9,7 +9,7 @@ const circuit = () => {
 }
 
 describe('Playback', () => {
-  it('avanza según la velocidad y se detiene al terminar', () => {
+  it('advances by speed and stops at the end', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }), 2)
     p.play()
     expect(p.update(1)).toBe(2)
@@ -17,19 +17,19 @@ describe('Playback', () => {
     expect(p.playing).toBe(false)
   })
 
-  it('sin play no avanza', () => {
+  it('does not advance without play', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }))
     expect(p.update(5)).toBe(0)
   })
 
-  it('sigue al primer pulso vivo y expone su región de código', () => {
+  it('follows the first live pulse and exposes its code region', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }, { at: 5 }))
     for (let i = 0; i < 40; i++) p.step()
     expect(p.followed).toBe(1)
     expect(p.activeRef).toBe('A#run')
   })
 
-  it('inspeccionar un nodo gana sobre el seguimiento automático', () => {
+  it('inspecting a node wins over automatic following', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }))
     p.inspect('out')
     for (let i = 0; i < 40; i++) p.step()
@@ -38,7 +38,7 @@ describe('Playback', () => {
     expect(p.inspected).toBeUndefined()
   })
 
-  it('reiniciar limpia foco y eventos pendientes', () => {
+  it('restarting clears focus and pending events', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }))
     for (let i = 0; i < 10; i++) p.step()
     p.restart()
@@ -47,7 +47,7 @@ describe('Playback', () => {
     expect(p.followed).toBeUndefined()
   })
 
-  it('al retroceder, el panel de código vuelve a la región donde estaba el pulso', () => {
+  it('when going back, the code panel returns to the region where the pulse was', () => {
     const p = new Playback(circuit(), scenario({ at: 0 }))
     while (p.activeRef !== 'A#run') p.step()
     const reachedAt = p.timeline.tick

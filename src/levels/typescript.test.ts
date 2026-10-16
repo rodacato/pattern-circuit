@@ -2,17 +2,17 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { LEVELS } from '.'
 
-// Todo el TypeScript que ve el jugador tiene que ser TypeScript válido (sintaxis; las dependencias
-// externas como CardTerminal son de mentira, así que no se comprueban tipos).
+// All the TypeScript the player sees has to be valid TypeScript (syntax; external dependencies
+// such as CardTerminal are fakes, so types are not checked).
 const files = LEVELS.flatMap((l) => Object.entries(l.codeFiles.ts).map(([key, file]) => [`${l.id} · ${key}`, file.text] as const))
 
-describe('el código TypeScript de cada nivel es sintácticamente válido', () => {
+describe('the TypeScript code of each level is syntactically valid', () => {
   it.each(files)('%s', (_name, text) => {
     const out = ts.transpileModule(text, { reportDiagnostics: true, compilerOptions: { target: ts.ScriptTarget.ES2022 } })
     expect((out.diagnostics ?? []).map((d) => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([])
   })
 
-  it('cada nivel trae su versión en TypeScript', () => {
+  it('every level ships its TypeScript version', () => {
     expect(LEVELS.filter((l) => !Object.keys(l.codeFiles.ts).length).map((l) => l.id)).toEqual([])
   })
 })

@@ -9,9 +9,9 @@ const hintLadder = (...args: Parameters<typeof ladder>) => ladder(...args).map(i
 
 const level = (id: string) => LEVELS.find((l) => l.id === id)!
 
-describe('pistas', () => {
-  it('van de una pregunta guía a la respuesta, pasando por la familia y un descarte', () => {
-    const l = level('L01-strategy')
+describe('hints', () => {
+  it('go from a guiding question to the answer, through the family and a ruling out', () => {
+    const l = level('strategy')
     const hints = hintLadder(l, { ...initialFlow(), stage: 'choose' }, evaluate(l, {}))
     expect(hints).toHaveLength(4)
     expect(hints[0]).toContain('se pierden pedidos')
@@ -20,15 +20,15 @@ describe('pistas', () => {
     expect(hints[3]).toBe('Prueba con Strategy.')
   })
 
-  it('con varios sockets apuntan al primero sin resolver y lo nombran', () => {
-    const l = level('L15-sucursales-y-pagos')
+  it('with several sockets they point at the first unresolved one and name it', () => {
+    const l = level('branches-and-payments')
     const [first, second] = l.sockets
     const solved = first.inventory.find((p) => first.options[p]?.outcome === 'solves')!
     const flow = { ...initialFlow(), stage: 'choose' as const, plugs: { [first.id]: { socketId: first.id, pattern: solved, outcome: 'solves' as const } } }
     expect(hintLadder(l, flow).at(-1)).toContain(`socket "${second.label}"`)
   })
 
-  it('cada nivel con sockets tiene al menos pregunta, familia y respuesta', () => {
+  it('every level with sockets has at least a question, a family and an answer', () => {
     for (const l of LEVELS.filter((x) => x.sockets.length)) expect(hintLadder(l, { ...initialFlow(), stage: 'choose' }).length, l.id).toBeGreaterThanOrEqual(3)
   })
 })

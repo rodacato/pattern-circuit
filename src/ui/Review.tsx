@@ -6,12 +6,12 @@ import { msg } from '../i18n'
 import { useT } from './i18nContext'
 import { useDialog } from './useDialog'
 
-// El orden de los cartuchos cambia en cada pregunta: se recuerda el patrón, no su posición.
+// The cartridge order changes on every question: the pattern is remembered, not its position.
 const shuffled = <T,>(items: T[]) => [...items].map((x) => ({ x, k: Math.random() })).sort((a, b) => a.k - b.k).map(({ x }) => x)
 
 type Question = { item: ReviewItem; choices: PatternId[] }
 
-// Repaso: problemas de niveles ya completados, sin circuito. Elegir el patrón y leer por qué.
+// Review: problems from already completed levels, without a circuit. Pick the pattern and read why.
 export function Review({ session, levels, onClose }: { session: GameSession; levels: Level[]; onClose: () => void }) {
   const [round] = useState<Question[]>(() => {
     const { completed, review } = session.progress

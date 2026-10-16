@@ -29,10 +29,10 @@ export function CodePanel({ session }: { session: GameSession }) {
   )
 }
 
-// Qué líneas de Ruby cambian entre sin y con patrón (o con el ticket), con el resto resumido.
+// Which Ruby lines change between without and with pattern (or with the ticket), with the rest summarized.
 function CodeDiff({ session }: { session: GameSession }) {
   const t = useT()
-  useSession(session, (s) => s.flow.side) // re-render al cambiar de lado
+  useSession(session, (s) => s.flow.side) // re-render when the side changes
   const change = session.codeChange
   if (!change) return null
   return (
@@ -80,7 +80,7 @@ function CodeView({ session }: { session: GameSession }) {
     let alive = true
     highlight(file.text, lang)
       .then((t) => alive && setHighlighted({ text: file.text, tokens: t }))
-      .catch(() => {}) // sin resaltado, el código plano sigue siendo legible
+      .catch(() => {}) // without highlighting, the plain code is still readable
     return () => {
       alive = false
     }
@@ -130,7 +130,7 @@ function CodeView({ session }: { session: GameSession }) {
 
 const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript' }
 
-// El mismo circuito contado en otro lenguaje: la preferencia la guarda GameApp para los niveles siguientes.
+// The same circuit told in another language: GameApp stores the preference for the following levels.
 function LangSwitch({ session }: { session: GameSession }) {
   const t = useT()
   const shown = useSession(session, (s) => s.shownCodeLang)

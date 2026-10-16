@@ -18,7 +18,7 @@ import { Transport } from './Transport'
 import { useSession } from './useSession'
 import './game.css'
 
-// Con el almacenamiento bloqueado (modo privado estricto, cookies desactivadas) el juego sigue, sin guardar.
+// With storage blocked (strict private mode, cookies disabled) the game goes on, without saving.
 function browserProgressStore(): ProgressStore {
   try {
     return new KeyValueProgressStore(window.localStorage)
@@ -29,7 +29,7 @@ function browserProgressStore(): ProgressStore {
 
 const progressStore = browserProgressStore()
 
-// El lenguaje del código es una preferencia de este navegador, como el idioma.
+// The code language is a preference of this browser, like the language.
 const CODE_LANG_KEY = 'pattern-circuit:code'
 const storedCodeLang = (): CodeLang => {
   try {
@@ -53,7 +53,7 @@ export default function GameApp() {
     try {
       window.localStorage.setItem(CODE_LANG_KEY, codeLang)
     } catch {
-      // sin almacenamiento, la preferencia dura esta sesión
+      // without storage, the preference lasts this session
     }
   }, [codeLang])
   const { t, locale, setLocale } = useLocale()
@@ -82,7 +82,7 @@ export default function GameApp() {
       created?.destroy()
       setStage(undefined)
     }
-  }, [session, t]) // cambiar de idioma rehace el canvas con los textos nuevos
+  }, [session, t]) // changing language rebuilds the canvas with the new texts
 
   useEffect(() => {
     if (dialogOpen) return

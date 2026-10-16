@@ -18,7 +18,7 @@ export const NEON = {
 export const FONT_UI = 'Inter, system-ui, sans-serif'
 export const FONT_MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace'
 
-// Color por etiqueta del pulso; lo desconocido brilla en blanco cálido.
+// Color per pulse tag; the unknown glows warm white.
 const TAG_COLORS: Record<string, number> = {
   espresso: 0xffb86b,
   latte: 0xf3e3c3,
@@ -26,12 +26,12 @@ const TAG_COLORS: Record<string, number> = {
   card: 0x4cc9ff,
   voucher: 0xffc15e,
   app: 0xff5fd2,
-  centro: 0x4cc9ff,
-  playa: 0xffc15e,
-  montana: 0xb57cff,
-  puerto: 0x7cff9b,
-  'args-cruzados': 0xffb86b,
-  hielo: 0x9fe7ff,
+  downtown: 0x4cc9ff,
+  beach: 0xffc15e,
+  mountain: 0xb57cff,
+  harbor: 0x7cff9b,
+  'crossed-args': 0xffb86b,
+  ice: 0x9fe7ff,
 }
 
 export const pulseColor = (tags: string[]) => TAG_COLORS[tags.find((t) => t in TAG_COLORS) ?? ''] ?? NEON.white

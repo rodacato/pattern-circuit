@@ -4,23 +4,23 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Rutas relativas: el build funciona en GitHub Pages bajo /<repo>/ sin configurar nada más.
+  // Relative paths: the build works on GitHub Pages under /<repo>/ without any further configuration.
   base: './',
   plugins: [react()],
   optimizeDeps: {
     include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs'],
   },
   build: {
-    // La gramática de Ruby de Shiki (~1.9 MB, se carga bajo demanda) supera el aviso por defecto.
+    // Shiki's Ruby grammar (~1.9 MB, loaded on demand) exceeds the default warning.
     chunkSizeWarningLimit: 2000,
   },
   test: {
     coverage: {
       include: ['src/**/*.{ts,tsx}'],
-      // Fuera: contenido de niveles (lo cubren sus propios tests), el dibujo Pixi (humble object: lo que
-      // se puede calcular vive en layout.ts y motion.ts, que sí se miden) y los puntos de entrada.
+      // Excluded: level content (covered by its own tests), the Pixi drawing (humble object: what
+      // can be computed lives in layout.ts and motion.ts, which are measured) and the entry points.
       exclude: [
-        'src/levels/L*/**',
+        'src/levels/*/**',
         'src/render/{NeonStage,PulseLayer,SocketLayer,draw,fx,theme}.ts',
         'src/render/skins/**',
         'src/debug/**',

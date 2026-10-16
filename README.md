@@ -1,83 +1,83 @@
 # Pattern Circuit
 
-Juego educativo para entender **patrones de diseño viéndolos, no leyéndolos**. Una cafetería es un circuito de nodos; cada pedido es un pulso de luz que lo recorre. Cuando algo falla (pedidos perdidos, cobros dobles, código que hay que abrir para cada cambio), enchufas un patrón en el socket y ves cómo cambia el recorrido, junto al código que lo implementa, en **Ruby o TypeScript**.
+An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby or TypeScript**.
 
-- **27 niveles** en 9 capítulos, del tutorial a "la cafetería completa".
-- **20 patrones**: 14 del catálogo GoF, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker y Saga. Y un capítulo para lo contrario: cuándo **no** aplicar uno.
-- Cada nivel sigue el mismo ritmo: **observar el problema → elegir un patrón → aplicar un cambio → comparar sin/con**.
-- Probar el patrón equivocado también enseña: cada intento deja una nota en el **Cuaderno de patrones**.
-- El contenido está verificado contra las fuentes originales (GoF, Fowler, Cockburn, Nygard…); la bibliografía está en [docs/DESIGN.md](docs/DESIGN.md#fuentes).
+- **27 levels** in 9 chapters, from the tutorial to "the whole cafeteria".
+- **20 patterns**: 14 from the GoF catalog, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker and Saga. Plus a chapter about the opposite: when **not** to apply one.
+- Every level follows the same rhythm: **observe the problem → pick a pattern → apply a change → compare without/with**.
+- Trying the wrong pattern teaches too: every attempt leaves a note in the **pattern notebook**.
+- The content is verified against the original sources (GoF, Fowler, Cockburn, Nygard…); the bibliography is in [docs/DESIGN.md](docs/DESIGN.md#sources).
 
-## Cómo se juega
+## How to play
 
-| Acción | Mouse | Teclado |
+| Action | Mouse | Keyboard |
 |---|---|---|
-| Reproducir / pausa | ▶ | `Espacio` |
-| Paso adelante / atrás | ▶\| · ◀ | `→` · `←` |
-| Reiniciar | ↺ | `R` |
-| Ver el código de un nodo o seguir un pulso | clic sobre él | — |
-| Enchufar un patrón | arrastrar el cartucho al socket ⬡ | `Tab` hasta el cartucho + `Enter` |
-| Desenchufar | clic en el cartucho enchufado | `Enter` sobre él |
-| Reparar un cable (nivel 0) | arrastrar desde el puerto de salida | botón "Conectar… sin arrastrar" |
-| Cámara | rueda: zoom · arrastrar el fondo · doble clic: encuadrar | — |
+| Play / pause | ▶ | `Space` |
+| Step forward / back | ▶\| · ◀ | `→` · `←` |
+| Restart | ↺ | `R` |
+| See a node's code or follow a pulse | click it | — |
+| Plug in a pattern | drag the cartridge to the ⬡ socket | `Tab` to the cartridge + `Enter` |
+| Unplug | click the plugged cartridge | `Enter` on it |
+| Repair a wire (level 0) | drag from the output port | "Connect… without dragging" button |
+| Camera | wheel: zoom · drag the background · double click: fit | — |
 
-Está en **español e inglés** (botón ES/EN arriba). El progreso se guarda en tu navegador (`localStorage`). Se borra desde el Cuaderno. El juego está pensado para pantallas de escritorio y respeta la preferencia de movimiento reducido del sistema.
+The game is available in **Spanish and English** (ES/EN button at the top). Progress is saved in your browser (`localStorage`) and can be erased from the notebook. It is designed for desktop and tablet screens and respects the system's reduced-motion preference.
 
-| Capítulo | Niveles | Patrones |
+| Chapter | Levels | Patterns |
 |---|---|---|
-| Apertura | 0 | tutorial |
-| El mostrador | 1–4 | Strategy, Factory Method, Builder, Singleton |
-| La barra crece | 5–9 | Adapter, Decorator, Composite, Facade, Proxy |
-| Hora pico | 10–14 | Observer, State, Chain of Responsibility, Command, Template Method |
-| Todo junto | 15–17 | combinaciones en circuitos con 2 y 3 sockets |
-| Arquitectura | 18–20 | Ports & Adapters, Event Bus, CQRS |
-| Resiliencia | 21–23 | Null Object, Circuit Breaker, Saga |
-| Criterio: cuándo no | 24–25 | mantenerlo simple frente a patrones que sobran |
-| La cafetería completa | 26 | todo funcionando junto |
+| Opening | 0 | tutorial |
+| The counter | 1–4 | Strategy, Factory Method, Builder, Singleton |
+| The bar grows | 5–9 | Adapter, Decorator, Composite, Facade, Proxy |
+| Rush hour | 10–14 | Observer, State, Chain of Responsibility, Command, Template Method |
+| All together | 15–17 | combinations in circuits with 2 and 3 sockets |
+| Architecture | 18–20 | Ports & Adapters, Event Bus, CQRS |
+| Resilience | 21–23 | Null Object, Circuit Breaker, Saga |
+| Judgment: when not to | 24–25 | keeping it simple against patterns that are not needed |
+| The whole cafeteria | 26 | everything working together |
 
-## Desarrollo
+## Development
 
-Requiere Node 22 o superior. Ruby es opcional: si está instalado, los tests verifican la sintaxis de todo el código Ruby que ve el jugador (la del TypeScript se verifica siempre).
+Requires Node 22 or later. Ruby is optional: if it is installed, the tests verify the syntax of all the Ruby code the player sees (the TypeScript is always verified).
 
 ```bash
 npm install
 npm run dev
 ```
 
-| Script | Qué hace |
+| Script | What it does |
 |---|---|
-| `npm run dev` | el juego en modo desarrollo (añade `?debug` a la URL para ver el motor en crudo) |
-| `npm test` | tests: motor, niveles, aplicación, render, UI y reglas de arquitectura |
-| `npm run coverage` | tests con cobertura y umbrales mínimos |
-| `npm run check` | tipos + lint + tests (lo mismo que corre CI) |
-| `npm run build` | build estático en `dist/` |
+| `npm run dev` | the game in development mode (add `?debug` to the URL to see the raw engine) |
+| `npm test` | tests: engine, levels, application, render, UI and architecture rules |
+| `npm run coverage` | tests with coverage and minimum thresholds |
+| `npm run check` | types + lint + tests (the same as CI runs) |
+| `npm run build` | static build in `dist/` |
 
-## Estructura
+## Structure
 
 ```
 src/
-  engine/   motor de simulación puro y determinista, esquema de niveles (sin DOM)
-  levels/   un nivel = carpeta con level.ts (datos) + fragmentos .rb; se registran solos
-  game/     aplicación: sesión, flujo del nivel, reproducción y progreso
-  render/   render PixiJS neón y firma visual por patrón
-  ui/       interfaz React
-  debug/    vista del motor (?debug)
+  engine/   pure, deterministic simulation engine and level schema (no DOM)
+  levels/   one level = a folder with level.ts (data) + code snippets; they register themselves
+  game/     application: session, level flow, playback and progress
+  render/   neon PixiJS render and the visual signature of each pattern
+  ui/       React interface
+  debug/    engine view (?debug)
 ```
 
-Las capas dependen en una sola dirección y un test lo verifica. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); diseño del juego, progresión y fuentes en [docs/DESIGN.md](docs/DESIGN.md).
+Layers depend in one direction only, and a test verifies it. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); game design, progression and sources in [docs/DESIGN.md](docs/DESIGN.md).
 
-## Publicar en GitHub Pages
+## Publishing to GitHub Pages
 
-1. Sube el repo a GitHub (rama `main`).
-2. En **Settings → Pages**, elige **Source: GitHub Actions**.
-3. Cada push a `main` corre las verificaciones y publica el juego ([`deploy.yml`](.github/workflows/deploy.yml)). Los pull requests corren las mismas verificaciones ([`ci.yml`](.github/workflows/ci.yml)).
+1. Push the repo to GitHub (branch `main`).
+2. In **Settings → Pages**, choose **Source: GitHub Actions**.
+3. Every push to `main` runs the checks and publishes the game ([`deploy.yml`](.github/workflows/deploy.yml)). Pull requests run the same checks ([`ci.yml`](.github/workflows/ci.yml)).
 
-El build usa rutas relativas, así que funciona bajo cualquier subruta (`https://<usuario>.github.io/<repo>/`).
+The build uses relative paths, so it works under any subpath (`https://<user>.github.io/<repo>/`).
 
-## Contribuir
+## Contributing
 
-Ver [CONTRIBUTING.md](CONTRIBUTING.md). Los cambios de cada versión están en [CHANGELOG.md](CHANGELOG.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). The changes of each version are in [CHANGELOG.md](CHANGELOG.md).
 
-## Licencia
+## License
 
 [MIT](LICENSE.md) © Adrian Castillo

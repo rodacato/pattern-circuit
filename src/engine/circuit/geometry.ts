@@ -1,8 +1,8 @@
-// Geometría compartida por motor (longitud de cables) y render (trazado).
-// Unidad: una celda de la cuadrícula.
+// Geometry shared by the engine (wire length) and the render (drawing).
+// Unit: one grid cell.
 export type Point = { x: number; y: number }
 
-// Ruta ortogonal estilo Mini Metro: horizontal, vertical en el punto medio, horizontal.
+// Orthogonal route in the Mini Metro style: horizontal, vertical at the midpoint, horizontal.
 export function wirePath(from: [number, number], to: [number, number]): Point[] {
   const a = { x: from[0], y: from[1] }
   const b = { x: to[0], y: to[1] }

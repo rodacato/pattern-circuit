@@ -3,28 +3,28 @@ import { Circuit, Scenario } from '../schema'
 import { line, scenario } from '../testing'
 import { createSim, runToEnd } from './sim'
 
-describe('simulación', () => {
-  it('entrega pulsos por un circuito lineal', () => {
+describe('simulation', () => {
+  it('delivers pulses through a linear circuit', () => {
     const c = line({ src: { type: 'source' }, a: { type: 'pass' }, out: { type: 'sink' } })
     const { sim } = runToEnd(createSim(c, scenario({ at: 0 }, { at: 10 })))
     expect(sim.state.metrics).toMatchObject({ spawned: 2, delivered: 2, dropped: 0 })
     expect(sim.state.pulses[0].trail).toEqual(['src', 'a', 'out'])
   })
 
-  it('pierde el pulso cuando falta el cable de salida', () => {
+  it('drops the pulse when the output wire is missing', () => {
     const c = line({ src: { type: 'source' }, a: { type: 'pass' } })
     const { events } = runToEnd(createSim(c, scenario({ at: 0 })))
     expect(events.find((e) => e.type === 'pulse.drop')).toMatchObject({ nodeId: 'a', reason: 'no-wire' })
   })
 
-  it('un branch sin caso para la etiqueta cae en else', () => {
+  it('a branch with no case for the tag falls to else', () => {
     const c = line({ src: { type: 'source' }, b: { type: 'branch', cases: { x: 'out' }, else: 'drop' }, out: { type: 'sink' } })
     const { sim, events } = runToEnd(createSim(c, scenario({ at: 0, tags: ['x'] }, { at: 5, tags: ['y'] })))
     expect(sim.state.metrics).toMatchObject({ delivered: 1, dropped: 1 })
     expect(events.filter((e) => e.type === 'pulse.branch').map((e) => e.branch)).toEqual(['x', 'else'])
   })
 
-  it('transform con `when` solo cambia los pulsos que cumplen la condición', () => {
+  it('transform with `when` only changes the pulses that meet the condition', () => {
     const c = line({
       src: { type: 'source' },
       fix: { type: 'transform', when: { hasTag: 'bad' }, removeTags: ['bad'], addTags: ['fixed'] },
@@ -34,7 +34,7 @@ describe('simulación', () => {
     expect(sim.state.pulses.map((p) => p.tags)).toEqual([['fixed'], ['ok']])
   })
 
-  it('broadcast clona el pulso y el sink cuenta duplicados por origen', () => {
+  it('broadcast clones the pulse and the sink counts duplicates by origin', () => {
     const c = Circuit.parse({
       nodes: [
         { id: 'src', label: '', at: [0, 0], behavior: { type: 'source' } },
@@ -55,25 +55,25 @@ describe('simulación', () => {
     expect(sim.state.metrics).toMatchObject({ spawned: 1, delivered: 2, duplicatesAtSink: 1 })
   })
 
-  it('un nodo con capacidad encola y registra la carga máxima', () => {
+  it('a node with capacity queues and records the peak load', () => {
     const c = line({ src: { type: 'source' }, slow: { type: 'pass' }, out: { type: 'sink' } }, { slow: { capacity: 1, cost: 40 } })
     const { sim, events } = runToEnd(createSim(c, scenario({ at: 0 }, { at: 0 }, { at: 0 })))
     expect(sim.state.metrics).toMatchObject({ delivered: 3, maxLoad: 3 })
     expect(events.filter((e) => e.type === 'pulse.queue')).toHaveLength(2)
   })
 
-  it('es determinista: misma entrada, mismos eventos', () => {
+  it('is deterministic: same input, same events', () => {
     const c = line({ src: { type: 'source' }, a: { type: 'pass' }, out: { type: 'sink' } }, { a: { capacity: 1 } })
     const s = scenario({ at: 0 }, { at: 3 }, { at: 7 })
     expect(runToEnd(createSim(c, s)).events).toEqual(runToEnd(createSim(c, s)).events)
   })
 })
 
-describe('primitivas con memoria', () => {
+describe('primitives with memory', () => {
   const graph = (nodes: object[], wires: object[]) => Circuit.parse({ nodes, wires })
   const node = (id: string, x: number, behavior: object, y = 0) => ({ id, label: id, at: [x, y], behavior })
 
-  it('counter: nodos con la misma clave comparten la numeración; fresh siempre empieza en 1', () => {
+  it('counter: nodes with the same key share the numbering; fresh always starts at 1', () => {
     const run = (fresh: boolean) =>
       runToEnd(
         createSim(
@@ -87,7 +87,7 @@ describe('primitivas con memoria', () => {
     expect(run(true).metrics.invalidAtSink).toBe(2)
   })
 
-  it('join: espera una parte por cable de entrada y sigue con un solo pulso que junta lo de todas', () => {
+  it('join: waits for one part per input wire and continues with a single pulse that gathers all of them', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('bc', 2, { type: 'broadcast' }), node('a', 4, { type: 'transform', addTags: ['de-a'] }, -1), node('b', 4, { type: 'transform', addTags: ['de-b'] }, 1), node('j', 6, { type: 'join' }), node('out', 8, { type: 'sink' })],
       [{ from: 'src', to: 'bc' }, { from: 'bc', to: 'a' }, { from: 'bc', to: 'b' }, { from: 'a', to: 'j' }, { from: 'b', to: 'j' }, { from: 'j', to: 'out' }],
@@ -98,7 +98,7 @@ describe('primitivas con memoria', () => {
     expect(sim.state.pulses.find((p) => p.status === 'delivered')?.tags.sort()).toEqual(['de-a', 'de-b'])
   })
 
-  it('join: si una parte se pierde, el resto queda retenido sin colgar la simulación', () => {
+  it('join: if a part is lost, the rest stay held without hanging the simulation', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('bc', 2, { type: 'broadcast' }), node('a', 4, { type: 'pass' }, -1), node('b', 4, { type: 'branch', cases: {} }, 1), node('j', 6, { type: 'join' }), node('out', 8, { type: 'sink' })],
       [{ from: 'src', to: 'bc' }, { from: 'bc', to: 'a' }, { from: 'bc', to: 'b' }, { from: 'a', to: 'j' }, { from: 'b', to: 'j' }, { from: 'j', to: 'out' }],
@@ -107,7 +107,7 @@ describe('primitivas con memoria', () => {
     expect(sim.state.metrics).toMatchObject({ delivered: 0, dropped: 1 })
   })
 
-  it('cache: la primera vez sale por miss y las siguientes por hit', () => {
+  it('cache: the first time leaves through miss and the next ones through hit', () => {
     const c = graph(
       [node('src', 0, { type: 'source' }), node('c', 2, { type: 'cache', key: 'item' }), node('slow', 4, { type: 'pass' }, 1), node('out', 6, { type: 'sink' })],
       [{ from: 'src', to: 'c' }, { from: 'c', port: 'miss', to: 'slow' }, { from: 'c', port: 'hit', to: 'out' }, { from: 'slow', to: 'out' }],
@@ -118,7 +118,7 @@ describe('primitivas con memoria', () => {
     expect(sim.state.pulses.map((p) => p.trail.includes('slow'))).toEqual([true, false, true])
   })
 
-  it('machine: recuerda el estado entre pulsos y rechaza lo que no aplica', () => {
+  it('machine: remembers the state between pulses and rejects what does not apply', () => {
     const c = line({
       src: { type: 'source' },
       m: {
@@ -135,7 +135,7 @@ describe('primitivas con memoria', () => {
     expect(events.filter((e) => e.type === 'node.state').map((e) => e.state)).toEqual(['pagado', 'entregado'])
   })
 
-  it('buffer: cancelar anula la orden retenida del mismo pedido', () => {
+  it('buffer: cancelling cancels the held order of the same request', () => {
     const c = line({ src: { type: 'source' }, q: { type: 'buffer', cancelTag: 'cancelar', match: 'order' }, out: { type: 'sink' } }, { q: { cost: 60 } })
     const s = Scenario.parse({
       id: 's',
@@ -150,7 +150,7 @@ describe('primitivas con memoria', () => {
     expect(sim.state.pulses.map((p) => p.status)).toEqual(['cancelled', 'delivered', 'cancelled'])
   })
 
-  it('breaker: tras el umbral de fallos se abre y desvía todo al respaldo', () => {
+  it('breaker: after the failure threshold it opens and diverts everything to the fallback', () => {
     const c = Circuit.parse({
       nodes: [
         node('src', 0, { type: 'source' }),

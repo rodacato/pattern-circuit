@@ -9,8 +9,8 @@ import type { Skin } from './types'
 export type { DrawContext, Skin } from './types'
 export { stateColor } from './behavioral'
 
-// Cada stage crea sus skins: el estado de animación (qué cartucho brilla, qué prensa baja) no se comparte.
-// Record completo: un patrón nuevo sin skin no compila.
+// Each stage creates its own skins: the animation state (which cartridge glows, which press comes down) is not shared.
+// Complete Record: a new pattern without a skin does not compile.
 export function createSkins(): Record<PatternId, Skin> {
   return {
     'factory-method': factoryMethod(),
@@ -33,6 +33,6 @@ export function createSkins(): Record<PatternId, Skin> {
     'null-object': nullObject(),
     'circuit-breaker': circuitBreaker(),
     saga: saga(),
-    'keep-simple': {}, // lo simple no lleva firma: el circuito queda como está
+    'keep-simple': {}, // keeping it simple carries no signature: the circuit stays as it is
   }
 }

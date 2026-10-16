@@ -1,5 +1,5 @@
-// Textos en español que el juego muestra, sacados del código fuente para exigir su traducción en los tests.
-// Se buscan literales dentro de t(…), msg(…), N(…), fx.float(…) y en los mapas de textos marcados con `// i18n`.
+// Spanish texts the game shows, extracted from the source code to require their translation in the tests.
+// Literals are searched inside t(…), msg(…), N(…), fx.float(…) and in the text maps marked with `// i18n`.
 const CALL = /(?:\bt|\bmsg|\bN|\.float)\(\s*(?:at,\s*)?(?:[\w.!?]+\s*\?\s*)?'((?:[^'\\]|\\.)+)'(?:\s*:\s*'((?:[^'\\]|\\.)+)')?/g
 const TERNARY_IN_T = /\bt\([^()']*\?\s*'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)+)'/g
 const MAP_ENTRY = /^\s*(?:[\w-]+|'[\w-]+'):\s*(?:\{\s*label:\s*)?'((?:[^'\\]|\\.)+)'/gm

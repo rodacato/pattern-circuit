@@ -4,7 +4,7 @@ import { N } from '../../i18n'
 import { arc } from '../draw'
 import type { Skin } from './types'
 
-// Strategy: el nodo contexto tiene una ranura; cada estrategia concreta es un cartucho con franja violeta.
+// Strategy: the context node has a slot; each concrete strategy is a cartridge with a violet stripe.
 export function strategy(): Skin {
   const active = new Map<string, { color: number; t: number }>()
   return {
@@ -31,7 +31,7 @@ export function strategy(): Skin {
   }
 }
 
-// Observer: el sujeto emite una onda por cada aviso; los suscriptores llevan "antenas".
+// Observer: the subject emits a wave for each notification; subscribers carry "antennas".
 export function observer(): Skin {
   return {
     drawNode({ d }, node, at) {
@@ -44,7 +44,7 @@ export function observer(): Skin {
   }
 }
 
-// State: el nodo toma el color de su estado y muestra el recorrido de estados.
+// State: the node takes the color of its state and shows the path of states.
 export function state(): Skin {
   return {
     drawNode({ d, gl, state: sim }, node, at) {
@@ -69,7 +69,7 @@ export function state(): Skin {
 const STATE_COLORS = [C.amber, C.cyan, C.violet, C.green, C.red]
 export const stateColor = (name: string) => STATE_COLORS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % STATE_COLORS.length]
 
-// Command: una bandeja con las tarjetas que esperan; deshacer las voltea.
+// Command: a tray with the waiting cards; undo flips them.
 export function command(): Skin {
   return {
     drawNode({ d, gl, state: sim }, node, at) {
@@ -94,7 +94,7 @@ export function command(): Skin {
   }
 }
 
-// Chain of Responsibility: cada eslabón escanea; si no le toca, lo pasa al siguiente.
+// Chain of Responsibility: each link scans; if it is not its turn, it passes on to the next.
 export function chainOfResponsibility(): Skin {
   const scans = new Map<string, number>()
   return {
@@ -114,7 +114,7 @@ export function chainOfResponsibility(): Skin {
   }
 }
 
-// Template Method: los pasos fijos llevan candado; el hueco espera a la subclase.
+// Template Method: the fixed steps carry a lock; the gap waits for the subclass.
 export function templateMethod(): Skin {
   return {
     drawNode({ d, gl }, node, at) {

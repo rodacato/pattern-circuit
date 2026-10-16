@@ -27,7 +27,7 @@
   cursor: pointer;
 }
 
-/* barra superior */
+/* top bar */
 .topbar {
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
   min-height: 0;
 }
 
-/* escenario */
+/* stage */
 .stage-wrap {
   container-type: inline-size;
   position: relative;
@@ -97,7 +97,7 @@
   color: var(--muted);
 }
 
-/* tarjeta del nivel */
+/* level card */
 .brief {
   top: 20px;
   left: 20px;
@@ -192,7 +192,7 @@
   box-shadow: 0 0 10px color-mix(in srgb, var(--green) 50%, transparent);
 }
 
-/* tarjeta de etapa */
+/* stage card */
 .stage-card {
   top: 20px;
   right: 20px;
@@ -422,7 +422,7 @@
   box-shadow: 0 0 18px color-mix(in srgb, var(--green) 30%, transparent);
 }
 
-/* etapas del nivel */
+/* level stages */
 .stages {
   display: flex;
   gap: 4px;
@@ -453,7 +453,7 @@
   box-shadow: 0 -6px 12px -8px var(--cyan);
 }
 
-/* inventario */
+/* inventory */
 .inventory {
   left: 20px;
   bottom: 96px;
@@ -596,7 +596,7 @@
   box-shadow: 0 0 30px var(--fam);
 }
 
-/* cuaderno */
+/* notebook */
 .topbar-actions {
   display: flex;
   gap: 10px;
@@ -715,7 +715,7 @@
   color: #b8c4de;
 }
 
-/* controles */
+/* controls */
 .transport {
   position: absolute;
   bottom: 22px;
@@ -790,7 +790,7 @@
   font: 12px/1 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* leyenda */
+/* legend */
 .legend {
   position: absolute;
   right: 20px;
@@ -835,7 +835,7 @@
   border-top: 2px dashed var(--violet);
 }
 
-/* panel de código */
+/* code panel */
 .code-panel {
   display: flex;
   flex-direction: column;
@@ -995,7 +995,7 @@
   outline-offset: 2px;
 }
 
-/* El juego es de escritorio: en pantallas angostas se explica en vez de mostrar un layout roto. */
+/* The game is desktop-only: on narrow screens it explains this instead of showing a broken layout. */
 .desktop-only {
   display: none;
 }
@@ -1096,7 +1096,7 @@
   color: var(--red);
 }
 
-/* Escritorio angosto (p. ej. 1024 px con el panel de código): las dos tarjetas comparten el ancho sin taparse. */
+/* Narrow desktop (e.g. 1024 px with the code panel): the two cards share the width without covering each other. */
 @container (max-width: 760px) {
   .brief,
   .stage-card {
@@ -1190,7 +1190,7 @@
   text-underline-offset: 3px;
 }
 
-/* Táctil: el canvas maneja sus gestos (el navegador no debe hacer scroll ni zoom encima), y los
+/* Touch: the canvas handles its own gestures (the browser must not scroll or zoom over it), and the
    blancos para tocar crecen. La leyenda muestra los gestos que corresponden a cada puntero. */
 .stage canvas,
 .cartridge {
@@ -1218,7 +1218,7 @@
   }
 }
 
-/* Tablet vertical: el circuito arriba y el código abajo. */
+/* Vertical tablet: the circuit on top and the code below. */
 @media (max-width: 1000px) {
   .game main {
     grid-template-columns: 1fr;

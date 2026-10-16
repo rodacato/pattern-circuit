@@ -3,7 +3,7 @@ import type { LevelInput } from '../schema'
 import { defineLevel, reachableVariants } from './define'
 import { codeKey } from './variants'
 
-// Nivel mínimo válido: src → a → out, con una reparación, un socket y un ticket.
+// Minimal valid level: src → a → out, with one repair, one socket and one ticket.
 const input = (overrides: Partial<LevelInput> = {}): LevelInput => ({
   id: 'mini',
   order: 0,
@@ -37,39 +37,39 @@ const input = (overrides: Partial<LevelInput> = {}): LevelInput => ({
 })
 
 describe('defineLevel', () => {
-  it('acepta un nivel completo y precompila su código', () => {
+  it('accepts a complete level and precompiles its code', () => {
     expect(defineLevel(input()).codeFiles.rb.base.text).toBe('# base')
   })
 
-  it('las reparaciones parciales también son alcanzables', () => {
+  it('partial repairs are reachable too', () => {
     const variants = reachableVariants(defineLevel(input()))
     expect(variants).toContainEqual({})
     expect(variants).toContainEqual({ repairs: ['r'] })
   })
 
-  it('reporta el código que falta', () => {
+  it('reports missing code', () => {
     const { patron: _, ...rb } = input().code.rb
     expect(() => defineLevel(input({ code: { rb } }))).toThrow(/falta el código patron/)
   })
 
-  it('reporta un codeRef sin región en el código de la variante', () => {
+  it('reports a codeRef with no region in the variant code', () => {
     const { rb } = input().code
     expect(() => defineLevel(input({ code: { rb: { ...rb, cambio: '# sin regiones' } } }))).toThrow(/a apunta a A#run, que no está en cambio/)
   })
 
-  it('reporta un patrón en el inventario sin opción', () => {
+  it('reports a pattern in the inventory with no option', () => {
     const [socket] = input().sockets!
     expect(() => defineLevel(input({ sockets: [{ ...socket, inventory: ['strategy', 'observer'] }] }))).toThrow(/observer en inventario sin opción/)
   })
 
-  it('reporta un cable a un nodo inexistente', () => {
+  it('reports a wire to a nonexistent node', () => {
     expect(() => defineLevel(input({ repairs: [], circuit: { ...input().circuit, wires: [{ from: 'src', to: 'nadie' }] } }))).toThrow(/destino inexistente nadie/)
   })
 })
 
 describe('codeKey', () => {
   const level = defineLevel(input())
-  it('prioridad: código del ticket, luego el del patrón, luego el de la reparación, luego base', () => {
+  it('priority: ticket code, then pattern code, then repair code, then base', () => {
     expect(codeKey(level, {})).toBe('base')
     expect(codeKey(level, { repairs: ['r'] })).toBe('reparado')
     expect(codeKey(level, { repairs: ['r'], sockets: [{ id: 's', pattern: 'strategy' }] })).toBe('patron')

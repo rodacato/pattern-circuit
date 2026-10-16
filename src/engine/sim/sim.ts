@@ -4,8 +4,8 @@ import type { Behavior, Circuit, NodeDef, Scenario, ScenarioPulse } from '../sch
 import type { DropReason, Pulse, SimEvent, SimState } from './types'
 
 export type SimConfig = {
-  speed: number // celdas por tick
-  defaultCost: number // ticks dentro de un nodo
+  speed: number // cells per tick
+  defaultCost: number // ticks inside a node
 }
 
 const DEFAULT_CONFIG: SimConfig = { speed: 0.1, defaultCost: 18 }
@@ -52,22 +52,22 @@ export function createSim(circuit: Circuit, scenario: Scenario, config: Partial<
 export const BREAKER_OPEN = 'abierto'
 const BREAKER_CLOSED = 'cerrado'
 
-// Estado con el que arranca un nodo con estado (máquina o interruptor), antes de recibir pulsos.
+// State a stateful node (machine or breaker) starts with, before receiving pulses.
 export function initialNodeState(behavior: Behavior): string | undefined {
   if (behavior.type === 'machine') return behavior.initial
   if (behavior.type === 'breaker') return BREAKER_CLOSED
   return undefined
 }
 
-// Cuántas veces llegó a un sink el pedido original (más de una = cobro duplicado).
+// How many times the original order reached a sink (more than one = duplicate charge).
 export const timesDelivered = (state: SimState, sinkId: string, originId: number) => state.deliveredOrigins[`${sinkId}:${originId}`] ?? 0
 
-// Un pulso retenido en un join cuyos hermanos se perdieron ya no avanzará: no bloquea el final.
+// A pulse held in a join whose siblings were lost will never advance: it does not block the end.
 export function isDone(sim: Sim): boolean {
   return sim.state.scenarioCursor >= sim.schedule.length && sim.state.pulses.every((p) => p.status !== 'alive' || p.loc.kind === 'held')
 }
 
-// Paso puro: devuelve un Sim nuevo; el estado anterior queda intacto para la línea de tiempo.
+// Pure step: returns a new Sim; the previous state stays intact for the timeline.
 export function step(sim: Sim): { sim: Sim; events: SimEvent[] } {
   const s: SimState = structuredClone(sim.state)
   const run = new Tick(sim, s)
@@ -125,7 +125,7 @@ class Tick {
   }
 
   advanceAll() {
-    // Solo los pulsos que existían al inicio del tick; los clones empiezan a moverse en el siguiente.
+    // Only the pulses that existed at the start of the tick; clones start moving in the next one.
     const count = this.s.pulses.length
     for (let i = 0; i < count; i++) {
       const pulse = this.s.pulses[i]
@@ -248,7 +248,7 @@ class Tick {
     return this.exitVia(pulse, node, t.port)
   }
 
-  // Los fallos vuelven al interruptor marcados con `failTag`; los éxitos no regresan, así que nunca reinician la cuenta.
+  // Failures come back to the breaker marked with `failTag`; successes do not return, so they never reset the count.
   private breaker(pulse: Pulse, node: NodeDef, b: BehaviorOf<'breaker'>) {
     if (!pulse.tags.includes(b.failTag)) return this.exitVia(pulse, node, this.s.nodeState[node.id] === BREAKER_OPEN ? 'fallback' : 'call')
     const failures = (this.s.failures[node.id] ?? 0) + 1
@@ -269,7 +269,7 @@ class Tick {
     }
     for (const id of held) {
       const sibling = this.s.pulses.find((p) => p.id === id)!
-      addTags(pulse, sibling.tags) // lo que cada parte aportó llega junto
+      addTags(pulse, sibling.tags) // what each part contributed arrives together
       sibling.status = 'merged'
       sibling.loc = { kind: 'gone', nodeId: node.id }
       this.emit({ type: 'pulse.merge', pulseId: id, nodeId: node.id, intoId: pulse.id })
@@ -278,7 +278,7 @@ class Tick {
     return this.exitVia(pulse, node, 'out')
   }
 
-  // Deshacer: la orden de cancelar anula a la orden retenida que apunta al mismo pedido.
+  // Undo: the cancel order cancels the held order that points to the same request.
   private tryCancel(pulse: Pulse, node: NodeDef, b: { cancelTag: string; match: string }) {
     if (!pulse.tags.includes(b.cancelTag)) return
     const target = this.s.pulses.find(

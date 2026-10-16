@@ -2,7 +2,7 @@ import { NEON as C } from '../theme'
 import { NODE_H, NODE_W } from '../layout'
 import type { Skin } from './types'
 
-// Decorator: anillos alrededor del nodo que envuelve y alrededor de cada pulso envuelto.
+// Decorator: rings around the wrapping node and around each wrapped pulse.
 export function decorator(): Skin {
   return {
     drawNode({ d, gl }, _node, at) {
@@ -16,7 +16,7 @@ export function decorator(): Skin {
   }
 }
 
-// Adapter: un conector que recibe una forma (■) y entrega otra (◆).
+// Adapter: a connector that takes in one shape (■) and hands out another (◆).
 export function adapter(): Skin {
   return {
     drawNode({ d, gl }, _node, at) {
@@ -32,7 +32,7 @@ export function adapter(): Skin {
   }
 }
 
-// Facade: la puerta es un panel ancho; lo que queda detrás se ve apagado.
+// Facade: the door is a wide panel; what stays behind looks dimmed.
 export function facade(): Skin {
   return {
     drawNode({ d, gl, circuit }, node, at) {
@@ -47,7 +47,7 @@ export function facade(): Skin {
   }
 }
 
-// Proxy: un gemelo translúcido delante del real; los aciertos rebotan aquí.
+// Proxy: a translucent twin in front of the real one; hits bounce back here.
 export function proxy(): Skin {
   return {
     drawNode({ d, gl, state }, node, at) {
@@ -66,7 +66,7 @@ export function proxy(): Skin {
   }
 }
 
-// Composite: las hojas llevan un punto; los grupos, un árbol que se abre.
+// Composite: leaves carry a dot; groups, a tree that opens.
 export function composite(): Skin {
   return {
     drawNode({ d }, node, at) {

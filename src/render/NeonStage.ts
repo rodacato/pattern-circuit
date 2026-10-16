@@ -13,14 +13,14 @@ import { SocketLayer } from './SocketLayer'
 import { DROP_TEXT, FONT_MONO, FONT_UI, INVALID_TEXT, NEON as C, pulseColor } from './theme'
 
 const PORT_R = 6
-const TOUCH = coarsePointer() // con el dedo, los blancos para tocar son más grandes
+const TOUCH = coarsePointer() // with a finger, touch targets are larger
 const PORT_HIT = PORT_R + (TOUCH ? 16 : 6)
 const PULSE_HIT = TOUCH ? 30 : 18
-const INVENTORY_INSET = 150 // mientras el inventario está abierto, el circuito se encuadra por encima de él
+const INVENTORY_INSET = 150 // while the inventory is open, the circuit is framed above it
 
 type Drag = { from: string; to: Point }
 
-// Render neón del circuito. Lee la sesión cada frame y traduce gestos a comandos; no decide nada del juego.
+// Neon render of the circuit. It reads the session every frame and turns gestures into commands; it decides nothing about the game.
 export class NeonStage {
   readonly app = new Application()
   private readonly world = new Container()
@@ -75,7 +75,7 @@ export class NeonStage {
     this.app.destroy(true, { children: true })
   }
 
-  // --- API para la ui: soltar un cartucho desde el DOM sobre el socket del canvas ---
+  // --- API for the ui: dropping a cartridge from the DOM onto the canvas socket ---
 
   socketAtClient(clientX: number, clientY: number): string | undefined {
     const rect = this.app.canvas.getBoundingClientRect()
@@ -86,7 +86,7 @@ export class NeonStage {
     this.sockets.dropHover = socketId
   }
 
-  // --- bucle ---
+  // --- loop ---
 
   private tick(delta: number) {
     const s = this.session
@@ -110,7 +110,7 @@ export class NeonStage {
     this.fx.draw(d, gl)
   }
 
-  // Latido entre 0 y 1; con movimiento reducido queda fijo a media intensidad.
+  // Heartbeat between 0 and 1; with reduced motion it stays fixed at half intensity.
   private beat(period: number) {
     return this.reduced ? 0.5 : 0.5 + 0.5 * Math.sin(this.time / period)
   }
@@ -194,7 +194,7 @@ export class NeonStage {
     return box
   }
 
-  // Cámara: rueda o pellizco = zoom hacia el puntero, arrastrar el fondo = mover, doble clic o doble toque = encuadrar.
+  // Camera: wheel or pinch = zoom toward the pointer, dragging the background = pan, double click or double tap = frame.
   private bindPointer() {
     const stage = this.app.stage
     stage.eventMode = 'static'
@@ -232,7 +232,7 @@ export class NeonStage {
     this.bindTouch(canvas)
   }
 
-  // Dos dedos: zoom alrededor del punto medio (y cancela el paneo de un dedo). Doble toque: encuadrar.
+  // Two fingers: zoom around the midpoint (and cancels the one-finger pan). Double tap: frame.
   private bindTouch(canvas: HTMLCanvasElement) {
     const pinch = new Pinch()
     const doubleTap = new DoubleTap()
@@ -323,7 +323,7 @@ export class NeonStage {
     }
   }
 
-  // Los cables "fluyen" en la dirección de la dependencia; con movimiento reducido quedan quietos.
+  // Wires "flow" in the direction of the dependency; with reduced motion they stay still.
   private drawFlow(d: Graphics) {
     for (const w of this.session.playback.circuit.wires.values()) {
       const abstract = w.dep === 'abstract'
@@ -337,7 +337,7 @@ export class NeonStage {
     }
   }
 
-  // Tras un intento fallido, un cable fantasma sugiere la reparación pendiente.
+  // After a failed attempt, a ghost wire suggests the pending repair.
   private drawHint(d: Graphics, gl: Graphics) {
     const s = this.session
     if (!s.failedRuns || this.drag) return
@@ -400,7 +400,7 @@ export class NeonStage {
     }
   }
 
-  // Máquinas e interruptores muestran su estado actual en una etiqueta del color de ese estado.
+  // Machines and breakers show their current state in a label of that state's color.
   private drawNodeState(d: Graphics, gl: Graphics, n: NodeDef, p: Point, h: number) {
     const text = this.stateLabels.get(n.id)
     if (!text) return

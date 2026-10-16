@@ -1,0 +1,33 @@
+// --- the rest of the coffee shop ---
+type Order = { drink: string; total: number }
+
+class OrderTaker {
+  constructor(private cashier: Cashier) {}
+
+  // region: OrderTaker#take
+  take(order: Order) { this.cashier.charge(order) }
+  // endregion
+}
+
+// External vendor SDK: we cannot modify it.
+namespace PagoFacil {
+  export class SDK {
+    // region: PagoFacil::SDK#charge_in_cents
+    chargeInCents({ amountCents, reference }: { amountCents: number; reference: string }) { return { status: 'ok' } }
+    // endregion
+  }
+}
+
+class Barista {
+  constructor(private counter: Counter) {}
+
+  // region: Barista#prepare
+  prepare(order: Order) { this.counter.handOver(order) }
+  // endregion
+}
+
+class Counter {
+  // region: Counter#hand_over
+  handOver(order: Order) { console.log(`${order.drink} ready!`) }
+  // endregion
+}

@@ -1,6 +1,6 @@
 name: CI
 
-# main se verifica en deploy.yml antes de publicar; aquí, cada pull request.
+# main is verified in deploy.yml before publishing; here, every pull request.
 on:
   pull_request:
 
@@ -22,11 +22,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Tipos
+      - name: Types
         run: npm run typecheck
       - name: Lint
         run: npm run lint
-      - name: Tests con cobertura
+      - name: Tests with coverage
         run: npm run coverage
       - name: Build
         run: npm run build

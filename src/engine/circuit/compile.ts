@@ -8,7 +8,7 @@ export type CompiledCircuit = {
   nodes: Map<string, NodeDef>
   wires: Map<string, CompiledWire>
   outgoing: Map<string, CompiledWire[]>
-  incoming: Map<string, number> // cables que llegan a cada nodo (un join espera una parte por cable)
+  incoming: Map<string, number> // wires arriving at each node (a join waits for one part per wire)
 }
 
 export function compile(circuit: Circuit): CompiledCircuit {

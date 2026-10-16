@@ -1,5 +1,5 @@
-// Formato de datos de un nivel. Es la única fuente de verdad: los tipos del
-// motor se infieren de aquí y el loader valida cada nivel contra este esquema.
+// Data format of a level. It is the single source of truth: the engine
+// types are inferred from here and the loader validates each level against this schema.
 import { z } from 'zod'
 
 export const CODE_LANGS = ['rb', 'ts'] as const
@@ -12,7 +12,7 @@ export const PATTERN_IDS = [
   'strategy', 'observer', 'state', 'command', 'chain-of-responsibility', 'template-method',
   'ports-and-adapters', 'event-bus', 'cqrs',
   'null-object', 'circuit-breaker', 'saga',
-  'keep-simple', // no aplicar un patrón también es una decisión de diseño
+  'keep-simple', // not applying a pattern is also a design decision
 ] as const
 
 export const PulseShape = z.enum(PULSE_SHAPES)
@@ -22,7 +22,7 @@ const Json: z.ZodType<unknown> = z.lazy(() =>
   z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(Json), z.record(z.string(), Json)]),
 )
 
-// Predicados declarativos sobre un pulso: nada de funciones en los datos.
+// Declarative predicates on a pulse: no functions in the data.
 export type Predicate =
   | { hasTag: string }
   | { shape: z.infer<typeof PulseShape> }
@@ -48,33 +48,33 @@ const Transition = z.object({
   addTags: z.array(z.string()).optional(),
 })
 
-// Vocabulario cerrado de primitivas. Un patrón nunca es código del motor:
-// es una composición de estas primitivas más un skin visual.
+// Closed vocabulary of primitives. A pattern is never engine code:
+// it is a composition of these primitives plus a visual skin.
 export const Behavior = z.discriminatedUnion('type', [
   z.object({ type: z.literal('source') }),
   z.object({
     type: z.literal('sink'),
     expects: Predicate.optional(),
-    uniqueBy: z.string().optional(), // un valor repetido en este campo es una entrega inválida
+    uniqueBy: z.string().optional(), // a repeated value in this field is an invalid delivery
     message: z.string().optional(),
   }),
   z.object({ type: z.literal('pass') }),
   z.object({
     type: z.literal('transform'),
-    when: Predicate.optional(), // si no se cumple, el pulso pasa sin cambios
+    when: Predicate.optional(), // if it does not hold, the pulse passes unchanged
     addTags: z.array(z.string()).optional(),
     removeTags: z.array(z.string()).optional(),
     setShape: PulseShape.optional(),
     setData: z.record(z.string(), Json).optional(),
   }),
-  // Árbol de if/elsif interno: `cases` es etiqueta -> puerto, en orden de evaluación.
+  // Internal if/elsif tree: `cases` is tag -> port, in evaluation order.
   z.object({
     type: z.literal('branch'),
     cases: z.record(z.string(), z.string()),
     else: z.union([z.literal('drop'), z.string()]).default('drop'),
   }),
-  // Punto de variación: enruta al cable abstracto cuya `key` coincide con una
-  // etiqueta del pulso. Los cables registrados no cuentan como modificar el nodo.
+  // Variation point: routes to the abstract wire whose `key` matches a
+  // pulse tag. Registered wires do not count as modifying the node.
   z.object({ type: z.literal('slot') }),
   z.object({ type: z.literal('broadcast') }),
   z.object({
@@ -82,22 +82,22 @@ export const Behavior = z.discriminatedUnion('type', [
     require: Predicate,
     onFail: z.union([z.literal('drop'), z.string()]).default('drop'),
   }),
-  // Numera cada pulso en `data[field]`. Nodos con la misma `key` comparten la cuenta; `fresh` empieza de cero cada vez.
+  // Numbers each pulse in `data[field]`. Nodes with the same `key` share the count; `fresh` starts from zero each time.
   z.object({ type: z.literal('counter'), key: z.string(), field: z.string().default('ticket'), fresh: z.boolean().default(false) }),
-  // Espera a todas las partes de un mismo pedido (una por cable de entrada) y sigue con una sola.
+  // Waits for all the parts of one order (one per input wire) and continues as a single one.
   z.object({ type: z.literal('join') }),
-  // Recuerda valores de `data[key]`: los ya vistos salen por `hit`, los nuevos por `miss`.
+  // Remembers values of `data[key]`: already seen ones leave through `hit`, new ones through `miss`.
   z.object({ type: z.literal('cache'), key: z.string() }),
-  // Máquina de estados con memoria entre pulsos: estado actual × etiqueta → transición.
+  // State machine with memory between pulses: current state × tag → transition.
   z.object({
     type: z.literal('machine'),
     initial: z.string(),
     states: z.record(z.string(), z.record(z.string(), Transition)),
     else: z.union([z.literal('drop'), z.string()]).default('drop'),
   }),
-  // Interruptor: deja pasar por `call` hasta ver `threshold` pulsos con `failTag`; entonces se abre y todo va por `fallback`.
+  // Breaker: lets pulses through `call` until it sees `threshold` pulses with `failTag`; then it opens and everything goes through `fallback`.
   z.object({ type: z.literal('breaker'), threshold: z.number().int().positive(), failTag: z.string() }),
-  // Retiene cada pulso `cost` ticks; un pulso con `cancelTag` anula al retenido con el mismo `data[match]`.
+  // Holds each pulse for `cost` ticks; a pulse with `cancelTag` cancels the held one with the same `data[match]`.
   z.object({ type: z.literal('buffer'), cancelTag: z.string(), match: z.string() }),
 ])
 
@@ -108,8 +108,8 @@ export const NodeDef = z.object({
   kind: z.enum(['class', 'interface', 'external', 'actor']).default('class'),
   at: z.tuple([z.number(), z.number()]),
   behavior: Behavior,
-  cost: z.number().int().nonnegative().optional(), // ticks que el pulso pasa dentro
-  capacity: z.number().int().positive().optional(), // pulsos simultáneos; sin límite si falta
+  cost: z.number().int().nonnegative().optional(), // ticks the pulse spends inside
+  capacity: z.number().int().positive().optional(), // simultaneous pulses; unlimited if missing
   codeRef: z.string().optional(),
   skin: PatternId.optional(),
 })
@@ -120,7 +120,7 @@ export const WireDef = z.object({
   port: z.string().default('out'),
   to: z.string(),
   dep: z.enum(['concrete', 'abstract']).default('concrete'),
-  key: z.string().optional(), // para cables que salen de un `slot`
+  key: z.string().optional(), // for wires leaving a `slot`
 })
 
 export const Circuit = z.object({
@@ -129,7 +129,7 @@ export const Circuit = z.object({
 })
 
 export const GraphPatch = z.object({
-  remove: z.array(z.string()).optional(), // ids de nodos; se llevan sus cables
+  remove: z.array(z.string()).optional(), // node ids; their wires go with them
   removeWires: z.array(z.string()).optional(),
   update: z.array(NodeDef.partial().extend({ id: z.string() })).optional(),
   add: Circuit.partial().optional(),
@@ -144,16 +144,16 @@ export const SocketOption = z.object({
   outcome: z.enum(['solves', 'partial', 'misfit']),
   patch: GraphPatch,
   note: FieldNote,
-  code: z.string(), // clave dentro de level.code
+  code: z.string(), // key inside level.code
 })
 
 export const SocketDef = z.object({
   id: z.string(),
-  at: z.string(), // nodo donde aparece el socket
+  at: z.string(), // node where the socket appears
   label: z.string(),
   inventory: z.array(PatternId),
   options: z.partialRecord(PatternId, SocketOption),
-  code: z.string().optional(), // con varios sockets: fragmento de código mientras está vacío
+  code: z.string().optional(), // with several sockets: code fragment while it is empty
 })
 
 export const ScenarioPulse = z.object({
@@ -173,9 +173,9 @@ export const Scenario = z.object({
 export const ChangeTicket = z.object({
   id: z.string(),
   text: z.string(),
-  scenario: z.string(), // escenario que ejercita el cambio
-  without: GraphPatch, // aplicado al circuito base
-  with: GraphPatch, // aplicado al circuito ya resuelto
+  scenario: z.string(), // scenario that exercises the change
+  without: GraphPatch, // applied to the base circuit
+  with: GraphPatch, // applied to the already resolved circuit
   code: z.object({ without: z.string().optional(), with: z.string().optional() }).default({}),
 })
 
@@ -186,7 +186,7 @@ export const Repair = z.object({
   code: z.string().optional(),
 })
 
-// Acciones del jugador que un nivel puede pedir en su lista de pasos (tutoriales).
+// Player actions a level can ask for in its list of steps (tutorials).
 export const PLAYER_ACTIONS = ['play', 'pause', 'step', 'back', 'reset', 'speed', 'repair', 'inspect-node', 'follow-pulse'] as const
 export const PlayerAction = z.enum(PLAYER_ACTIONS)
 
@@ -201,7 +201,7 @@ export const Assertion = z.object({
   metric: z.enum(METRICS),
   op: z.enum(['==', '<=', '>=']),
   value: z.number(),
-  label: z.string().optional(), // cómo se lee la métrica en este nivel ("eventos fuera de orden")
+  label: z.string().optional(), // how the metric reads in this level ("out-of-order events")
 })
 
 export const LevelDef = z.object({
@@ -215,10 +215,10 @@ export const LevelDef = z.object({
   sockets: z.array(SocketDef).default([]),
   repairs: z.array(Repair).default([]),
   scenarios: z.array(Scenario).min(1),
-  changeTickets: z.array(ChangeTicket).max(1).default([]), // el flujo del nivel tiene una sola etapa de cambio
+  changeTickets: z.array(ChangeTicket).max(1).default([]), // the level flow has a single change stage
   winWhen: z.array(Assertion).default([]),
   checklist: z.array(ChecklistItem).default([]),
-  // Un fragmento por clave ({ base, strategy, … }) en cada lenguaje; Ruby es el de referencia.
+  // One fragment per key ({ base, strategy, … }) in each language; Ruby is the reference.
   code: z.object({ rb: z.record(z.string(), z.string()), ts: z.record(z.string(), z.string()).optional() }),
 })
 

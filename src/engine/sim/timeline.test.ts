@@ -3,8 +3,8 @@ import { line, scenario } from '../testing'
 import { createSim } from './sim'
 import { Timeline } from './timeline'
 
-describe('línea de tiempo', () => {
-  it('retroceder y avanzar reproduce exactamente el mismo estado', () => {
+describe('timeline', () => {
+  it('going back and forward reproduces exactly the same state', () => {
     const c = line({ src: { type: 'source' }, a: { type: 'pass' }, out: { type: 'sink' } }, { a: { capacity: 1 } })
     const tl = new Timeline(createSim(c, scenario({ at: 0 }, { at: 4 })), 10)
     for (let i = 0; i < 47; i++) tl.forward()
