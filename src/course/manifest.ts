@@ -1,8 +1,9 @@
-import { CourseManifest, PROTOCOL_VERSION, THEME_TOKENS } from '../course-kit'
+import { CourseManifest, PROTOCOL_VERSION } from '../course-kit'
 import { createTranslator, type Message } from '../i18n'
 import { APP_CATALOGS, CANONICAL_LOCALE, LOCALES } from '../i18n/registry'
 import { LEVELS, LEVEL_CATALOGS, TRACKS } from '../levels'
 import { HOST_LANGUAGES } from './codeLanguages'
+import { HONORED_TOKENS } from './theme'
 
 declare const __APP_VERSION__: string
 
@@ -31,7 +32,7 @@ export function buildManifest(): CourseManifest {
     completion: { requires: 'all' },
     capabilities: {
       codeRunner: 'none',
-      theming: { modes: ['dark'], honors: [...THEME_TOKENS] },
+      theming: { modes: ['light', 'dark'], honors: HONORED_TOKENS },
       minViewport: { width: 640, height: 480 },
       persistsOwnState: true,
     },

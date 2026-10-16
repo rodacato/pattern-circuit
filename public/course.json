@@ -315,6 +315,7 @@
     "codeRunner": "none",
     "theming": {
       "modes": [
+        "light",
         "dark"
       ],
       "honors": [
@@ -322,18 +323,12 @@
         "surface",
         "elevated",
         "border",
-        "accent",
-        "onAccent",
-        "success",
-        "danger",
-        "warning",
         "textPrimary",
         "textSecondary",
         "textMuted",
+        "accent",
         "fontSans",
-        "fontMono",
-        "radiusSm",
-        "radiusMd"
+        "fontMono"
       ]
     },
     "minViewport": {

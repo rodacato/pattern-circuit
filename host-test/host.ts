@@ -1,4 +1,4 @@
-import { createHostController, embeddingFragment, windowTransport, type CourseManifest, type HostCommand, type Progress } from '../src/course-kit'
+import { createHostController, embeddingFragment, windowTransport, type CourseManifest, type HostCommand, type Progress, type Theme } from '../src/course-kit'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 const KEY = 'host-test:state'
@@ -16,6 +16,14 @@ const persist = () => {
   localStorage.setItem(KEY, JSON.stringify(state))
   $('progress').textContent = JSON.stringify({ rev: state.rev, ...state.progress }, null, 1)
 }
+
+// The three themes of Dojo (apps/web/src/styles/main.css), as the tokens a host would send.
+const THEMES: Record<string, Theme> = {
+  slate: { mode: 'dark', tokens: { page: '#0F172A', surface: '#1E293B', elevated: '#253347', border: '#334155', textPrimary: '#F8FAFC', textSecondary: '#94A3B8', textMuted: '#64748B', accent: '#6366F1' } },
+  sumi: { mode: 'dark', tokens: { page: '#0A0908', surface: '#13110F', elevated: '#1B1815', border: '#2A2520', textPrimary: '#F2EDE3', textSecondary: '#A39A8C', textMuted: '#7A7064', accent: '#B73A2F' } },
+  washi: { mode: 'light', tokens: { page: '#F5F1E8', surface: '#EDE7D9', elevated: '#E3DCC9', border: '#C9BFA8', textPrimary: '#1F1B16', textSecondary: '#5C5448', textMuted: '#6F6658', accent: '#B73A2F' } },
+}
+const chosenTheme = () => THEMES[$<HTMLSelectElement>('theme').value]
 
 const log = (line: string) => {
   const box = $('log')
@@ -50,7 +58,7 @@ async function load() {
     transport: windowTransport(window, iframe.contentWindow!, courseOrigin),
     supported: { min: 1, max: 1 },
     handlers: {
-      init: () => ({ locale: state.locale, codeLanguage: state.codeLanguage, progress: state.progress, reducedMotion: $<HTMLInputElement>('reduced').checked, features: { codeRunner: false } }),
+      init: () => ({ locale: state.locale, codeLanguage: state.codeLanguage, progress: state.progress, reducedMotion: $<HTMLInputElement>('reduced').checked, theme: chosenTheme(), features: { codeRunner: false } }),
       ready: () => log('← ready'),
       unitStarted: (id) => log(`← unit.started ${id}`),
       unitCompleted: (id, detail) => {
@@ -89,6 +97,11 @@ $('code').addEventListener('change', (e) => {
   state.codeLanguage = (e.target as HTMLSelectElement).value
   persist()
   send({ type: 'codeLanguage', value: state.codeLanguage })
+})
+$('theme').addEventListener('change', () => {
+  const theme = chosenTheme()
+  if (theme) send({ type: 'theme', theme })
+  else void load()
 })
 $('unit').addEventListener('change', (e) => send({ type: 'navigate', unitId: (e.target as HTMLSelectElement).value }))
 $('visible').addEventListener('change', (e) => {

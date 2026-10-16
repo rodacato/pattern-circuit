@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [react()],
   define: { __APP_VERSION__: JSON.stringify(version) },
   optimizeDeps: {
-    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs'],
+    include: ['shiki/core', 'shiki/engine/javascript', 'shiki/langs/ruby.mjs', 'shiki/langs/typescript.mjs', 'shiki/themes/tokyo-night.mjs', 'shiki/themes/github-light.mjs'],
   },
   build: {
     // Shiki's Ruby grammar (~1.9 MB, loaded on demand) exceeds the default warning.

@@ -155,6 +155,7 @@ The game can run on its own or inside a hub such as Dojo (an iframe). The contra
 - **Ports**: `HostBridge` with two adapters: `StandaloneHostBridge` (today's behavior) and `EmbeddedHostBridge` (handshake with retries, then events up and commands down). If the host does not answer in five seconds the game runs standalone and says so. `HostController` (`course-kit/host.ts`) is the matching host side.
 - **Progress**: standalone, the browser's `localStorage` as always. Embedded, the host is the record: `HostProgressStore` starts from what the host sends and reports debounced snapshots (`course.progress`); completed levels travel as `course.unit.completed`. Nothing else in the game knows which mode it is in.
 - **Preferences**: language and code language are requested from the host (`course.preference.requested`) and obeyed when it answers; the game never sends back what the host just imposed.
+- **Theme**: a host sends `{ mode, tokens }` (validated: colors, font names, radii; never URLs). The game honors the tokens of its chrome (`course/theme.ts` maps them to CSS variables; text that would be hard to read on the host's surface is ignored) and picks the code colors by mode. The circuit stage and the cards over it keep their own dark palette: the glow needs a dark ground and pulse, family and status colors mean something.
 - **Try it**: `npm run dev` (the course) and `npm run host:test` (a small host on another port, `host-test/`) reproduce the real conditions: another origin, another storage.
 
 ## New tracks

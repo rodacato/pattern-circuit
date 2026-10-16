@@ -52,11 +52,8 @@ describe('handshake', () => {
   })
 
   it('repeats the greeting until the host is ready, then stops', async () => {
-    const host = new FakeWindow('https://dojo.example')
-    const frame = new FakeWindow('https://courses.example')
     const posted: unknown[] = []
     const bridge = new EmbeddedHostBridge({ transport: { post: (m) => posted.push(m), listen: () => () => {} }, course: COURSE, retryMs: 100, giveUpMs: 1000 })
-    void host, void frame
     const started = bridge.start()
     started.catch(() => {})
     await vi.advanceTimersByTimeAsync(350)
