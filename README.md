@@ -8,11 +8,17 @@
 
 An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
 
+![Pattern Circuit: the tutorial's broken wire, then Strategy plugged into the payment socket](docs/media/demo.gif)
+
+[Full recording (MP4)](docs/media/demo.mp4)
+
+## What you learn
+
 - **27 levels** in 9 chapters, from the tutorial to "the whole cafeteria".
 - **20 patterns**: 14 from the GoF catalog, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker and Saga. Plus a chapter about the opposite: when **not** to apply one.
-- Every level follows the same rhythm: **observe the problem → pick a pattern → apply a change → compare without/with**.
-- Trying the wrong pattern teaches too: every attempt leaves a note in the **pattern notebook**.
-- The content is verified against the original sources (GoF, Fowler, Cockburn, Nygard…); the bibliography is in [docs/DESIGN.md](docs/DESIGN.md#sources).
+- A level runs **observe the problem → pick a pattern → compare without/with**. In eight levels a **change ticket** arrives in between, and the game counts how many existing nodes had to be opened. The tutorial and the final level have no socket.
+- Before a run you predict what the pattern will do, and trying the wrong pattern teaches too: every attempt leaves a note in the **pattern notebook**.
+- The content is checked against the original sources (GoF, Fowler, Cockburn, Nygard…; bibliography in [docs/DESIGN.md](docs/DESIGN.md#sources)), and every snippet the player sees runs in CI on Ruby 3.0.1, Python 3.10 and TypeScript.
 
 ## How to play
 
@@ -41,48 +47,44 @@ The game is available in **Spanish and English** (ES/EN button at the top); addi
 | Judgment: when not to | 24–25 | keeping it simple against patterns that are not needed |
 | The whole cafeteria | 26 | everything working together |
 
-## Development
+## Run it
 
-Requires Node 22 or later. Ruby and Python are optional: if they are installed, the tests verify and run all the Ruby and Python code the player sees (the TypeScript is always verified).
+Needs Node 22.22 or newer (or 24.15+) and npm. Ruby and Python are optional: if they are installed, the tests also run every Ruby and Python snippet the player sees. CI uses Ruby 3.0.1 and Python 3.10, the versions Dojo runs, so newer syntax fails there.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:5173 (add ?debug for the raw engine view)
 ```
+
+## Checks
 
 | Script | What it does |
 |---|---|
-| `npm run dev` | the game in development mode (add `?debug` to the URL to see the raw engine) |
-| `npm test` | tests: engine, levels, application, render, UI and architecture rules |
+| `npm test` | engine, levels, application, i18n, course-kit, render, UI and architecture rules |
+| `npm run typecheck` / `npm run lint` | `tsc -b` / oxlint |
+| `npm run check` | types + lint + tests |
 | `npm run coverage` | tests with coverage and minimum thresholds |
-| `npm run check` | types + lint + tests (the same as CI runs) |
-| `npm run build` | static build in `dist/` |
+| `npm run build` / `npm run preview` | static build in `dist/` / serve it |
+| `npm run host:test` | a test host that embeds the course from another origin |
+| `npm run demo` | records `docs/media/demo.mp4` and `demo.gif` from the production build (needs `ffmpeg`) |
 
-## Structure
+CI runs typecheck, lint, `coverage` and `build` on every push and pull request; every push to `main` publishes the game to GitHub Pages.
 
-```
-src/
-  engine/   pure, deterministic simulation engine and level schema (no DOM)
-  levels/   one level = a folder with level.ts (data) + code snippets; they register themselves
-  game/     application: session, level flow, playback and progress
-  render/   neon PixiJS render and the visual signature of each pattern
-  ui/       React interface
-  debug/    engine view (?debug)
-```
+## Architecture
 
-Layers depend in one direction only, and a test verifies it. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); game design, progression and sources in [docs/DESIGN.md](docs/DESIGN.md).
+Layers depend in one direction only (`engine ← game ← render ← ui`, with `levels` as content on top of `engine`), and a test enforces it. The engine is pure and deterministic, with no DOM and no real time. A pattern is never engine code but a patch over the circuit, so a new level is data only and every reachable variant is validated. No component or level contains prose: every text is a key in a per-locale catalog. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); game design, progression and sources in [docs/DESIGN.md](docs/DESIGN.md).
 
-## Publishing to GitHub Pages
+## Embedding in Dojo
 
-1. Push the repo to GitHub (branch `main`).
-2. In **Settings → Pages**, choose **Source: GitHub Actions**.
-3. Every push to `main` runs the checks and publishes the game ([`site-pages.yml`](.github/workflows/site-pages.yml)). Pull requests and pushes to `main` run the same checks ([`ci.yml`](.github/workflows/ci.yml)).
-
-The build uses relative paths, so it works under any subpath (`https://<user>.github.io/<repo>/`).
+[Dojo](https://github.com/rodacato/dojo) is a self-hosted practice space for developers that embeds courses like this one in an iframe. Pattern Circuit runs on its own or embedded through `course-kit` protocol 1, an earlier draft than Dojo's current scroll protocol v0: a manifest at `public/course.json`, typed messages validated with zod, and strict origin checks (`#ck-host=<origin>`, never `'*'`). If the host does not answer within five seconds, the game runs standalone and says so. Try it with `npm run dev` plus `npm run host:test`.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). The changes of each version are in [CHANGELOG.md](CHANGELOG.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md): how to add a level, a language (`npm run i18n:scaffold`) or a pattern, and why nothing in the content is made up. The changes of each version are in [CHANGELOG.md](CHANGELOG.md).
+
+## Sources
+
+Every level is checked against the original sources: the Gang of Four, Bloch, POSA, Woolf, Cockburn, Fowler, Evans, Nygard, Garcia-Molina and Salem, Hohpe and Woolf, and Kerievsky. The game simplifies but should not contradict any of them. Full bibliography in [docs/DESIGN.md](docs/DESIGN.md#sources).
 
 ## License
 
