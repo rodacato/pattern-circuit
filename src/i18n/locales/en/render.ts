@@ -14,7 +14,7 @@ export const render = {
   'render.fx.connected': 'connected!',
   'render.fx.uselessWire': "that wire doesn't fix anything here",
   'render.fx.orderLost': 'order lost! · {reason}',
-  'render.fx.chargedAgain': 'charged again!',
+  'render.fx.chargedAgain': 'repeated!',
   'render.fx.delivered': '☕ {label} delivered',
   'render.fx.invalid': "this isn't what I ordered!",
 

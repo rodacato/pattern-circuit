@@ -87,7 +87,7 @@ function FailCard({ session, result, onClose }: { session: GameSession; result: 
   const wire = repair?.patch.add?.wires?.[0]
   const nodeLabel = (id: string) => session.playback.circuit.nodes.get(id)?.label ?? id
   return (
-    <div className="stage-card card bad" role="status">
+    <div className="stage-card card bad" role="status" data-testid="card-fail">
       <Close onClose={onClose} />
       <span className="eyebrow">{t('cards.stage.fail.title')}</span>
       <Failures result={result} />
@@ -95,7 +95,7 @@ function FailCard({ session, result, onClose }: { session: GameSession; result: 
       <div className="actions">
         <button onClick={() => session.play()}>{t('cards.stage.fail.retry')}</button>
         {wire && (
-          <button className="link" onClick={() => session.connect(wire.from, wire.to)}>
+          <button className="link" data-testid="repair" onClick={() => session.connect(wire.from, wire.to)}>
             {t(msg('cards.stage.fail.connect', { from: nodeLabel(wire.from), to: nodeLabel(wire.to) }))}
           </button>
         )}
@@ -131,7 +131,7 @@ function Hints({ session }: { session: GameSession }) {
 function ProblemCard({ session, result, onClose }: { session: GameSession; result: Evaluation; onClose?: () => void }) {
   const t = useT()
   return (
-    <div className="stage-card card bad" role="status">
+    <div className="stage-card card bad" role="status" data-testid="card-problem">
       <Close onClose={onClose} />
       <span className="eyebrow">{t('cards.stage.problem.title')}</span>
       <Failures result={result} />
@@ -146,7 +146,7 @@ function PredictionCard({ session }: { session: GameSession }) {
   const t = useT()
   const p = session.prediction!
   return (
-    <div className="stage-card card predict" role="status">
+    <div className="stage-card card predict" role="status" data-testid="card-predict">
       <span className="eyebrow">🔮 {t('cards.stage.predict.title')}</span>
       <h3>{t(p.question)}</h3>
       <Choices prediction={p} onPick={(id) => session.predict(id)} />
@@ -164,7 +164,7 @@ function Choices({ prediction, onPick }: { prediction: Prediction; onPick: (id: 
   return (
     <div className="choices">
       {prediction.choices.map((c) => (
-        <button key={c.id} onClick={() => onPick(c.id)}>
+        <button key={c.id} data-testid="choice" onClick={() => onPick(c.id)}>
           {t(c.label)}
         </button>
       ))}
@@ -193,7 +193,7 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
   const outcome = OUTCOME[option.outcome]
   const pending = session.pendingSockets
   return (
-    <div className={`stage-card card ${outcome.tone}`} role="status">
+    <div className={`stage-card card ${outcome.tone}`} role="status" data-testid="card-note" data-outcome={option.outcome}>
       <Close onClose={solved ? undefined : onClose} />
       <span className={`badge ${outcome.tone}`}>{t(outcome.label)}</span>
       <PredictionResult prediction={session.prediction?.kind === 'outcome' ? session.prediction : undefined} />
@@ -202,7 +202,7 @@ function NoteCard({ session, onClose }: { session: GameSession; onClose?: () => 
       {!solved && session.result && <Failures result={session.result} />}
       <div className="actions">
         {solved ? (
-          <button className="primary" onClick={() => session.continue()}>
+          <button className="primary" data-testid="note-continue" onClick={() => session.continue()}>
             {t(session.ticket ? 'cards.stage.note.nextTicket' : 'cards.stage.note.nextCompare')}
           </button>
         ) : option.outcome === 'solves' && pending.length ? (
@@ -223,8 +223,11 @@ function TicketCard({ session }: { session: GameSession }) {
   const touched = useSession(session, (s) => s.touched.length)
   const running = useSession(session, (s) => s.playback.playing)
   const prediction = session.prediction?.kind === 'touched' ? session.prediction : undefined
+  // Facade and Template Method concentrate the change in one node on purpose: opening that one is the point.
+  const allowed = session.level.winWhen.find((a) => a.metric === 'nodesTouched' && a.op !== '>=')?.value ?? 0
+  const verdict = touched === 0 ? 'cards.stage.ticket.added' : touched <= allowed ? 'cards.stage.ticket.withinLimit' : 'cards.stage.ticket.opened'
   return (
-    <div className="stage-card card ticket" role="status">
+    <div className="stage-card card ticket" role="status" data-testid="card-ticket">
       <span className="eyebrow">📋 {t('cards.stage.ticket.title')}</span>
       <h3>{session.ticket && t(session.ticket.text)}</h3>
       {!applied && prediction && (
@@ -240,7 +243,7 @@ function TicketCard({ session }: { session: GameSession }) {
       )}
       {!applied && !prediction && (
         <div className="actions">
-          <button className="primary" onClick={() => session.applyTicket()}>
+          <button className="primary" data-testid="ticket-apply" onClick={() => session.applyTicket()}>
             {t('cards.stage.ticket.apply')}
           </button>
         </div>
@@ -248,13 +251,13 @@ function TicketCard({ session }: { session: GameSession }) {
       {applied && (
         <>
           <div className="big-stat">
-            <b className={touched ? 'bad' : 'good'}>{touched}</b>
+            <b className={touched <= allowed ? 'good' : 'bad'}>{touched}</b>
             <span>{t('cards.metrics.nodesTouched')}</span>
           </div>
           <PredictionResult prediction={prediction} />
-          <p className="muted">{t(touched ? 'cards.stage.ticket.opened' : 'cards.stage.ticket.added')}</p>
+          <p className="muted">{t(verdict === 'cards.stage.ticket.withinLimit' ? msg(verdict, { allowed }) : verdict)}</p>
           <div className="actions">
-            <button className="primary" disabled={!done || running} onClick={() => session.continue()}>
+            <button className="primary" data-testid="ticket-compare" disabled={!done || running} onClick={() => session.continue()}>
               {t('cards.stage.ticket.compare')}
             </button>
           </div>
@@ -270,7 +273,7 @@ function CompareCard({ session }: { session: GameSession }) {
   const cmp = session.comparison!
   const rows = session.comparisonRows
   return (
-    <div className="stage-card card compare" role="status">
+    <div className="stage-card card compare" role="status" data-testid="card-compare">
       <span className="eyebrow">{t('cards.comparison.title')}</span>
       <div className="seg">
         <button className={side === 'without' ? 'on bad' : ''} aria-pressed={side === 'without'} onClick={() => session.showSide('without')}>
@@ -299,7 +302,7 @@ function CompareCard({ session }: { session: GameSession }) {
         </tbody>
       </table>
       <div className="actions">
-        <button className="primary" onClick={() => session.finishLevel()}>
+        <button className="primary" data-testid="finish-level" onClick={() => session.finishLevel()}>
           {t('cards.comparison.finish')}
         </button>
       </div>
@@ -312,7 +315,7 @@ function WinCard({ session, onNext }: { session: GameSession; onNext?: () => voi
   const patterns = session.pluggedPatterns
   const title = !onNext ? t('cards.win.finishedGame') : patterns.length ? t(msg('cards.win.learned', { names: names(session, t) })) : t('cards.win.cafeWorks')
   return (
-    <div className="stage-card card won" role="status">
+    <div className="stage-card card won" role="status" data-testid="card-win">
       <span className="eyebrow">{t(onNext ? 'cards.win.levelDone' : 'cards.win.endOfTour')}</span>
       <h2>{title}</h2>
       {!onNext && <p className="muted">{t('cards.win.endBody')}</p>}
@@ -325,7 +328,7 @@ function WinCard({ session, onNext }: { session: GameSession; onNext?: () => voi
       <div className="actions">
         <button onClick={() => session.play()}>{t('cards.win.again')}</button>
         {onNext && (
-          <button className="primary" onClick={onNext}>
+          <button className="primary" data-testid="next-level" onClick={onNext}>
             {t('cards.win.next')}
           </button>
         )}

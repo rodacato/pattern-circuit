@@ -258,7 +258,10 @@
   top: 50%;
   left: 50%;
   right: auto;
+  z-index: 3;
   width: 400px;
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
   transform: translate(-50%, -50%);
   text-align: center;
   border-color: color-mix(in srgb, var(--green) 45%, transparent);
@@ -450,7 +453,7 @@
   padding-top: 8px;
   border-top: 3px solid var(--faint);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   transition: all 0.3s;
 }
 
@@ -557,7 +560,7 @@
 
 .cartridge .family {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .cartridge:hover {
@@ -650,6 +653,37 @@
   border-radius: 0;
   border-width: 0 0 0 1px;
   animation: slide 0.3s ease-out;
+}
+
+.walkthrough {
+  top: 50%;
+  left: 50%;
+  width: min(460px, calc(100% - 32px));
+  padding: 22px 24px;
+  transform: translate(-50%, -50%);
+}
+
+.walkthrough h2 {
+  margin: 6px 0 10px;
+  font-size: 22px;
+}
+
+.walkthrough p {
+  margin: 0 0 18px;
+  color: #b8c4de;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.walkthrough .actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.walkthrough .actions .link {
+  margin-right: auto;
 }
 
 .notebook header h2 {
@@ -836,7 +870,7 @@
 .legend .camera {
   margin-top: 4px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .legend .solid {
@@ -942,6 +976,7 @@
 
 .code-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -957,6 +992,8 @@
 
 .code-head .ref {
   display: flex;
+  flex: 1 1 100%;
+  order: 3;
   gap: 8px;
   align-items: center;
   min-width: 0;
@@ -966,6 +1003,7 @@
   color: var(--muted);
   font-style: normal;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .code-head code {
@@ -984,7 +1022,7 @@
   min-height: 0;
   overflow: auto;
   padding: 12px 0 40px;
-  font: 12.5px/1.65 var(--font-mono);
+  font: 13.5px/1.65 var(--font-mono);
   color: #a9b1d6;
 }
 
@@ -1006,7 +1044,7 @@
 }
 
 .line.dim {
-  opacity: 0.45;
+  opacity: 0.65;
 }
 
 .line.on {
@@ -1203,10 +1241,11 @@
   .stage-card p {
     font-size: 13px;
   }
+}
 
-  .inventory-open .legend {
-    display: none;
-  }
+/* While choosing, the inventory takes the bottom of the stage, where the legend sits. */
+.inventory-open .legend {
+  display: none;
 }
 
 .review .review-question .where {
@@ -1223,7 +1262,7 @@
 .choices button small {
   margin-left: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .choices button.right {
@@ -1342,7 +1381,7 @@
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .lang-switch button.on {

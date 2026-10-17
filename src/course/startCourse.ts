@@ -58,6 +58,8 @@ async function embedded(hostOrigin: string): Promise<Course> {
     progress,
     locale: hostPreference(bridge, 'locale', init.locale),
     codeLanguage: hostPreference(bridge, 'codeLanguage', fromHostLanguage(init.codeLanguage) ?? 'rb', (v) => toHostLanguage(storedLanguage(v))),
+    // The protocol has no field for it: whether the guide was seen stays in this browser.
+    walkthrough: createBrowserStorage().walkthrough,
   }
   bridge.onCommand((command) => {
     if (command.type === 'progress') progress.replace(command.progress)

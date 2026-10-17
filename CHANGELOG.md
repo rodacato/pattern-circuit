@@ -17,6 +17,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).
 - Wires are legible at rest: the concrete wire color and the alpha of interface wires reach 3:1 against the stage, and code line numbers use the muted text color instead of the faint one.
 - The README says who the course is for and how each canvas action is done by keyboard.
+- Easier to read: code at 13.5 px with less dimming outside the active region, muted helper text no smaller than 11–12 px, and node titles and class names shrink to fit their node instead of spilling over it.
 
 ### Added
 
@@ -25,6 +26,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - The code panel shows each region's name the way the language spells it (`Counter#hand_over` in Ruby, `Counter#handOver` in TypeScript); a test checks that both languages tell the story with the same regions.
 - `npm run i18n:scaffold` to start a new language from the English catalogs.
 - **The circuit can be explored without a pointer**: a "⌨ Keyboard" panel lists every node (with what it sends to) and the pulses in flight; `Enter` inspects a node or follows a pulse, exactly like clicking it on the canvas, and buttons zoom and reframe the camera.
+- **A "how to play" guide**: four steps on the first visit (the circuit, the playback controls, the code panel, plugging and comparing), again from the **?** button; `?walkthrough=off` keeps it closed.
+- **End-to-end tests on the production build** (Playwright): smoke tests on every pull request, and a nightly suite that solves all 27 levels from the UI in both languages and two viewports, with a reload halfway.
 - **Python as a third code language** for all 27 levels, with the same regions and the same output as Ruby, a Python example of each pattern in "Where you've seen it" (standard library, Django, Celery… each checked against its docs) and Python in the language list a host receives.
 - **The code players see is executed, not only parsed**: every file a variant can show runs against stubbed collaborators in Ruby, TypeScript and Python, and all must print the same. CI runs it on Ruby 3.0.1 and Python 3.10, the versions Dojo executes; two command snippets were adjusted to be valid there (`raise(…)` in an endless method).
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.
@@ -36,6 +39,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Metrics say what they count: Observer, Event Bus and live-orders count notifications or events, not delivered orders, and `duplicatesAtSink` reads "duplicated orders" instead of "double charges".
 - Misfit notes no longer present a limit of this implementation as something the pattern cannot do (Strategy "doesn't recurse", a single factory "doesn't know the branch", Facade "doesn't decouple", Command "undoes in memory", "nothing to decouple" with one listener).
 - Closing messages claim only what happened: "You solved it with…" instead of "You learned…", "You completed the final walkthrough!", and a change ticket says no existing node changed its behavior, not that nothing changed. Counts read "Notes: 1" instead of "1 notes".
+
+- Feedback says what the game checks: the guiding hints for lost and wrong orders send the player to follow a pulse instead of assuming a cause, the "partial" prediction reads "It helps in part, but not enough", a change ticket that opens only the node the level allows is no longer shown as a failure, the family hint for keep-simple says it is a principle and not a pattern, a repeated pulse reads "repeated!" instead of "charged again!", and the live-orders undo, the review schedule and the closing card are described as they are.
+- At 1280×720 the level-complete card no longer hides its buttons under the legend when two patterns are summarized, the legend no longer overlaps the open inventory, and the code panel header no longer squeezes the region name.
 
 ## [1.1.0] - 2026-09-24
 

@@ -98,6 +98,8 @@ export function Inventory({ session, stage }: { session: GameSession; stage?: Ne
             return (
               <button
                 key={id}
+                data-testid="cartridge"
+                data-pattern={id}
                 className={`cartridge ${info.family}${plugged ? ' plugged' : ''}${ghost?.pattern === id ? ' lifted' : ''}`}
                 onPointerDown={onDown(id)}
                 onPointerMove={onMove}

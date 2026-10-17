@@ -12,6 +12,12 @@ export function label(text: string, size: number, fill: number, fontFamily = FON
   return new Text({ text, style: { fontFamily, fontSize: size, fontWeight, fill } })
 }
 
+// A long class name (DeliveryRequestAdapter) is shrunk to the node instead of spilling over its border.
+export function fitWidth(text: Text, max: number) {
+  if (text.width > max) text.scale.set(max / text.width)
+  return text
+}
+
 // The if/elsif tree: one branch per case plus the `else` that loses orders.
 export function drawBranchGlyph(d: Graphics, p: Point, cases: number) {
   const x0 = p.x - NODE_W / 2 + 12

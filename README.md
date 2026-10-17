@@ -58,6 +58,8 @@ npm install
 npm run dev        # http://localhost:5173 (add ?debug for the raw engine view)
 ```
 
+A short "how to play" guide opens on the first visit and again from the **?** button. `?walkthrough=off` keeps it closed, for a host that already explains the course, a demo or a test.
+
 ## Checks
 
 | Script | What it does |
@@ -68,9 +70,13 @@ npm run dev        # http://localhost:5173 (add ?debug for the raw engine view)
 | `npm run coverage` | tests with coverage and minimum thresholds |
 | `npm run build` / `npm run preview` | static build in `dist/` / serve it |
 | `npm run host:test` | a test host that embeds the course from another origin |
+| `npm run e2e:smoke` | Playwright on the production build: tutorial by keyboard, one socket level to the comparison, the guide, and the course embedded in the test host |
+| `npm run e2e` | the smoke tests plus two walks that solve all 27 levels from the UI (es-MX at 1280×720 with a reload halfway, en at 1440×900 trying cartridges in reverse), the notebook, the review and the code in three languages |
 | `npm run demo` | records `docs/media/demo.mp4` and `demo.gif` from the production build (needs `ffmpeg`) |
 
-CI runs typecheck, lint, `coverage` and `build` on every push and pull request; every push to `main` publishes the game to GitHub Pages.
+E2E needs Chromium once: `npx playwright install chromium`.
+
+CI runs typecheck, lint, `coverage`, `build` and the smoke tests on every push and pull request, and the whole e2e suite every night; every push to `main` publishes the game to GitHub Pages.
 
 ## Architecture
 

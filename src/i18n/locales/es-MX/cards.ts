@@ -55,6 +55,7 @@ export const cards: Record<keyof typeof source, string> = {
   'cards.stage.ticket.skipPrediction': 'Aplicar sin predecir',
   'cards.stage.ticket.apply': 'Aplicar el cambio',
   'cards.stage.ticket.opened': 'Hubo que abrir código que ya funcionaba.',
+  'cards.stage.ticket.withinLimit': 'Se abrió solo lo que este nivel permite (hasta {allowed}): la pieza que concentra el cambio.',
   'cards.stage.ticket.added': 'Solo se agregó una pieza nueva: ningún nodo existente cambió su comportamiento.',
   'cards.stage.ticket.compare': 'Comparar sin/con patrón →',
 
@@ -72,7 +73,7 @@ export const cards: Record<keyof typeof source, string> = {
   'cards.win.cafeWorks': '¡La cafetería funciona!',
   'cards.win.levelDone': 'Nivel superado',
   'cards.win.endOfTour': 'Fin del recorrido',
-  'cards.win.endBody': 'La cafetería entera corre sobre los patrones del recorrido. Tu cuaderno guarda lo que probaste con cada uno, también lo que no encajó.',
+  'cards.win.endBody': 'La cafetería entera corre sobre varios de los patrones del recorrido. Tu cuaderno guarda lo que probaste con cada uno, también lo que no encajó.',
   'cards.win.again': 'Ver de nuevo',
   'cards.win.next': 'Siguiente nivel →',
 }
