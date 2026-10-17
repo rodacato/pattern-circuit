@@ -1,6 +1,6 @@
 # ADR 025: course-kit — the contract between Dojo and embedded interactive courses
 
-**Status:** Proposed (draft for review; intended to land in `dojo/docs/adr/025-course-kit.md`)
+**Status:** Superseded by [PROTOCOL-ALIGNMENT.md](PROTOCOL-ALIGNMENT.md). Dojo published its own scroll protocol (its ADR 025–029) after this draft was written, and number 025 is taken. Kept for history; the ideas that survive are listed there.
 **Date:** 2026-10-02 (revised after the first review round)
 **Related:** [ADR 015](015-courses-bounded-context.md) (Learning context), [ADR 016](016-iframe-sandbox-browser-execution.md) (iframe sandbox), [ADR 020](020-ubiquitous-language-pass.md) (ubiquitous language), [ADR 021](021-sumi-e-dual-theme-architecture.md) (theme tokens), [ADR 022](022-crash-course-pivot.md) (scroll catalog shape), [ADR 024](024-self-hosted-hub-pivot.md) (self-hosted hub); Domain Wall `docs/adr/0001` (hexagonal, embeddable), `0005` (execution delegated to the host), `0006` (locale registry) and `docs/proposal/muro-proposal.md` §4.3–4.4 (its draft host protocol)
 
