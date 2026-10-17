@@ -4,6 +4,7 @@ const texts: Record<keyof typeof en, string> = {
   title: 'Servicios que se enteran',
   'brief.problem': 'Pedidos y Devoluciones avisan a mano a Inventario, Facturación y Lealtad. Cada productor lleva su propia lista, y Devoluciones olvidó a Facturación y a Lealtad: las devoluciones nunca se facturan.',
   'brief.goal': 'Que cada evento llegue a todos los servicios interesados, venga de quien venga, y que sumar un servicio no toque a los productores.',
+  'win.0': 'eventos recibidos por los servicios',
   'node.customers': 'Pedidos',
   'node.refundEvents': 'Devoluciones',
   'node.orders': 'Servicio de pedidos',

@@ -113,7 +113,7 @@ export default defineLevel({
     },
   ],
   winWhen: [
-    { metric: 'delivered', op: '>=', value: 9 },
+    { metric: 'delivered', op: '>=', value: 9, label: '' },
     { metric: 'nodesTouched', op: '==', value: 0 },
   ],
   code: { rb: { base: code(base), base_analytics: code(baseAnalytics), bus: code(bus), bus_analytics: code(busAnalytics), observer: code(observer), facade: code(facade) }, ts: { base: codeTs(tsBase), base_analytics: codeTs(tsBaseAnalytics), bus: codeTs(tsBus), bus_analytics: codeTs(tsBusAnalytics), observer: codeTs(tsObserver), facade: codeTs(tsFacade) }, py: { base: codePy(pyBase), base_analytics: codePy(pyBaseAnalytics), bus: codePy(pyBus), bus_analytics: codePy(pyBusAnalytics), observer: codePy(pyObserver), facade: codePy(pyFacade) } },

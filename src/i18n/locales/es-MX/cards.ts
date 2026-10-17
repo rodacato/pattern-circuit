@@ -6,7 +6,7 @@ export const cards: Record<keyof typeof source, string> = {
   'cards.metrics.delivered': 'pedidos entregados',
   'cards.metrics.dropped': 'pedidos perdidos',
   'cards.metrics.invalidAtSink': 'pedidos equivocados',
-  'cards.metrics.duplicatesAtSink': 'cobros duplicados',
+  'cards.metrics.duplicatesAtSink': 'pedidos duplicados',
   'cards.metrics.cancelled': 'pedidos cancelados a tiempo',
   'cards.metrics.maxLoad': 'carga máxima de un nodo',
   'cards.metrics.nodesTouched': 'nodos existentes modificados',
@@ -55,7 +55,7 @@ export const cards: Record<keyof typeof source, string> = {
   'cards.stage.ticket.skipPrediction': 'Aplicar sin predecir',
   'cards.stage.ticket.apply': 'Aplicar el cambio',
   'cards.stage.ticket.opened': 'Hubo que abrir código que ya funcionaba.',
-  'cards.stage.ticket.added': 'Solo se agregó una pieza nueva: nada existente cambió.',
+  'cards.stage.ticket.added': 'Solo se agregó una pieza nueva: ningún nodo existente cambió su comportamiento.',
   'cards.stage.ticket.compare': 'Comparar sin/con patrón →',
 
   // comparison
@@ -67,12 +67,12 @@ export const cards: Record<keyof typeof source, string> = {
   'cards.comparison.finish': 'Terminar nivel ✓',
 
   // level complete
-  'cards.win.finishedGame': '¡Terminaste Pattern Circuit!',
-  'cards.win.learned': 'Aprendiste {names}',
+  'cards.win.finishedGame': '¡Completaste el recorrido final!',
+  'cards.win.learned': 'Resolviste con {names}',
   'cards.win.cafeWorks': '¡La cafetería funciona!',
   'cards.win.levelDone': 'Nivel superado',
   'cards.win.endOfTour': 'Fin del recorrido',
-  'cards.win.endBody': 'La cafetería entera corre sobre los patrones que fuiste enchufando. Tu cuaderno guarda lo que aprendiste de cada uno, también de los que no encajaban.',
+  'cards.win.endBody': 'La cafetería entera corre sobre los patrones del recorrido. Tu cuaderno guarda lo que probaste con cada uno, también lo que no encajó.',
   'cards.win.again': 'Ver de nuevo',
   'cards.win.next': 'Siguiente nivel →',
 }

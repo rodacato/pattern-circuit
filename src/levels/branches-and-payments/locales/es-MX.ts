@@ -11,7 +11,7 @@ const texts: Record<keyof typeof en, string> = {
   'option.create-drink.factory-method.title': 'Factory Method decide qué se crea',
   'option.create-drink.factory-method.body': 'Cada sucursal es una subclase con su propio molde. Convive sin problema con Strategy: uno responde "qué objeto crear", el otro "cómo hacer algo con él".',
   'option.create-drink.singleton.title': 'Singleton: todas las sucursales reciben lo mismo',
-  'option.create-drink.singleton.body': 'Una fábrica única no sabe de qué sucursal viene cada pedido. La creación tenía que variar, no compartirse.',
+  'option.create-drink.singleton.body': 'Compartir una sola fábrica controla cuántas instancias hay, no qué se crea: esta sigue haciendo la misma bebida para todas las sucursales. La creación tenía que variar, no compartirse.',
   'option.create-drink.builder.title': 'Builder arma, no elige la clase',
   'option.create-drink.builder.body': 'Armar la bebida por pasos no cambia que el if del flujo compartido siga eligiendo mal para Montaña.',
   'socket.payment-method': 'Método de pago',

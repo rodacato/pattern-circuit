@@ -1,11 +1,9 @@
 // A single instance of the remote client… that still travels to the warehouse on every query.
 // region: RemoteInventory.instance
-namespace RemoteInventory {
-  let shared: RemoteInventory | undefined
-  export const instance = () => (shared ??= new RemoteInventory())
-}
+let sharedInventory: RemoteInventory | undefined
+const remoteInventory = () => (sharedInventory ??= new RemoteInventory())
 // endregion
 
 // region: wiring
-const taker = new OrderTaker(RemoteInventory.instance(), barista)
+const taker = new OrderTaker(remoteInventory(), barista)
 // endregion

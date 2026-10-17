@@ -8,7 +8,7 @@ const texts: Record<keyof typeof en, string> = {
   'option.notice.keep-simple.title': 'Una llamada directa se lee de corrido',
   'option.notice.keep-simple.body': 'Con un solo interesado, Cashier llama a la cocina y el flujo queda escrito en el código de principio a fin. Un bus o una lista de suscriptores tendrán sentido cuando aparezcan más interesados.',
   'option.notice.event-bus.title': 'Un bus para un solo suscriptor',
-  'option.notice.event-bus.body': 'Funciona, pero el flujo ya no está escrito en ningún lado: para saber qué pasa tras cobrar hay que buscar quién se suscribió. Fowler advierte que con eventos el flujo cuesta ver; con un solo oyente, no hay nada que desacoplar.',
+  'option.notice.event-bus.body': 'Funciona, pero el flujo ya no está escrito en ningún lado: para saber qué pasa tras cobrar hay que buscar quién se suscribió. Fowler advierte que con eventos el flujo cuesta ver; aquí hay un solo oyente que no necesita correr después ni por separado, y la llamada directa basta.',
   'option.notice.command.title': 'Un comando que nadie encola ni deshace',
   'option.notice.command.body': 'Command convierte una petición en objeto para poder encolarla, deshacerla o registrarla. Aquí no se hace nada de eso: es un objeto más entre Cashier y la cocina.',
   'scenario.main.0': 'Latte',

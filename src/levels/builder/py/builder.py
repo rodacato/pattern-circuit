@@ -54,8 +54,12 @@ class OrderTaker:
     # region: OrderTaker#take
     def take(self, request):
         try:
-            order = OrderBuilder().size("large").milk("oat").syrup("vanilla").shots(2).hot().build()
-            self.cashier.charge(order)
+            builder = OrderBuilder().size(request.size).milk(request.milk).syrup(request.syrup).shots(request.shots)
+            if request.hot:
+                builder.hot()
+            if request.iced:
+                builder.iced()
+            self.cashier.charge(builder.build())
         except InvalidOrder as e:
             self.counter.notify(str(e))
     # endregion

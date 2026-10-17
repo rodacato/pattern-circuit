@@ -8,6 +8,7 @@ import comboFacade from './combo_facade.rb?raw'
 import extrasAdapter from './extras_adapter.rb?raw'
 import extrasBase from './extras_base.rb?raw'
 import extrasDecorator from './extras_decorator.rb?raw'
+import extrasLattes from './extras_lattes.rb?raw'
 import extrasSingleton from './extras_singleton.rb?raw'
 import pyComboBase from '../composite/py/base.py?raw'
 import pyCommon from '../composite/py/common.py?raw'
@@ -17,6 +18,7 @@ import pyComboFacade from './py/combo_facade.py?raw'
 import pyExtrasAdapter from './py/extras_adapter.py?raw'
 import pyExtrasBase from './py/extras_base.py?raw'
 import pyExtrasDecorator from './py/extras_decorator.py?raw'
+import pyExtrasLattes from './py/extras_lattes.py?raw'
 import pyExtrasSingleton from './py/extras_singleton.py?raw'
 import tsComboBase from '../composite/ts/base.ts?raw'
 import tsCommon from '../composite/ts/common.ts?raw'
@@ -26,6 +28,7 @@ import tsComboFacade from './ts/combo_facade.ts?raw'
 import tsExtrasAdapter from './ts/extras_adapter.ts?raw'
 import tsExtrasBase from './ts/extras_base.ts?raw'
 import tsExtrasDecorator from './ts/extras_decorator.ts?raw'
+import tsExtrasLattes from './ts/extras_lattes.ts?raw'
 import tsExtrasSingleton from './ts/extras_singleton.ts?raw'
 
 const EXTRAS = ['oat', 'shot']
@@ -160,10 +163,10 @@ export default defineLevel({
       combo_composite: comboComposite,
       combo_strategy: comboBase + comboStrategy,
       combo_facade: comboBase + comboFacade,
-      extras_base: extrasBase,
+      extras_base: extrasBase + extrasLattes,
       extras_decorator: extrasDecorator,
-      extras_adapter: extrasBase + extrasAdapter,
-      extras_singleton: extrasBase + extrasSingleton,
+      extras_adapter: extrasAdapter + extrasLattes,
+      extras_singleton: extrasSingleton + extrasLattes,
     },
     ts: {
       base: tsCommon,
@@ -171,10 +174,10 @@ export default defineLevel({
       combo_composite: tsComboComposite,
       combo_strategy: tsComboBase + tsComboStrategy,
       combo_facade: tsComboBase + tsComboFacade,
-      extras_base: tsExtrasBase,
+      extras_base: tsExtrasBase + tsExtrasLattes,
       extras_decorator: tsExtrasDecorator,
-      extras_adapter: tsExtrasBase + tsExtrasAdapter,
-      extras_singleton: tsExtrasBase + tsExtrasSingleton,
+      extras_adapter: tsExtrasAdapter + tsExtrasLattes,
+      extras_singleton: tsExtrasSingleton + tsExtrasLattes,
     },
     py: {
       base: pyCommon,
@@ -182,10 +185,10 @@ export default defineLevel({
       combo_composite: pyComboComposite,
       combo_strategy: pyComboBase + pyComboStrategy,
       combo_facade: pyComboBase + pyComboFacade,
-      extras_base: pyExtrasBase,
+      extras_base: pyExtrasBase + pyExtrasLattes,
       extras_decorator: pyExtrasDecorator,
-      extras_adapter: pyExtrasBase + pyExtrasAdapter,
-      extras_singleton: pyExtrasBase + pyExtrasSingleton,
+      extras_adapter: pyExtrasAdapter + pyExtrasLattes,
+      extras_singleton: pyExtrasSingleton + pyExtrasLattes,
     },
   },
 })

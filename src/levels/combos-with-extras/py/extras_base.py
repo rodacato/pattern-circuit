@@ -17,15 +17,3 @@ class CoffeeMenu:
             raise Exception("Which subclass is it?")
         # endregion
     # endregion
-
-
-# region: OatMilkLatte
-class OatMilkLatte(Product):
-    pass
-# endregion
-
-
-# region: ShotLatte
-class ShotLatte(Product):
-    pass
-# endregion

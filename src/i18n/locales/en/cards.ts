@@ -5,7 +5,7 @@ export const cards = {
   'cards.metrics.delivered': 'orders delivered',
   'cards.metrics.dropped': 'orders lost',
   'cards.metrics.invalidAtSink': 'wrong orders',
-  'cards.metrics.duplicatesAtSink': 'double charges',
+  'cards.metrics.duplicatesAtSink': 'duplicated orders',
   'cards.metrics.cancelled': 'orders cancelled in time',
   'cards.metrics.maxLoad': 'peak load on a node',
   'cards.metrics.nodesTouched': 'existing nodes modified',
@@ -54,7 +54,7 @@ export const cards = {
   'cards.stage.ticket.skipPrediction': 'Apply without predicting',
   'cards.stage.ticket.apply': 'Apply the change',
   'cards.stage.ticket.opened': 'Code that already worked had to be opened up.',
-  'cards.stage.ticket.added': 'Only a new piece was added: nothing existing changed.',
+  'cards.stage.ticket.added': 'Only a new piece was added: no existing node changed its behavior.',
   'cards.stage.ticket.compare': 'Compare without/with the pattern →',
 
   // comparison
@@ -66,12 +66,12 @@ export const cards = {
   'cards.comparison.finish': 'Finish level ✓',
 
   // level complete
-  'cards.win.finishedGame': 'You finished Pattern Circuit!',
-  'cards.win.learned': 'You learned {names}',
+  'cards.win.finishedGame': 'You completed the final walkthrough!',
+  'cards.win.learned': 'You solved it with {names}',
   'cards.win.cafeWorks': 'The coffee shop works!',
   'cards.win.levelDone': 'Level complete',
   'cards.win.endOfTour': 'End of the journey',
-  'cards.win.endBody': "The whole coffee shop runs on the patterns you plugged in. Your notebook keeps what you learned from each one, including the ones that didn't fit.",
+  'cards.win.endBody': "The whole coffee shop runs on the patterns of the walkthrough. Your notebook keeps what you tried with each one, including what didn't fit.",
   'cards.win.again': 'Watch again',
   'cards.win.next': 'Next level →',
 } as const

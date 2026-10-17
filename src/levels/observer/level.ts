@@ -90,7 +90,7 @@ export default defineLevel({
     },
   ],
   winWhen: [
-    { metric: 'delivered', op: '>=', value: 9 },
+    { metric: 'delivered', op: '>=', value: 9, label: '' },
     { metric: 'nodesTouched', op: '==', value: 0 },
   ],
   code: {
