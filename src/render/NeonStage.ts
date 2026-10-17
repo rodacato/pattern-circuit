@@ -140,7 +140,7 @@ export class NeonStage {
       g.moveTo(pts[0].x, pts[0].y)
       for (const p of pts.slice(1)) g.lineTo(p.x, p.y)
       const abstract = w.dep === 'abstract'
-      g.stroke({ width: 3, color: abstract ? C.violet : C.wire, alpha: abstract ? 0.35 : 0.9, join: 'round', cap: 'round' })
+      g.stroke({ width: 3, color: abstract ? C.violet : C.wire, alpha: abstract ? 0.6 : 0.9, join: 'round', cap: 'round' })
     }
 
     this.nodesLayer.removeChildren().forEach((c) => c.destroy({ children: true }))
@@ -259,8 +259,13 @@ export class NeonStage {
     canvas.addEventListener('pointercancel', lift)
   }
 
-  private reframe() {
+  reframe() {
     this.view = { zoom: 1, x: 0, y: 0 }
+  }
+
+  zoomBy(factor: number) {
+    const center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 }
+    this.view = zoomAt(this.app.screen, this.bounds, this.view, center, factor, this.inset())
   }
 
   private endDrag() {

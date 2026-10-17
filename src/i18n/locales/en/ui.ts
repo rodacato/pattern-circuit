@@ -19,6 +19,16 @@ export const ui = {
   'ui.common.levelTitle': 'Level {n} · {title}',
 
   // legend
+  'ui.explorer.title': 'Keyboard',
+  'ui.explorer.hint': 'The circuit by keyboard: nodes, pulses and camera',
+  'ui.explorer.nodes': 'Nodes: inspect one to see its code',
+  'ui.explorer.sendsTo': 'sends to {targets}',
+  'ui.explorer.pulses': 'Pulses in flight: follow one through the code',
+  'ui.explorer.noPulses': 'None right now: press Play or step forward.',
+  'ui.explorer.pulse': 'Pulse #{id}',
+  'ui.explorer.zoomIn': 'Zoom in',
+  'ui.explorer.zoomOut': 'Zoom out',
+  'ui.explorer.reframe': 'Reframe',
   'ui.legend.order': 'order',
   'ui.legend.concrete': 'depends on a concrete class',
   'ui.legend.interface': 'depends on an interface',

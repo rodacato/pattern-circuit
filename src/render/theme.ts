@@ -3,7 +3,7 @@ import { N } from '../i18n'
 export const NEON = {
   bg: 0x060a13,
   grid: 0x141d33,
-  wire: 0x2c3a5c,
+  wire: 0x4f6594, // 3:1 against bg even at the 0.9 alpha it is drawn with
   panel: 0x0c1324,
   cyan: 0x2de2e6,
   violet: 0xb57cff,

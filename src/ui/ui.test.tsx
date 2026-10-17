@@ -5,6 +5,7 @@ import { emptyProgress, MemoryProgressStore } from '../game/progress/progress'
 import { GameSession } from '../game/session/GameSession'
 import { LEVELS } from '../levels'
 import { BriefCard } from './BriefCard'
+import { CircuitExplorer } from './CircuitExplorer'
 import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
 import { I18nProvider } from './I18nProvider'
@@ -38,6 +39,29 @@ describe('Transport', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Velocidad 2×' }))
     expect(screen.getByRole('button', { name: 'Velocidad 2×' }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByRole('button', { name: 'Reproducir' })).toBeTruthy()
+  })
+})
+
+describe('CircuitExplorer', () => {
+  it('inspects a node and follows a pulse without a pointer', () => {
+    const s = session('tutorial')
+    render(
+      <I18nProvider locale="es-MX">
+        <CircuitExplorer session={s} />
+      </I18nProvider>,
+    )
+    const cashier = screen.getByRole('button', { name: /Cashier/ })
+    keyboardClick(cashier)
+    expect(s.playback.inspected).toBe('charge')
+    expect(cashier.getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByText('Ninguno ahora: dale Play o avanza un paso.')).toBeTruthy()
+
+    act(() => {
+      for (let i = 0; i < 50 && !s.playback.timeline.current.state.pulses.some((p) => p.status === 'alive'); i++) s.step()
+    })
+    keyboardClick(screen.getAllByRole('button', { name: /Pulso #/ })[0])
+    expect(s.playback.followed).toBeDefined()
+    expect(s.playback.inspected).toBeUndefined()
   })
 })
 

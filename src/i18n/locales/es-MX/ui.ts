@@ -20,6 +20,16 @@ export const ui: Record<keyof typeof source, string> = {
   'ui.common.levelTitle': 'Nivel {n} · {title}',
 
   // legend
+  'ui.explorer.title': 'Teclado',
+  'ui.explorer.hint': 'El circuito con teclado: nodos, pulsos y cámara',
+  'ui.explorer.nodes': 'Nodos: inspecciona uno para ver su código',
+  'ui.explorer.sendsTo': 'envía a {targets}',
+  'ui.explorer.pulses': 'Pulsos en curso: sigue uno por el código',
+  'ui.explorer.noPulses': 'Ninguno ahora: dale Play o avanza un paso.',
+  'ui.explorer.pulse': 'Pulso #{id}',
+  'ui.explorer.zoomIn': 'Acercar',
+  'ui.explorer.zoomOut': 'Alejar',
+  'ui.explorer.reframe': 'Encuadrar',
   'ui.legend.order': 'pedido',
   'ui.legend.concrete': 'depende de una clase concreta',
   'ui.legend.interface': 'depende de una interfaz',

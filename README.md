@@ -6,7 +6,9 @@
 
 **Play it in your browser: [rodacato.github.io/pattern-circuit](https://rodacato.github.io/pattern-circuit/)**
 
-An educational game for understanding **design patterns by seeing them, not reading them**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
+An educational game for understanding **design patterns by watching what they change, next to the code that does it**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
+
+It is for developers who already read classes, methods and objects in one of those three languages; it does not teach the language itself.
 
 ![Pattern Circuit: the tutorial's broken wire, then Strategy plugged into the payment socket](docs/media/demo.gif)
 
@@ -27,11 +29,11 @@ An educational game for understanding **design patterns by seeing them, not read
 | Play / pause | ▶ | `Space` |
 | Step forward / back | ▶\| · ◀ | `→` · `←` |
 | Restart | ↺ | `R` |
-| See a node's code or follow a pulse | click it | — |
+| See a node's code or follow a pulse | click it | "⌨ Keyboard" panel: `Tab` to the node or pulse + `Enter` |
 | Plug in a pattern | drag the cartridge to the ⬡ socket | `Tab` to the cartridge + `Enter` |
 | Unplug | click the plugged cartridge | `Enter` on it |
 | Repair a wire (level 0) | drag from the output port | "Connect… without dragging" button |
-| Camera | wheel: zoom · drag the background · double click: fit | — |
+| Camera | wheel: zoom · drag the background · double click: fit | zoom and reframe buttons in the same panel |
 
 The game is available in **Spanish and English** (ES/EN button at the top); adding a language means adding catalog files, with no code change (see [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-language)). Progress is saved in your browser (`localStorage`) and can be erased from the notebook. It is designed for desktop and tablet screens and respects the system's reduced-motion preference.
 
