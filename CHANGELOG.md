@@ -15,6 +15,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - The English label of the language button is now "Change language" (it read "Cambiar idioma (switch to Spanish)").
 - The game's page (`index.html`) is described in English and says 27 levels, Ruby and TypeScript.
 - Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).
+- Wires are legible at rest: the concrete wire color and the alpha of interface wires reach 3:1 against the stage, and code line numbers use the muted text color instead of the faint one.
+- The README says who the course is for and how each canvas action is done by keyboard.
 
 ### Added
 
@@ -22,6 +24,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **The course can be embedded** in a hub (such as Dojo) through an iframe, with the same game on its own: a manifest (`course.json`), a typed, versioned `postMessage` protocol with strict origin checks, progress and preferences kept by the host when embedded, and a test host (`npm run host:test`). See `docs/ARCHITECTURE.md`.
 - The code panel shows each region's name the way the language spells it (`Counter#hand_over` in Ruby, `Counter#handOver` in TypeScript); a test checks that both languages tell the story with the same regions.
 - `npm run i18n:scaffold` to start a new language from the English catalogs.
+- **The circuit can be explored without a pointer**: a "⌨ Keyboard" panel lists every node (with what it sends to) and the pulses in flight; `Enter` inspects a node or follows a pulse, exactly like clicking it on the canvas, and buttons zoom and reframe the camera.
 - **Python as a third code language** for all 27 levels, with the same regions and the same output as Ruby, a Python example of each pattern in "Where you've seen it" (standard library, Django, Celery… each checked against its docs) and Python in the language list a host receives.
 - **The code players see is executed, not only parsed**: every file a variant can show runs against stubbed collaborators in Ruby, TypeScript and Python, and all must print the same. CI runs it on Ruby 3.0.1 and Python 3.10, the versions Dojo executes; two command snippets were adjusted to be valid there (`raise(…)` in an endless method).
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.

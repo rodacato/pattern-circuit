@@ -7,6 +7,7 @@ import { chapterName, LEVELS, nextLevel, TRACKS, trackOf } from '../levels'
 import { NeonStage } from '../render/NeonStage'
 import { forceReducedMotion } from '../render/motion'
 import { BriefCard } from './BriefCard'
+import { CircuitExplorer } from './CircuitExplorer'
 import { StageCard } from './cards/StageCard'
 import { CodePanel } from './CodePanel'
 import { Inventory } from './Inventory'
@@ -169,6 +170,7 @@ export default function GameApp() {
             <StageCard key={`card-${session.level.id}`} session={session} onNext={next ? () => setLevelId(next.id) : undefined} />
             <Inventory session={session} stage={stage} />
             <Legend />
+            <CircuitExplorer session={session} stage={stage} />
             <Transport session={session} />
           </section>
           <CodePanel key={session.level.id} session={session} />
