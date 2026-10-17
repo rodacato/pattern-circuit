@@ -16,11 +16,3 @@ class CoffeeMenu
   end
   # endregion
 end
-
-# region: OatMilkLatte
-class OatMilkLatte < Product; end
-# endregion
-
-# region: ShotLatte
-class ShotLatte < Product; end
-# endregion

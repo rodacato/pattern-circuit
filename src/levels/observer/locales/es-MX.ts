@@ -4,6 +4,7 @@ const texts: Record<keyof typeof en, string> = {
   title: '¡Pedido listo!',
   'brief.problem': 'Cuando un pedido está listo hay que avisar a la pantalla, a la app del cliente y al programa de lealtad. El pedido llama a cada uno por nombre… y a Lealtad nunca la llama.',
   'brief.goal': 'Que todos los interesados se enteren y que sumar uno nuevo no obligue a tocar el pedido.',
+  'win.0': 'avisos recibidos',
   'node.bar': 'Preparar',
   'node.ready': 'Pedido listo',
   'node.display.message': '🔔 Pantalla avisada',

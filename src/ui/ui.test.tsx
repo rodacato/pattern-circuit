@@ -200,7 +200,7 @@ describe('Notebook', () => {
         <Notebook levels={LEVELS} notes={['strategy:observer', 'observer:observer']} onClose={() => {}} onReset={onReset} />
       </I18nProvider>,
     )
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('2 notas de campo')
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('Notas de campo (2)')
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1)
     expect(screen.getByRole('link', { name: /Ver fuente/ }).getAttribute('href')).toContain('Observable')
     fireEvent.click(screen.getByRole('button', { name: 'Borrar progreso' }))

@@ -26,6 +26,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **The code players see is executed, not only parsed**: every file a variant can show runs against stubbed collaborators in Ruby, TypeScript and Python, and all must print the same. CI runs it on Ruby 3.0.1 and Python 3.10, the versions Dojo executes; two command snippets were adjusted to be valid there (`raise(…)` in an endless method).
 - A test that every `Class#method:branch` region in the snippets names a branch that exists, so a renamed branch can no longer silently stop highlighting its code.
 
+### Fixed
+
+- **Every TypeScript snippet now runs**, so the README's promise holds: the 17 assemblies that declared a class twice are gone, and so is the list that excused them. In live-orders the notices live in their own `OrderUpdates` class instead of reopening `Order`, which was also wrong in Ruby (Observer's `initialize` replaced State's) and in Python (the second `class Order` replaced the first). In combos-with-extras each misfit shows one `CoffeeMenu` instead of two.
+- The builder's `OrderTaker#take` builds the order from the request it receives, in the three languages; a test runs it with the two orders the level animates and checks that the hot iced drink is turned away before charging.
+- Metrics say what they count: Observer, Event Bus and live-orders count notifications or events, not delivered orders, and `duplicatesAtSink` reads "duplicated orders" instead of "double charges".
+- Misfit notes no longer present a limit of this implementation as something the pattern cannot do (Strategy "doesn't recurse", a single factory "doesn't know the branch", Facade "doesn't decouple", Command "undoes in memory", "nothing to decouple" with one listener).
+- Closing messages claim only what happened: "You solved it with…" instead of "You learned…", "You completed the final walkthrough!", and a change ticket says no existing node changed its behavior, not that nothing changed. Counts read "Notes: 1" instead of "1 notes".
+
 ## [1.1.0] - 2026-09-24
 
 Learning improvements: predict, see the change in the code, review, know when not to use a pattern and recognize it in real code. Also English, TypeScript and tablets.

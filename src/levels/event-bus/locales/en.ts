@@ -3,6 +3,7 @@ export default {
   title: 'Services that find out',
   'brief.problem': 'Orders and Returns manually notify Inventory, Billing and Loyalty. Each producer keeps its own list, and Returns forgot Billing and Loyalty: returns never get billed.',
   'brief.goal': 'Make every event reach all interested services, no matter who sends it, and make adding a service not touch the producers.',
+  'win.0': 'events received by services',
   'node.customers': 'Orders',
   'node.refundEvents': 'Returns',
   'node.orders': 'Orders service',

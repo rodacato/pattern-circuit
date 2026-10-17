@@ -11,13 +11,59 @@ const ruby = new Map<string, Run>()
 const typescript = new Map<string, Run>()
 const python = new Map<string, Run>()
 
-// Known since v1.1.0: TypeScript cannot reopen a class the way Ruby does, and these combinations declare the same
-// class twice, so the code shown is not valid TypeScript. Reported as content to fix; listed so it cannot grow.
-const KNOWN_BROKEN_TYPESCRIPT = new Set([
-  'proxy/singleton',
-  ...['combo_base', 'combo_composite', 'combo_strategy', 'combo_facade'].flatMap((combo) => ['extras_adapter', 'extras_singleton'].map((extras) => `combos-with-extras/base+${combo}+${extras}`)),
-  ...['events_base', 'events_command'].flatMap((e) => ['states_base', 'states_state'].flatMap((s) => ['notices_base', 'notices_observer'].map((n) => `live-orders/base+${e}+${s}+${n}`))),
-])
+// The two requests the builder level animates: a latte that goes through, and a hot iced drink rejected at build.
+const BUILDER_DRIVER = {
+  rb: `
+Order = Struct.new(:size, :milk, :syrup, :shots, :temp, :ice, keyword_init: true) do
+  def name = "#{size} #{milk}"
+  def total = 0
+  def hot? = temp == :hot
+  def ice? = !!ice
+end
+Request = Struct.new(:size, :milk, :syrup, :shots, :hot, :iced, keyword_init: true)
+counter = Counter.new
+taker = OrderTaker.new(Cashier.new(Barista.new(counter)), counter)
+taker.take(Request.new(size: :large, milk: :oat, syrup: :vanilla, shots: 2, hot: true))
+taker.take(Request.new(size: :medium, shots: 1, hot: true, iced: true))`,
+  ts: `
+class Order {
+  constructor(private o: any) {}
+  get name() { return \`\${this.o.size} \${this.o.milk}\` }
+  get total() { return 0 }
+  isHot() { return this.o.temp === 'hot' }
+  isIced() { return !!this.o.ice }
+}
+const counter = new Counter()
+const taker = new OrderTaker(new Cashier(new Barista(counter)), counter)
+taker.take({ size: 'large', milk: 'oat', syrup: 'vanilla', shots: 2, hot: true })
+taker.take({ size: 'medium', shots: 1, hot: true, iced: true })`,
+  py: `
+from types import SimpleNamespace
+
+class Order:
+    total = 0
+
+    def __init__(self, **o):
+        self.o = o
+
+    @property
+    def name(self):
+        return f"{self.o['size']} {self.o['milk']}"
+
+    def is_hot(self):
+        return self.o["temp"] == "hot"
+
+    def is_iced(self):
+        return bool(self.o["ice"])
+
+def request(size, milk=None, syrup=None, shots=None, hot=False, iced=False):
+    return SimpleNamespace(size=size, milk=milk, syrup=syrup, shots=shots, hot=hot, iced=iced)
+
+counter = Counter()
+taker = OrderTaker(Cashier(Barista(counter)), counter)
+taker.take(request("large", milk="oat", syrup="vanilla", shots=2, hot=True))
+taker.take(request("medium", shots=1, hot=True, iced=True))`,
+}
 
 describe('toolchain', () => {
   it.skipIf(!process.env.CI)('CI has Ruby, in the version the hub runs (3.0)', () => {
@@ -46,9 +92,8 @@ describe.skipIf(!hasRuby || !hasPython)('the code players can see runs', () => {
     expect(failed(ruby)).toEqual([])
   })
 
-  it('every TypeScript file runs, except the ones known to declare a class twice', () => {
-    expect(failed(typescript).filter((line) => !KNOWN_BROKEN_TYPESCRIPT.has(line.split(':')[0]))).toEqual([])
-    expect([...KNOWN_BROKEN_TYPESCRIPT].filter((id) => typescript.get(id)?.ok)).toEqual([]) // fixed ones leave the list
+  it('every TypeScript file runs', () => {
+    expect(failed(typescript)).toEqual([])
   })
 
   it('Ruby and TypeScript print the same', () => {
@@ -81,6 +126,15 @@ describe.skipIf(!hasRuby || !hasPython)('the code players can see runs', () => {
     expect(ruby.get('tutorial/repaired')).toEqual({ ok: true, stdout: expected })
     expect(typescript.get('tutorial/repaired')).toEqual({ ok: true, stdout: expected })
     expect(python.get('tutorial/repaired')).toEqual({ ok: true, stdout: expected })
+  })
+
+  it('the builder builds the order it is given and turns the impossible one away before charging', () => {
+    const level = LEVELS.find((l) => l.id === 'builder')!
+    const shown = (lang: CodeLang) => displayedCode(level, lang).find((s) => s.key === 'builder')!.text
+    const expected = { ok: true, stdout: 'large oat ready!\nBefore charging: hot and iced is not possible' }
+    expect(runRuby(`${shown('rb')}\n${BUILDER_DRIVER.rb}`)).toEqual(expected)
+    expect(runTypeScript(`${shown('ts')}\n${BUILDER_DRIVER.ts}`)).toEqual(expected)
+    expect(runPython(`${shown('py')}\n${BUILDER_DRIVER.py}`)).toEqual(expected)
   })
 
   it('every level shows code in every language', () => {

@@ -34,8 +34,10 @@ class OrderTaker
 
   # region: OrderTaker#take
   def take(request)
-    order = OrderBuilder.new.size(:large).milk(:oat).syrup(:vanilla).shots(2).hot.build
-    @cashier.charge(order)
+    builder = OrderBuilder.new.size(request.size).milk(request.milk).syrup(request.syrup).shots(request.shots)
+    builder.hot if request.hot
+    builder.iced if request.iced
+    @cashier.charge(builder.build)
   rescue InvalidOrder => e
     @counter.notify(e.message)
   end

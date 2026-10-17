@@ -1,25 +1,25 @@
 import { defineLevel } from '../../engine'
 import { abstract, actor, chain, node, pulse, skinned, wire } from '../kit'
-import noticesBase from '../observer/base.rb?raw'
+import noticesBase from './notices_base.rb?raw'
 import noticesCommon from '../observer/common.rb?raw'
-import noticesObserver from '../observer/observer.rb?raw'
+import noticesObserver from './notices_observer.rb?raw'
 import statesBase from '../state/base.rb?raw'
 import statesCommon from '../state/common.rb?raw'
 import { permissive, strict } from '../state/level'
 import eventsCommand from './events_command.rb?raw'
 import statesState from '../state/state.rb?raw'
 import eventsBase from '../command/base.rb?raw'
-import pyNoticesBase from '../observer/py/base.py?raw'
+import pyNoticesBase from './py/notices_base.py?raw'
 import pyNoticesCommon from '../observer/py/common.py?raw'
-import pyNoticesObserver from '../observer/py/observer.py?raw'
+import pyNoticesObserver from './py/notices_observer.py?raw'
 import pyStatesBase from '../state/py/base.py?raw'
 import pyStatesCommon from '../state/py/common.py?raw'
 import pyStatesState from '../state/py/state.py?raw'
 import pyEventsBase from '../command/py/base.py?raw'
 import pyEventsCommand from './py/events_command.py?raw'
-import tsNoticesBase from '../observer/ts/base.ts?raw'
+import tsNoticesBase from './ts/notices_base.ts?raw'
 import tsNoticesCommon from '../observer/ts/common.ts?raw'
-import tsNoticesObserver from '../observer/ts/observer.ts?raw'
+import tsNoticesObserver from './ts/notices_observer.ts?raw'
 import tsStatesBase from '../state/ts/base.ts?raw'
 import tsStatesCommon from '../state/ts/common.ts?raw'
 import tsStatesState from '../state/ts/state.ts?raw'
@@ -40,7 +40,7 @@ export default defineLevel({
       node('counter', 'FrontDesk', [3, 2], { type: 'branch', cases: { 'cmd:event': 'out', 'cmd:undo': 'undo' } }, { codeRef: 'FrontDesk#submit' }),
       node('undo', 'Undo', [5, 4.5], { type: 'branch', cases: {} }, { codeRef: 'Undo#call' }),
       node('order', 'Order', [7, 2], { type: 'machine', initial: 'pending', states: permissive }, { codeRef: 'Order#handle' }),
-      node('ready', 'Order', [10, 2], { type: 'broadcast' }, { codeRef: 'Order#complete!' }),
+      node('ready', 'OrderUpdates', [10, 2], { type: 'broadcast' }, { codeRef: 'OrderUpdates#publish' }),
       node('display', 'Display', [13, 0], { type: 'sink', expects: notOutOfOrder, message: '' }, { codeRef: 'Display#update' }),
       node('loyalty', 'LoyaltyProgram', [13, 4], { type: 'sink', expects: notOutOfOrder, message: '' }, { codeRef: 'LoyaltyProgram#update' }),
     ],
@@ -137,7 +137,7 @@ export default defineLevel({
     },
   ],
   winWhen: [
-    { metric: 'delivered', op: '==', value: 7 },
+    { metric: 'delivered', op: '==', value: 7, label: '' },
     { metric: 'cancelled', op: '==', value: 1 },
     { metric: 'invalidAtSink', op: '==', value: 0 },
     { metric: 'dropped', op: '==', value: 0 },

@@ -10,7 +10,7 @@ export default {
   'option.create-drink.factory-method.title': 'Factory Method decides what gets created',
   'option.create-drink.factory-method.body': 'Each branch is a subclass with its own mold. It lives happily alongside Strategy: one answers "what object to create", the other "how to do something with it".',
   'option.create-drink.singleton.title': 'Singleton: every branch gets the same thing',
-  'option.create-drink.singleton.body': 'A single factory doesn\'t know which branch each order comes from. Creation had to vary, not be shared.',
+  'option.create-drink.singleton.body': 'Sharing a single factory controls how many instances exist, not what gets created: this one still makes the same drink for every branch. Creation had to vary, not be shared.',
   'option.create-drink.builder.title': 'Builder assembles, it doesn\'t pick the class',
   'option.create-drink.builder.body': 'Building the drink in steps doesn\'t change the fact that the if in the shared flow still picks wrong for Mountain.',
   'socket.payment-method': 'Payment method',

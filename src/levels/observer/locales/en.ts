@@ -3,6 +3,7 @@ export default {
   title: 'Order ready!',
   'brief.problem': 'When an order is ready, the display, the customer app and the loyalty program must be notified. The order calls each one by name… and never calls Loyalty.',
   'brief.goal': 'Make sure everyone interested finds out, and that adding a new one doesn\'t force you to touch the order.',
+  'win.0': 'notifications received',
   'node.bar': 'Prepare',
   'node.ready': 'Order ready',
   'node.display.message': '🔔 Display notified',

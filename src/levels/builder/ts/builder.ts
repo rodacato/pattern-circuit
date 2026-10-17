@@ -42,8 +42,10 @@ class OrderTaker {
   // region: OrderTaker#take
   take(request: OrderRequest) {
     try {
-      const order = new OrderBuilder().size('large').milk('oat').syrup('vanilla').shots(2).hot().build()
-      this.cashier.charge(order)
+      const builder = new OrderBuilder().size(request.size).milk(request.milk).syrup(request.syrup).shots(request.shots)
+      if (request.hot) builder.hot()
+      if (request.iced) builder.iced()
+      this.cashier.charge(builder.build())
     } catch (e) {
       if (!(e instanceof InvalidOrder)) throw e
       this.counter.notify(e.message)

@@ -61,7 +61,7 @@ function Failures({ result }: { result: Evaluation }) {
         .filter((r) => !r.pass)
         .map((r) => (
           <li key={r.assertion.metric}>
-            <b>{r.actual}</b> {t(r.assertion.label ?? METRIC_TEXT[r.assertion.metric])}{' '}
+            {t(r.assertion.label ?? METRIC_TEXT[r.assertion.metric])}: <b>{r.actual}</b>{' '}
             <span className="expected">
               ({t(OP_TEXT[r.assertion.op])} {r.assertion.value})
             </span>
