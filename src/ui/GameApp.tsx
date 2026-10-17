@@ -22,6 +22,8 @@ import { isShortcut, SHORTCUTS } from './shortcuts'
 import { ModeContext } from './themeContext'
 import { Transport } from './Transport'
 import { useSession } from './useSession'
+import { Walkthrough } from './Walkthrough'
+import { walkthroughWanted } from '../course/walkthrough'
 import './game.css'
 
 export default function GameApp() {
@@ -86,11 +88,16 @@ export default function GameApp() {
   const [stage, setStage] = useState<NeonStage>()
   const [notebookOpen, setNotebookOpen] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
-  const dialogOpen = notebookOpen || reviewOpen
+  const [walkthroughOpen, setWalkthroughOpen] = useState(() => walkthroughWanted(location.search, storage.walkthrough.load()))
+  const dialogOpen = notebookOpen || reviewOpen || walkthroughOpen
   const progress = useSession(session, (s) => s.progress)
   const inventoryOpen = useSession(session, (s) => s.inventoryOpen)
   const closeNotebook = useCallback(() => setNotebookOpen(false), [])
   const closeReview = useCallback(() => setReviewOpen(false), [])
+  const closeWalkthrough = useCallback(() => {
+    storage.walkthrough.save('seen')
+    setWalkthroughOpen(false)
+  }, [storage])
   const reviewable = useSession(session, (s) => reviewItems(LEVELS, s.progress.completed).length)
   const due = useSession(session, (s) => dueItems(reviewItems(LEVELS, s.progress.completed), s.progress.review, Date.now()).length)
 
@@ -130,17 +137,20 @@ export default function GameApp() {
             Pattern Circuit
           </div>
           <div className="topbar-actions">
+            <button className="notebook-button" data-testid="help" onClick={() => setWalkthroughOpen(true)} aria-haspopup="dialog" aria-label={t('ui.header.help')} title={t('ui.header.help')}>
+              ?
+            </button>
             {LOCALES.length > 1 && (
               <button className="notebook-button locale" onClick={() => setLocale(upcoming)} aria-label={t('ui.header.language')} lang={upcoming}>
                 {LOCALE_META[upcoming]?.short}
               </button>
             )}
             {reviewable > 0 && (
-              <button className="notebook-button" onClick={() => setReviewOpen(true)} aria-haspopup="dialog" title={t('ui.header.reviewHint')}>
+              <button className="notebook-button" data-testid="review" onClick={() => setReviewOpen(true)} aria-haspopup="dialog" title={t('ui.header.reviewHint')}>
                 🧠 {t('ui.header.review')} <span aria-label={t(msg('ui.header.reviewDue', { n: due }))}>{due}</span>
               </button>
             )}
-            <button className="notebook-button" onClick={() => setNotebookOpen(true)} aria-haspopup="dialog">
+            <button className="notebook-button" data-testid="notebook" onClick={() => setNotebookOpen(true)} aria-haspopup="dialog">
               📓 {t('ui.header.notebook')} <span aria-label={t(msg('ui.header.notes', { n: progress.notes.length }))}>{progress.notes.length}</span>
             </button>
             <select value={levelId} onChange={(e) => setLevelId(e.target.value)} aria-label={t('ui.header.level')}>
@@ -178,6 +188,7 @@ export default function GameApp() {
 
         {notebookOpen && <Notebook levels={LEVELS} notes={progress.notes} predictions={progress.predictions} lang={codeLang} onReset={() => session.resetProgress()} onClose={closeNotebook} />}
         {reviewOpen && <Review session={session} levels={LEVELS} onClose={closeReview} />}
+        {walkthroughOpen && <Walkthrough onClose={closeWalkthrough} />}
         <p className="desktop-only">{t('ui.app.desktopOnly')}</p>
       </div>
       </ModeContext.Provider>

@@ -54,6 +54,7 @@ export const cards = {
   'cards.stage.ticket.skipPrediction': 'Apply without predicting',
   'cards.stage.ticket.apply': 'Apply the change',
   'cards.stage.ticket.opened': 'Code that already worked had to be opened up.',
+  'cards.stage.ticket.withinLimit': 'Only what this level allows was opened (up to {allowed}): the piece that concentrates the change.',
   'cards.stage.ticket.added': 'Only a new piece was added: no existing node changed its behavior.',
   'cards.stage.ticket.compare': 'Compare without/with the pattern →',
 
@@ -71,7 +72,7 @@ export const cards = {
   'cards.win.cafeWorks': 'The coffee shop works!',
   'cards.win.levelDone': 'Level complete',
   'cards.win.endOfTour': 'End of the journey',
-  'cards.win.endBody': "The whole coffee shop runs on the patterns of the walkthrough. Your notebook keeps what you tried with each one, including what didn't fit.",
+  'cards.win.endBody': "The whole coffee shop runs on several of the walkthrough's patterns. Your notebook keeps what you tried with each one, including what didn't fit.",
   'cards.win.again': 'Watch again',
   'cards.win.next': 'Next level →',
 } as const

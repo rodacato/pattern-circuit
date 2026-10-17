@@ -18,7 +18,7 @@ export function Transport({ session }: { session: GameSession }) {
       <button title={t('ui.transport.back.title')} aria-label={t('ui.transport.back.label')} onClick={() => session.back()} disabled={tick === 0}>
         ◀︎
       </button>
-      <button className="play" title={t('ui.transport.play.title')} aria-label={t(playing ? 'ui.transport.pause' : 'ui.transport.play')} onClick={() => session.toggle()}>
+      <button className="play" data-testid="play" data-playing={playing} title={t('ui.transport.play.title')} aria-label={t(playing ? 'ui.transport.pause' : 'ui.transport.play')} onClick={() => session.toggle()}>
         {playing ? '❚❚' : '▶︎'}
       </button>
       <button title={t('ui.transport.forward.title')} aria-label={t('ui.transport.forward.label')} onClick={() => session.step()}>
@@ -26,7 +26,7 @@ export function Transport({ session }: { session: GameSession }) {
       </button>
       <span className="sep" />
       {SPEEDS.map((s) => (
-        <button key={s} className={`speed${s === speed ? ' on' : ''}`} aria-pressed={s === speed} aria-label={t(msg('ui.transport.speed', { s }))} onClick={() => session.setSpeed(s)}>
+        <button key={s} data-testid={`speed-${s}`} className={`speed${s === speed ? ' on' : ''}`} aria-pressed={s === speed} aria-label={t(msg('ui.transport.speed', { s }))} onClick={() => session.setSpeed(s)}>
           {s}×
         </button>
       ))}

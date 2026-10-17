@@ -138,7 +138,7 @@ export default defineLevel({
   ],
   winWhen: [
     { metric: 'delivered', op: '==', value: 7, label: '' },
-    { metric: 'cancelled', op: '==', value: 1 },
+    { metric: 'cancelled', op: '==', value: 1, label: '' },
     { metric: 'invalidAtSink', op: '==', value: 0 },
     { metric: 'dropped', op: '==', value: 0 },
   ],

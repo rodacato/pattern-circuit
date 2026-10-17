@@ -2,7 +2,7 @@ import { Application, BlurFilter, Container, FederatedPointerEvent, Graphics, Re
 import { initialNodeState, pointAt, stateTextKey, timesDelivered, wirePath, type NodeDef, type PatternId, type Point, type SimEvent } from '../engine'
 import type { GameSession } from '../game/session/GameSession'
 import { msg, N, type Translate } from '../i18n'
-import { dashed, drawBranchGlyph, label } from './draw'
+import { dashed, drawBranchGlyph, fitWidth, label } from './draw'
 import { Effects } from './fx'
 import { coarsePointer, DoubleTap, Pinch } from './gestures'
 import { CELL, circuitBounds, nearestPulse, NODE_H, NODE_W, nodeAt, nodeCenter, outPort, toPx, worldTransform, zoomAt, type View } from './layout'
@@ -166,10 +166,10 @@ export class NeonStage {
     box.on('pointerout', () => this.hovered === n.id && (this.hovered = undefined))
     box.on('pointertap', () => this.session.inspect(this.session.playback.inspected === n.id ? undefined : n.id))
 
-    const title = label(this.t(n.label), 13, C.text, FONT_UI, '600')
+    const title = fitWidth(label(this.t(n.label), 13, C.text, FONT_UI, '600'), NODE_W - 12)
     title.anchor.set(0.5, 1)
     title.y = 3
-    const sub = label(n.className ?? (n.kind === 'actor' ? this.t('render.node.actor') : ''), 10, C.muted, FONT_MONO, '400')
+    const sub = fitWidth(label(n.className ?? (n.kind === 'actor' ? this.t('render.node.actor') : ''), 11, C.muted, FONT_MONO, '400'), NODE_W - 12)
     sub.anchor.set(0.5, 0)
     sub.y = 6
     box.addChild(title, sub)

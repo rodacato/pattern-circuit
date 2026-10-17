@@ -42,7 +42,7 @@ export function hintLadder(level: HintLevel, flow: FlowState, result?: Evaluatio
   const where = level.sockets.length > 1 ? msg('game.hints.socketSuffix', { socket: socket.label }) : ''
   return [
     (failing && QUESTIONS[failing]) ?? N('game.hints.question.fallback'),
-    msg('game.hints.family', { where, family: FAMILY_NAMES[family], detail: FAMILY_HINT[family] }),
+    family === 'principle' ? msg('game.hints.principle', { where }) : msg('game.hints.family', { where, family: FAMILY_NAMES[family], detail: FAMILY_HINT[family] }),
     ...(decoy ? [msg('game.hints.ruleOut', { pattern: PATTERNS[decoy].name, where })] : []),
     msg('game.hints.answer', { pattern: PATTERNS[answer].name, where }),
   ]

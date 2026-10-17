@@ -15,7 +15,7 @@ export const render: Record<keyof typeof source, string> = {
   'render.fx.connected': '¡conectado!',
   'render.fx.uselessWire': 'ese cable no resuelve nada aquí',
   'render.fx.orderLost': '¡pedido perdido! · {reason}',
-  'render.fx.chargedAgain': '¡cobrado otra vez!',
+  'render.fx.chargedAgain': '¡repetido!',
   'render.fx.delivered': '☕ {label} entregado',
   'render.fx.invalid': '¡esto no es lo que pedí!',
 

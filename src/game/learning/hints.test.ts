@@ -22,6 +22,12 @@ describe('hints', () => {
     expect(hints[3]).toBe('Prueba con Strategy.')
   })
 
+  it('when the answer is to add nothing, the family hint does not call it a pattern', () => {
+    const l = level('single-payment')
+    const hints = hintLadder(l, { ...initialFlow(), stage: 'choose' }, evaluate(l, {}))
+    expect(hints[1]).toBe('Lo que buscas no es un patrón sino un principio: a veces la mejor pieza es la que no agregas.')
+  })
+
   it('with several sockets they point at the first unresolved one and name it', () => {
     const l = level('branches-and-payments')
     const [first, second] = l.sockets
