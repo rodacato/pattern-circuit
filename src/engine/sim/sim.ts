@@ -249,6 +249,7 @@ class Tick {
   }
 
   // Failures come back to the breaker marked with `failTag`; successes do not return, so they never reset the count.
+  // The snippets count consecutive failures: that only matches while every call in the level fails.
   private breaker(pulse: Pulse, node: NodeDef, b: BehaviorOf<'breaker'>) {
     if (!pulse.tags.includes(b.failTag)) return this.exitVia(pulse, node, this.s.nodeState[node.id] === BREAKER_OPEN ? 'fallback' : 'call')
     const failures = (this.s.failures[node.id] ?? 0) + 1

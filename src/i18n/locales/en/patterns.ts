@@ -125,7 +125,7 @@ export const patterns = {
   'seenIn.strategy.pyText': 'Each hasher is an interchangeable algorithm (PBKDF2, Argon2, scrypt...), and the first one in PASSWORD_HASHERS is the one that stores new passwords.',
   'seenIn.observer.pyText': 'Senders notify the receivers registered with Signal.connect(), called one at a time in registration order, and a receiver can listen to a single sender: a publish-subscribe relative of Observer.',
   'seenIn.state.pyText': 'You declare states and transitions (trigger, source, dest), and firing a trigger from a state that has no transition for it raises a MachineError: a declarative state machine, a relative of State.',
-  'seenIn.command.pyText': 'A task is a class created out of any callable: calling it sends a message, and a worker runs it when it receives that message, so the work happens later.',
+  'seenIn.command.pyText': 'A task is a class created out of any callable: delay() or apply_async() sends it as a message and a worker runs it when it receives it, so the work happens later (calling it directly runs it right here).',
   'seenIn.chainOfResponsibility.pyText': 'Each middleware receives the request and either returns a response on its own or calls get_response to pass it to whatever comes next in the chain.',
   'seenIn.templateMethod.pyText': 'TestCase fixes the order: setUp() runs immediately before the test method and tearDown() immediately after it, even if the test failed; your subclass fills in those hooks and the tests.',
   'seenIn.portsAndAdapters.pyText': 'Your code builds an EmailMessage; the email backend that actually sends it (SMTP, console, in-memory, dummy...) is a swappable adapter. The shape is the same, although the port is defined by Django, not by your domain.',
