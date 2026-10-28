@@ -12,7 +12,7 @@ const texts: Record<keyof typeof en, string> = {
   'node.registered.message': '✔ registrado',
   'socket.model': 'Modelo',
   'option.model.cqrs.title': 'CQRS: escribir y leer por caminos separados',
-  'option.model.cqrs.body': 'El lado de escritura valida y guarda, de a uno. Cada cambio actualiza una proyección: una vista ya lista para leer. Las pantallas consultan esa vista, que responde rápido y sin fila. A cambio, la vista puede ir un instante detrás de la escritura.',
+  'option.model.cqrs.body': 'El lado de escritura valida y guarda, de a uno. Cada cambio actualiza una proyección: una vista ya lista para leer. Las pantallas consultan esa vista: ya está calculada y se puede copiar, así que responde rápido y sin fila. A cambio, la vista puede ir un instante detrás de la escritura y hay dos modelos que mantener al día; en la mayoría de los sistemas esa complejidad no vale la pena.',
   'option.model.singleton.title': 'Una instancia, la misma fila',
   'option.model.singleton.body': 'Compartir una única instancia del modelo no cambia que lecturas y escrituras esperen en la misma fila.',
   'option.model.facade.title': 'Facade no separa caminos',

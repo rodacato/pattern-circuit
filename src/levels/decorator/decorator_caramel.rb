@@ -30,7 +30,7 @@ end
 # endregion
 
 # region: WithCaramel
-class WithCaramel < SimpleDelegator # ← a new extra: one class, nothing else
+class WithCaramel < SimpleDelegator # ← a new extra: one class and its entry in EXTRAS; no existing class changes
   def cost = super + 7
   def description = "#{super} with caramel"
 end

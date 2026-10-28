@@ -11,7 +11,7 @@ export default {
   'node.registered.message': '✔ registered',
   'socket.model': 'Model',
   'option.model.cqrs.title': 'CQRS: write and read along separate paths',
-  'option.model.cqrs.body': 'The write side validates and saves, one at a time. Each change updates a projection: a view that is ready to read. The displays query that view, which answers fast and with no line. In exchange, the view may lag a moment behind the write.',
+  'option.model.cqrs.body': 'The write side validates and saves, one at a time. Each change updates a projection: a view that is ready to read. The displays query that view: it is already computed and can be copied, so it answers fast and with no line. In exchange, the view may lag a moment behind the write, and there are two models to keep in step; for most systems that complexity is not worth it.',
   'option.model.singleton.title': 'One instance, the same line',
   'option.model.singleton.body': 'Sharing a single instance of the model doesn\'t change the fact that reads and writes wait in the same line.',
   'option.model.facade.title': 'Facade doesn\'t split paths',
