@@ -1,14 +1,14 @@
 // region: WithOatMilk
 class WithOatMilk extends Product {
   constructor(private inner: Product) { super() }
-  make() { const drink = this.inner.make(); drink.extras.push('oat'); return drink }
+  make() { const parts = this.inner.make(); parts[parts.length - 1].extras.push('oat'); return parts }
 }
 // endregion
 
 // region: WithShot
 class WithShot extends Product {
   constructor(private inner: Product) { super() }
-  make() { const drink = this.inner.make(); drink.extras.push('shot'); return drink }
+  make() { const parts = this.inner.make(); parts[parts.length - 1].extras.push('shot'); return parts }
 }
 // endregion
 

@@ -1,5 +1,7 @@
 # --- the rest of the coffee shop ---
 class Barista
+  def initialize = @counter = Counter.new
+
   # region: Barista#prepare
   def prepare(order) = @counter.hand_over(order)
   # endregion

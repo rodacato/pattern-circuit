@@ -65,6 +65,132 @@ taker.take(request("large", milk="oat", syrup="vanilla", shots=2, hot=True))
 taker.take(request("medium", shots=1, hot=True, iced=True))`,
 }
 
+type SolvedDriver = { level: string; key: string; expected: string; driver: Partial<Record<CodeLang, string>> }
+
+// Running a file only builds its objects, so a method body can be wrong and still run: these call the solution the
+// way its circuit does. TypeScript's private constructor is only a type check, so Singleton has no TS driver.
+const SOLVED_DRIVERS: SolvedDriver[] = [
+  {
+    level: 'singleton',
+    key: 'singleton',
+    expected: 'one counter',
+    driver: {
+      rb: `
+second = begin
+  TicketCounter.new
+rescue NoMethodError
+  TicketCounter.instance
+end
+puts second.equal?(TicketCounter.instance) ? "one counter" : "two counters"`,
+      py: `
+print("one counter" if TicketCounter() is TicketCounter.instance() else "two counters")`,
+    },
+  },
+  {
+    level: 'combos-with-extras',
+    key: 'base+combo_composite+extras_decorator',
+    expected: 'latte: oat shot',
+    driver: {
+      rb: `
+class Latte < Product
+  def extras = @extras ||= []
+end
+parts = CoffeeMenu.new.drink_for([:oat, :shot]).make
+puts "latte: #{parts.last.extras.join(" ")}"`,
+      ts: `
+class Latte extends Product { extras: string[] = [] }
+const parts = new CoffeeMenu().drinkFor(['oat', 'shot']).make() as Latte[]
+console.log(\`latte: \${parts[parts.length - 1].extras.join(' ')}\`)`,
+      py: `
+class Latte(Product):
+    def __init__(self):
+        self.extras = []
+
+parts = CoffeeMenu().drink_for(["oat", "shot"]).make()
+print("latte: " + " ".join(parts[-1].extras))`,
+    },
+  },
+  {
+    level: 'null-object',
+    key: 'null_object',
+    expected: 'Card: no card\nReady!',
+    driver: {
+      rb: `
+order = Struct.new(:card, :total).new(LoyaltyCards.new.find(Struct.new(:id).new("ana")), 5)
+Loyalty.new.reward(order)
+Discounts.new.apply(order)
+Receipt.new.print(order)
+Counter.new.hand_over(order)`,
+      ts: `
+const order = { card: new LoyaltyCards().find({ id: 'ana' }), total: 5 }
+new Loyalty().reward(order)
+new Discounts().apply(order)
+new Receipt().print(order)
+new Counter().handOver(order)`,
+      py: `
+from types import SimpleNamespace
+
+order = SimpleNamespace(card=LoyaltyCards().find(SimpleNamespace(id="ana")), total=5)
+Loyalty().reward(order)
+Discounts().apply(order)
+Receipt().print(order)
+Counter().hand_over(order)`,
+    },
+  },
+  {
+    level: 'saga',
+    key: 'saga',
+    expected: 'Charged 5\nReady!\nCharged 6\nRefunded 6\nLuis: No supplies left: we refunded your money',
+    driver: {
+      rb: `
+class OutOfStock < StandardError; end
+module Gateway
+  def self.charge(total) = puts("Charged #{total}")
+  def self.refund(total) = puts("Refunded #{total}")
+end
+module Stock
+  def self.available?(items) = !items.include?(:oat)
+  def self.release(items) = nil
+end
+Order = Struct.new(:customer, :total, :items)
+PlaceOrderSaga.new.call(Order.new("Ana", 5, [:espresso]))
+PlaceOrderSaga.new.call(Order.new("Luis", 6, [:oat]))`,
+      ts: `
+class OutOfStock extends Error {}
+const Gateway = { charge: (total: number) => console.log(\`Charged \${total}\`), refund: (total: number) => console.log(\`Refunded \${total}\`) }
+const Stock = { isAvailable: (items: string[]) => !items.includes('oat'), release: (_items: string[]) => {} }
+new PlaceOrderSaga().call({ customer: 'Ana', total: 5, items: ['espresso'] })
+new PlaceOrderSaga().call({ customer: 'Luis', total: 6, items: ['oat'] })`,
+      py: `
+from types import SimpleNamespace
+
+class OutOfStock(Exception):
+    pass
+
+class Gateway:
+    @staticmethod
+    def charge(total):
+        print(f"Charged {total}")
+
+    @staticmethod
+    def refund(total):
+        print(f"Refunded {total}")
+
+class Stock:
+    @staticmethod
+    def is_available(items):
+        return "oat" not in items
+
+    @staticmethod
+    def release(items):
+        pass
+
+PlaceOrderSaga().call(SimpleNamespace(customer="Ana", total=5, items=["espresso"]))
+PlaceOrderSaga().call(SimpleNamespace(customer="Luis", total=6, items=["oat"]))`,
+    },
+  },
+]
+
 describe('toolchain', () => {
   it.skipIf(!process.env.CI)('CI has Ruby, in the version the hub runs (3.0)', () => {
     expect(hasRuby).toBe(true)
@@ -135,6 +261,18 @@ describe.skipIf(!hasRuby || !hasPython)('the code players can see runs', () => {
     expect(runRuby(`${shown('rb')}\n${BUILDER_DRIVER.rb}`)).toEqual(expected)
     expect(runTypeScript(`${shown('ts')}\n${BUILDER_DRIVER.ts}`)).toEqual(expected)
     expect(runPython(`${shown('py')}\n${BUILDER_DRIVER.py}`)).toEqual(expected)
+  })
+
+  it.each(SOLVED_DRIVERS)('$level/$key does what its circuit shows', ({ level, key, expected, driver }) => {
+    const snippet = (lang: CodeLang) => displayedCode(LEVELS.find((l) => l.id === level)!, lang).find((s) => s.key === key)!.text
+    const run = { rb: runRuby, ts: runTypeScript, py: runPython }
+    const wrong = CODE_LANGS.flatMap((lang) => {
+      const code = driver[lang]
+      if (!code) return []
+      const result = run[lang](`${snippet(lang)}\n${code}`)
+      return result.ok && result.stdout === expected ? [] : [`${lang}: ${JSON.stringify(result)}`]
+    })
+    expect(wrong).toEqual([])
   })
 
   it('every level shows code in every language', () => {

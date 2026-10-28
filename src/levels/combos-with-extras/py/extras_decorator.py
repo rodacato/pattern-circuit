@@ -9,9 +9,9 @@ class WithOatMilk(Product):
         self.inner = inner
 
     def make(self):
-        drink = self.inner.make()
-        drink.extras.append("oat")
-        return drink
+        parts = self.inner.make()
+        parts[-1].extras.append("oat")
+        return parts
 # endregion
 
 
@@ -21,9 +21,9 @@ class WithShot(Product):
         self.inner = inner
 
     def make(self):
-        drink = self.inner.make()
-        drink.extras.append("shot")
-        return drink
+        parts = self.inner.make()
+        parts[-1].extras.append("shot")
+        return parts
 # endregion
 
 

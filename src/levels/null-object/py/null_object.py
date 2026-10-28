@@ -1,4 +1,7 @@
 class LoyaltyCards:
+    def __init__(self):
+        self.cards = {}
+
     # region: LoyaltyCards#find
     def find(self, customer):
         return self.cards.get(customer.id) or NullCard()

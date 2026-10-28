@@ -1,4 +1,6 @@
 class LoyaltyCards
+  def initialize = @cards = {}
+
   # region: LoyaltyCards#find
   def find(customer) = @cards.fetch(customer.id) { NullCard.new }
   # endregion
