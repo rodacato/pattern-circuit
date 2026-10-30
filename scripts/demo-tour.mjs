@@ -2,7 +2,10 @@
 export const launchOptions = {};
 
 export async function prepare(page) {
-  await page.addInitScript(() => localStorage.setItem('pattern-circuit:locale', 'en'));
+  await page.addInitScript(() => {
+    localStorage.setItem('pattern-circuit:locale', 'en');
+    localStorage.setItem('pattern-circuit:walkthrough', 'seen');
+  });
 }
 
 export default async function tour(page) {
