@@ -1,6 +1,6 @@
 # Pattern Circuit: design
 
-An educational game for understanding design patterns by seeing them, not reading them. A simulated cafeteria is a circuit of nodes; a pulse (the data) travels through it; at the sockets the player plugs in a pattern and the pulse reacts.
+An educational game for understanding design patterns by seeing them, not reading them. A simulated coffee shop is a circuit of nodes; a pulse (the data) travels through it; at the sockets the player plugs in a pattern and the pulse reacts.
 
 ## Decisions taken
 
@@ -10,7 +10,7 @@ An educational game for understanding design patterns by seeing them, not readin
 | Language | UI in Spanish and English; identifiers, comments and documentation in English |
 | Platform | Desktop and tablet |
 | Stack | React + TypeScript + Vite, **PixiJS** (game-like render), zod to validate levels, vitest |
-| Progression | By chapters of the cafeteria's growth (see below) |
+| Progression | By chapters of the coffee shop's growth (see below) |
 | Visual theme | **Neon circuit** (chosen after comparing neon vs pixel art prototypes): dark background, glowing nodes, animated light wires, pulses with trails and particles |
 
 ## Visual language
@@ -74,7 +74,7 @@ The complete schema is in [`src/engine/schema.ts`](../src/engine/schema.ts).
 
 ## Progression
 
-| # | Chapter | Pattern | Context in the cafeteria |
+| # | Chapter | Pattern | Context in the coffee shop |
 |---|---|---|---|
 | 0 | Opening | — | The linear circuit (tutorial) |
 | 1 | The counter | Strategy | Payment methods |
@@ -102,7 +102,7 @@ The complete schema is in [`src/engine/schema.ts`](../src/engine/schema.ts).
 | 23 | | Saga | Charged and out of oat milk |
 | 24 | Judgment: when not to | Keep it simple (vs Strategy, Factory Method) | A single payment method, no other in sight |
 | 25 | | Keep it simple (vs Event Bus, Command) | A single party interested in knowing about a charge |
-| 26 | The whole cafeteria | — | The final run with everything working together |
+| 26 | The whole coffee shop | — | The final run with everything working together |
 
 Level ids are the folder names under `src/levels/` (for example `strategy`, `branches-and-payments`, `full-cafe`); they carry no number and the position comes from `order`.
 
@@ -153,7 +153,7 @@ The content of each level was verified against these sources and against the aut
 
 ### Level design example: 0–3
 
-- **0 · Open the cafeteria**: `Customer → Take → Charge → Prepare → Hand over`, the wire to Hand over is missing. Teaches the controls, click on a node → code, wire = dependency.
+- **0 · Open the coffee shop**: `Customer → Take → Charge → Prepare → Hand over`, the wire to Hand over is missing. Teaches the controls, click on a node → code, wire = dependency.
 - **1 · Cash or card?** (Strategy): `Charge` is an if tree; the voucher gets lost. The "pay by app" ticket opens `Charge`. Strategy: cartridges, ticket with 0 nodes touched. Observer charges 3 times; Decorator wraps but the voucher is lost all the same.
 - **2 · Two branches, two menus** (Factory Method): the shared flow decides with `if` which drink to create and Mountain receives lattes. Factory Method: one subclass (mold) per branch; opening Harbor touches nothing existing. Singleton and Builder do not fit.
 - **3 · A made-to-measure order** (Builder): a 9-argument constructor, crossed order, an impossible combination that blows up in the kitchen after being charged. Builder: named stations + a `build()` that rejects before charging. Factory Method loses the orders without a mold; Decorator = partial.
