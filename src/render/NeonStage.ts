@@ -5,7 +5,7 @@ import { msg, N, type Translate } from '../i18n'
 import { dashed, drawBranchGlyph, fitWidth, label } from './draw'
 import { Effects } from './fx'
 import { coarsePointer, DoubleTap, Pinch } from './gestures'
-import { CELL, circuitBounds, nearestPulse, NODE_H, NODE_W, nodeAt, nodeCenter, outPort, toPx, worldTransform, zoomAt, type View } from './layout'
+import { CELL, levelBounds, nearestPulse, NODE_H, NODE_W, nodeAt, nodeCenter, outPort, toPx, worldTransform, zoomAt, type View } from './layout'
 import { NodeAnimations, prefersReducedMotion } from './motion'
 import { PulseLayer } from './PulseLayer'
 import { createSkins, stateColor, type DrawContext, type Skin } from './skins'
@@ -16,7 +16,7 @@ const PORT_R = 6
 const TOUCH = coarsePointer() // with a finger, touch targets are larger
 const PORT_HIT = PORT_R + (TOUCH ? 16 : 6)
 const PULSE_HIT = TOUCH ? 30 : 18
-const INVENTORY_INSET = 150 // while the inventory is open, the circuit is framed above it
+const INVENTORY_INSET = 150 // a level with a socket frames its circuit above the inventory, from the first stage
 
 type Drag = { from: string; to: Point }
 
@@ -39,6 +39,7 @@ export class NeonStage {
   private readonly sockets: SocketLayer
   private builtVersion = -1
   private bounds = { w: 0, h: 0 }
+  private framedLevel?: string
   private views = new Map<string, Container>()
   private stateLabels = new Map<string, Text>()
   private hovered?: string
@@ -120,7 +121,7 @@ export class NeonStage {
   }
 
   private inset() {
-    return this.session.inventoryOpen ? INVENTORY_INSET : 0
+    return this.session.level.sockets.length ? INVENTORY_INSET : 0
   }
 
   private build() {
@@ -129,7 +130,10 @@ export class NeonStage {
     this.pulses.clear()
     const nodes = [...s.playback.circuit.nodes.values()]
     const before = new Set(this.views.keys())
-    this.bounds = circuitBounds([...nodes, ...s.level.circuit.nodes])
+    if (this.framedLevel !== s.level.id) {
+      this.bounds = levelBounds(s.level)
+      this.framedLevel = s.level.id
+    }
 
     const g = this.base.clear()
     for (let x = -4; x <= this.bounds.w / CELL + 4; x++) {
