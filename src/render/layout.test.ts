@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { Circuit, compile, type Pulse } from '../engine'
-import { CELL, circuitBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition, socketCenter, withinSocket, worldTransform, zoomAt, ZOOM_LIMITS } from './layout'
+import { buildCircuit, Circuit, compile, reachableVariants, type Pulse } from '../engine'
+import { LEVELS } from '../levels'
+import { CELL, circuitBounds, levelBounds, fitWorld, nearestPulse, NODE_W, nodeAt, pulsePosition, socketCenter, withinSocket, worldTransform, zoomAt, ZOOM_LIMITS } from './layout'
 
 const circuit = compile(
   Circuit.parse({
@@ -78,5 +79,17 @@ describe('layout', () => {
     expect(world.x * t1.scale + t1.x).toBeCloseTo(pointer.x, 0)
     expect(world.y * t1.scale + t1.y).toBeCloseTo(pointer.y, 0)
     expect(zoomAt(screen, bounds, view, pointer, 100).zoom).toBe(ZOOM_LIMITS[1])
+  })
+
+  it('frames a level for every circuit it can reach, so plugging a pattern or a ticket does not move it', () => {
+    const level = LEVELS.find((l) => l.id === 'strategy')!
+    const solved = buildCircuit(level, { sockets: [{ id: level.sockets[0].id, pattern: 'strategy' }] }).circuit
+    expect(circuitBounds(solved.nodes).h).toBeGreaterThan(circuitBounds(level.circuit.nodes).h)
+    const frame = levelBounds(level)
+    for (const v of reachableVariants(level)) {
+      const reached = circuitBounds(buildCircuit(level, v).circuit.nodes)
+      expect(reached.w).toBeLessThanOrEqual(frame.w)
+      expect(reached.h).toBeLessThanOrEqual(frame.h)
+    }
   })
 })
