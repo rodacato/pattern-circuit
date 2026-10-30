@@ -1029,9 +1029,19 @@
 .line {
   display: flex;
   padding: 0 18px 0 0;
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   border-left: 3px solid transparent;
   transition: background 0.25s, opacity 0.25s, border-color 0.25s;
+}
+
+/* A wrapped line continues deeper than its own indent, so it never reads as the next line. */
+.line > :last-child {
+  --hang: calc(var(--indent, 0) * 1ch + 4ch);
+  flex: 1;
+  min-width: 0;
+  padding-left: var(--hang);
+  text-indent: calc(-1 * var(--hang));
 }
 
 .line .ln {

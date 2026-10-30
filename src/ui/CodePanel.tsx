@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { collapse, regionLabel, resolveRegion, type CodeLang } from '../engine'
 import { highlight, plainTokens, type Mode, type Token } from './code/highlight'
 import { useMode } from './themeContext'
@@ -54,7 +54,7 @@ function CodeDiff({ session }: { session: GameSession }) {
           ) : (
             <div key={i} className={`line ${c.kind}`}>
               <span className="ln">{c.kind === 'add' ? '+' : c.kind === 'del' ? '−' : ' '}</span>
-              <span>{c.text || ' '}</span>
+              <span style={hang(c.text)}>{c.text || ' '}</span>
             </div>
           ),
         )}
@@ -112,7 +112,7 @@ function CodeView({ session }: { session: GameSession }) {
           return (
             <div key={i} className={`line${on ? ' on' : ''}${region && !on ? ' dim' : ''}`}>
               <span className="ln">{i + 1}</span>
-              <span>
+              <span style={hang(line.map((t) => t.content).join(''))}>
                 {line.length === 0 || (line.length === 1 && line[0].content === '')
                   ? ' '
                   : line.map((t, j) => (
@@ -129,6 +129,8 @@ function CodeView({ session }: { session: GameSession }) {
     </>
   )
 }
+
+const hang = (text: string) => ({ '--indent': text.length - text.trimStart().length }) as CSSProperties
 
 const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript', py: 'Python' }
 const CODE_LABEL = { rb: 'ui.code.labelRuby', ts: 'ui.code.labelTypeScript', py: 'ui.code.labelPython' } as const
