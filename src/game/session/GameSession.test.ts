@@ -172,13 +172,28 @@ describe('GameSession · predictions', () => {
     expect(store.load().predictions).toEqual({ right: 0, total: 1 })
   })
 
-  it('pressing play without answering skips the question and does not count', () => {
+  it('the circuit and the code keep their old shape until the question is answered, so they do not give it away', () => {
+    const s = inChoose('strategy')
+    const nodes = s.playback.circuit.nodes.size
+    const code = s.codeFile.text
+    s.plug('strategy')
+    expect(s.playback.circuit.nodes.size).toBe(nodes)
+    expect(s.codeFile.text).toBe(code)
+    s.predict('solves')
+    expect(s.playback.circuit.nodes.size).toBeGreaterThan(nodes)
+    expect(s.codeFile.text).not.toBe(code)
+  })
+
+  it('pressing play without answering skips the question, does not count, and runs the plugged circuit', () => {
     const store = new MemoryProgressStore()
     const s = inChoose('strategy', store)
+    const nodes = s.playback.circuit.nodes.size
     s.plug('strategy')
     s.play()
     expect(s.prediction).toBeUndefined()
     expect(store.load().predictions.total).toBe(0)
+    expect(s.playback.playing).toBe(true)
+    expect(s.playback.circuit.nodes.size).toBeGreaterThan(nodes)
   })
 
   it('the ticket asks how many pieces will be touched and answering applies it', () => {
