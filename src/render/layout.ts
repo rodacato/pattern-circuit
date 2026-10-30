@@ -1,5 +1,5 @@
 // Screen geometry without Pixi: everything the render computes that can be tested in isolation.
-import { pointAt, type CompiledCircuit, type NodeDef, type Point, type Pulse } from '../engine'
+import { buildCircuit, pointAt, reachableVariants, type CompiledCircuit, type LevelDef, type NodeDef, type Point, type Pulse } from '../engine'
 
 export const CELL = 62
 export const NODE_W = 112
@@ -16,6 +16,9 @@ export function circuitBounds(nodes: Iterable<NodeDef>): { w: number; h: number 
     h: Math.max(0, ...list.map((n) => n.at[1])) * CELL,
   }
 }
+
+// Every circuit the player can reach in the level, so the framing does not move between stages.
+export const levelBounds = (level: LevelDef) => circuitBounds(reachableVariants(level).flatMap((v) => buildCircuit(level, v).circuit.nodes))
 
 export type Insets = { top: number; bottom: number }
 
