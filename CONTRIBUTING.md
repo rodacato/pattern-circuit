@@ -68,7 +68,7 @@ Pattern Circuit teaches, so the content has to be correct:
 
 - Every idea, field note and verdict (`solves`, `partial`, `misfit`) must be backed by a verifiable source: a book, a paper or an article by the pattern's author. Cite the source in the PR.
 - If the game simplifies, the simplification must not contradict the source. If it teaches a variant (for example Bloch's Builder), it is named in the documentation.
-- Simple, short, concrete texts, in the cafeteria's world.
+- Simple, short, concrete texts, in the coffee shop's world.
 
 ## Publishing a release
 

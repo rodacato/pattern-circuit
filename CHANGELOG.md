@@ -13,7 +13,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **Texts are identified by keys and live in catalogs**: components, render, game and level data contain no prose. A new language is a folder of catalog files (`npm run i18n:scaffold`), with parity tests for every locale. English is the source of the typed keys. The Spanish locale is now `es-MX` (a saved `es` is recognized), and the language button cycles through the registered languages.
 - "Erase progress" asks for confirmation inside the notebook instead of a native `confirm()` (which an embedding page can block). The flow's change ticket is one state (`open`, `applied`, `met`) instead of two booleans, and the engine's error messages are English.
 - The English label of the language button is now "Change language" (it read "Cambiar idioma (switch to Spanish)").
-- The game's page (`index.html`) is described in English and says 27 levels, Ruby and TypeScript.
+- The game's page (`index.html`) is described in English and says 27 levels, Ruby, TypeScript and Python; a shared link carries its type and canonical URL.
+- The scene is a coffee shop everywhere in English (it was a "cafeteria" in the README, the page description and the course manifest).
+- The README says up front what a level asks of you (predict, plug, compare) and that the game needs no install or account, and no longer implies every snippet is called in CI: most only build their objects.
 - Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).
 - Wires are legible at rest: the concrete wire color and the alpha of interface wires reach 3:1 against the stage, and code line numbers use the muted text color instead of the faint one.
 - The README says who the course is for and how each canvas action is done by keyboard.

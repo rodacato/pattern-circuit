@@ -6,7 +6,7 @@
 
 **Play it in your browser: [rodacato.github.io/pattern-circuit](https://rodacato.github.io/pattern-circuit/)**
 
-An educational game for understanding **design patterns by watching what they change, next to the code that does it**. A cafeteria is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, double charges, code that has to be opened for every change), you plug a pattern into the socket and watch the route change, next to the code that implements it, in **Ruby, TypeScript or Python**.
+An educational game for understanding **design patterns by watching what they change, next to the code that does it**. A coffee shop is a circuit of nodes; every order is a pulse of light that travels through it. When something goes wrong (lost orders, repeated orders, code that has to be opened for every change), you predict what a pattern will do, plug it into the socket and compare the run without and with it, next to the code that implements it in **Ruby, TypeScript or Python**. 27 levels, 20 patterns, and a chapter on when **not** to use one. It runs in the browser with no install and no account; progress stays on your device.
 
 It is for developers who already read classes, methods and objects in one of those three languages; it does not teach the language itself.
 
@@ -16,11 +16,11 @@ It is for developers who already read classes, methods and objects in one of tho
 
 ## What you learn
 
-- **27 levels** in 9 chapters, from the tutorial to "the whole cafeteria".
+- **27 levels** in 9 chapters, from the tutorial to "the whole coffee shop".
 - **20 patterns**: 14 from the GoF catalog, Ports & Adapters, Event Bus, CQRS, Null Object, Circuit Breaker and Saga. Plus a chapter about the opposite: when **not** to apply one.
 - A level runs **observe the problem → pick a pattern → compare without/with**. In eight levels a **change ticket** arrives in between, and the game counts how many existing nodes had to be opened. The tutorial and the final level have no socket.
 - Before a run you predict what the pattern will do, and trying the wrong pattern teaches too: every attempt leaves a note in the **pattern notebook**.
-- The content is checked against the original sources (GoF, Fowler, Cockburn, Nygard…; bibliography in [docs/DESIGN.md](docs/DESIGN.md#sources)), and every snippet the player sees runs in CI on Ruby 3.0.1, Python 3.10 and TypeScript.
+- The content is checked against the original sources (GoF, Fowler, Cockburn, Nygard…; bibliography in [docs/DESIGN.md](docs/DESIGN.md#sources)), and every snippet the player sees is executed in CI on Ruby 3.0.1, Python 3.10 and TypeScript. Most only build their objects; some levels also run their solution end to end.
 
 ## How to play
 
@@ -47,7 +47,7 @@ The game is available in **Spanish and English** (ES/EN button at the top); addi
 | Architecture | 18–20 | Ports & Adapters, Event Bus, CQRS |
 | Resilience | 21–23 | Null Object, Circuit Breaker, Saga |
 | Judgment: when not to | 24–25 | keeping it simple against patterns that are not needed |
-| The whole cafeteria | 26 | everything working together |
+| The whole coffee shop | 26 | everything working together |
 
 ## Run it
 
