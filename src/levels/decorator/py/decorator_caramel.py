@@ -52,7 +52,7 @@ class WithCinnamon:
 
 
 # region: WithCaramel
-class WithCaramel:  # ← a new extra: one class and its entry in EXTRAS; no existing class changes
+class WithCaramel:  # ← a new extra: one class plus its entry in EXTRAS
     def __init__(self, drink):
         self.drink = drink
 

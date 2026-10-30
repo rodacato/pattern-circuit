@@ -41,7 +41,7 @@ class VoucherPayment(PaymentMethod):
 
 
 # region: AppPayment#charge
-class AppPayment(PaymentMethod):  # ← new cartridge, nothing else
+class AppPayment(PaymentMethod):  # ← new cartridge: one class plus its entry in the wiring
     def charge(self, order):
         AppWallet.charge(order.total)
 # endregion

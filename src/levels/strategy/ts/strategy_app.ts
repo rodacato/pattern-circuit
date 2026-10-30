@@ -36,7 +36,7 @@ class VoucherPayment implements PaymentMethod {
 }
 
 // region: AppPayment#charge
-class AppPayment implements PaymentMethod { // ← new cartridge, nothing else
+class AppPayment implements PaymentMethod { // ← new cartridge: one class plus its entry in the wiring
   charge(order: Order) { AppWallet.charge(order.total) }
 }
 // endregion
