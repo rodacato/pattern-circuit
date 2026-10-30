@@ -1,7 +1,7 @@
 // Level decorator: English texts, by key (the source of the typed keys).
 export default {
   title: 'Endless extras',
-  'brief.problem': 'Every combination of extras is a subclass: LatteConAvena, LatteConShot, LatteConAvenaYShot… Someone ordered oat milk, an extra shot and cinnamon, and that class doesn\'t exist.',
+  'brief.problem': 'Every combination of extras is a subclass: OatMilkLatte, ShotLatte, OatShotLatte… Someone ordered oat milk, an extra shot and cinnamon, and that class doesn\'t exist.',
   'brief.goal': 'Make any combination of extras work, and make a new extra not require touching the menu.',
   'node.menu': 'Menu',
   'node.withOat': 'With oat milk',
