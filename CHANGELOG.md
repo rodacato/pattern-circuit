@@ -17,6 +17,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - The scene is a coffee shop everywhere in English (it was a "cafeteria" in the README, the page description, the course manifest and the code panel's file name, now `coffee_shop.rb`, `coffeeShop.ts` or `coffee_shop.py`).
 - Long code lines wrap instead of scrolling sideways, and continue deeper than their own indent so they never read as the next line.
 - The "how to play" guide lights the region each step talks about (the circuit, the playback bar, the code panel, the inventory) and sits beside it, instead of blurring the whole game behind a centered card.
+- The circuit no longer moves between stages: a level is framed once for every circuit it can reach, with room for the inventory from the first stage.
+- Predicting what a pattern will do is a real question: the circuit and the code keep their old shape until it is answered or skipped, instead of already showing the plugged pattern's nodes.
 - The README demo is recorded again with the current game, and a shared link shows a preview image.
 - The README says up front what a level asks of you (predict, plug, compare) and that the game needs no install or account, and no longer implies every snippet is called in CI: most only build their objects.
 - Saved progress from 1.0 and 1.1 keeps working: level ids and review-card socket ids are translated on load (`LEGACY_LEVEL_IDS`, `LEGACY_SOCKET_IDS`).

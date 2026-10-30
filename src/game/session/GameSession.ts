@@ -57,6 +57,7 @@ export class GameSession {
   flow: FlowState = initialFlow()
   repairs: string[] = []
   playback!: Playback
+  private built: Variant = {} // what the circuit and the code show: a plug waits for its prediction
   circuitVersion = 0
   touched: string[] = []
   result?: Evaluation
@@ -107,7 +108,7 @@ export class GameSession {
   }
 
   get codeFile() {
-    return this.files[codeKey(this.level, this.variant)]
+    return this.files[codeKey(this.level, this.built)]
   }
 
   get sockets(): SocketDef[] {
@@ -203,7 +204,10 @@ export class GameSession {
   }
 
   play() {
-    if (this.awaitingPrediction && this.prediction?.kind === 'outcome') this.prediction = undefined // running without answering = skipping
+    if (this.awaitingPrediction && this.prediction?.kind === 'outcome') {
+      this.prediction = undefined // running without answering = skipping
+      this.rebuild()
+    }
     if (this.playback.done) this.result = undefined
     this.playback.play()
     this.did('play')
@@ -270,7 +274,7 @@ export class GameSession {
     if (!socket || !option || !this.inventoryOpen) return undefined
     this.dispatch({ type: 'plug', socketId: socket.id, pattern, outcome: option.outcome })
     this.prediction = outcomePrediction(PATTERNS[pattern].name, option.outcome)
-    this.rerun(false)
+    this.emitter.emit()
     return option
   }
 
@@ -286,14 +290,14 @@ export class GameSession {
     this.prediction = guessed(this.prediction, guess)
     this.saveProgress(withPrediction(this.progress, isRight(this.prediction)))
     if (this.prediction.kind === 'touched') this.applyTicket()
-    else this.play()
+    else this.rerun()
   }
 
   skipPrediction() {
     const kind = this.prediction?.kind
     this.prediction = undefined
     if (kind === 'touched') this.applyTicket()
-    else this.play()
+    else this.rerun()
   }
 
   continue() {
@@ -378,6 +382,7 @@ export class GameSession {
   private rebuild() {
     const variant = this.variant
     const built = buildCircuit(this.level, variant)
+    this.built = variant
     const previous = this.playback
     this.playback = new Playback(built.circuit, scenarioFor(this.level, variant), previous?.speed)
     if (previous?.inspected) this.playback.inspect(previous.inspected)
