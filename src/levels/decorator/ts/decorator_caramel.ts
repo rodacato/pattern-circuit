@@ -31,7 +31,7 @@ class WithCinnamon implements Drink {
 // endregion
 
 // region: WithCaramel
-class WithCaramel implements Drink { // ← a new extra: one class and its entry in EXTRAS; no existing class changes
+class WithCaramel implements Drink { // ← a new extra: one class plus its entry in EXTRAS
   constructor(private drink: Drink) {}
   cost() { return this.drink.cost() + 7 }
   description() { return `${this.drink.description()} with caramel` }

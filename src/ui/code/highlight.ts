@@ -27,10 +27,13 @@ function load() {
 export type Mode = 'light' | 'dark'
 const THEME: Record<Mode, string> = { dark: 'tokyo-night', light: 'github-light' }
 
+// Comments carry part of each lesson; Tokyo Night's #51597d reads at 2.7:1 on the panel, this one at 5:1.
+const COMMENT_COLORS: Record<Mode, Record<string, string>> = { dark: { '#51597d': '#7a83ad' }, light: {} }
+
 export async function highlight(code: string, lang: CodeLang, mode: Mode = 'dark'): Promise<Token[][]> {
   const hl = await load()
   return hl
-    .codeToTokensBase(code, { lang: SHIKI_LANG[lang], theme: THEME[mode] })
+    .codeToTokensBase(code, { lang: SHIKI_LANG[lang], theme: THEME[mode], colorReplacements: COMMENT_COLORS[mode] })
     .map((line: ThemedToken[]) => line.map((t) => ({ content: t.content, color: t.color })))
 }
 
