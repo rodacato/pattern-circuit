@@ -67,7 +67,7 @@ function CodeDiff({ session }: { session: GameSession }) {
 function CodeView({ session }: { session: GameSession }) {
   const t = useT()
   const lang = useSession(session, (s) => s.shownCodeLang)
-  const fileName = `cafeteria.${lang}`
+  const fileName = FILE_NAME[lang]
   const file = useSession(session, (s) => s.codeFile)
   const activeRef = useSession(session, (s) => s.playback.activeRef)
   const followed = useSession(session, (s) => s.playback.followed)
@@ -132,6 +132,7 @@ function CodeView({ session }: { session: GameSession }) {
 
 const hang = (text: string) => ({ '--indent': text.length - text.trimStart().length }) as CSSProperties
 
+const FILE_NAME: Record<CodeLang, string> = { rb: 'coffee_shop.rb', ts: 'coffeeShop.ts', py: 'coffee_shop.py' }
 const LANG_NAME: Record<CodeLang, string> = { rb: 'Ruby', ts: 'TypeScript', py: 'Python' }
 const CODE_LABEL = { rb: 'ui.code.labelRuby', ts: 'ui.code.labelTypeScript', py: 'ui.code.labelPython' } as const
 
