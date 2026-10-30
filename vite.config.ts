@@ -2,6 +2,7 @@
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
+import { configDefaults } from 'vitest/config'
 
 const { version } = JSON.parse(readFileSync('./package.json', 'utf8')) as { version: string }
 
@@ -19,6 +20,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
   },
   test: {
+    // Agent worktrees live inside the checkout and carry their own copy of the suite.
+    exclude: [...configDefaults.exclude, '.claude/**'],
     coverage: {
       include: ['src/**/*.{ts,tsx}'],
       // Excluded: level content (covered by its own tests), the Pixi drawing (humble object: what
