@@ -2,7 +2,7 @@ import type en from './en'
 
 const texts: Record<keyof typeof en, string> = {
   title: 'Extras sin fin',
-  'brief.problem': 'Cada combinación de extras es una subclase: LatteConAvena, LatteConShot, LatteConAvenaYShot… Alguien pidió avena, shot y canela y esa clase no existe.',
+  'brief.problem': 'Cada combinación de extras es una subclase: OatMilkLatte, ShotLatte, OatShotLatte… Alguien pidió avena, shot y canela y esa clase no existe.',
   'brief.goal': 'Que cualquier combinación de extras funcione y que un extra nuevo no obligue a tocar el menú.',
   'node.menu': 'Menú',
   'node.withOat': 'Con avena',
